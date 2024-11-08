@@ -4,7 +4,7 @@ CXXFLAGS=-Wall -Wextra -Werror
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
-exec: Carte.o Jeu.o PLateau.o
+exec: Carte.o Jeu.o Plateau.o
 	$(CXX) $^ -o $@
 
 .PHONY: run clean

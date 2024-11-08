@@ -1,14 +1,21 @@
 #ifndef __CarteAction_H__
 #define __CarteAction_H__
 
-class CarteAction{
+class CarteAction : public Carte{
   private :
-    std::string m_name, m_description;
-    int m_cost, m_draws, m_buys, m_actions, m_coins;
+    int m_draws, m_buys, m_actions, m_coins;
+    bool m_isAttack, m_isReaction;
   public :
-    CarteAction(std::string name, std::string description, int cost, int actions, int buys, int draws, int coins);
+    CarteAction(std::string name, std::string description, int cost, int actions, int buys, int draws, int coins, bool isAttack, bool isReaction);
+    CarteAction(Carte c, int actions, int buys, int draws, int coins, bool isAttack, bool isReaction);
     ~CarteAction();
     void play(Joueur &p, Jeu &j);
+    int getDraws();
+    int getBuys();
+    int getActions();
+    int getCoins();
+    bool getIsAttack();
+    bool getIsReaction();
 };
 
 #endif
