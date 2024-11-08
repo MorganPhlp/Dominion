@@ -1,12 +1,15 @@
 #ifndef __CarteTresor_H__
 #define __CarteTresor_H__
 
-class CarteTresor{
+class CarteTresor : public Carte{
   private :
-    
+  	int m_coins;
   public :
-	
-
+	CarteTresor(std::string name, std::string description, int cost, int coins);
+	CarteTresor(Carte c, int coins);
+	~CarteTresor();
+	void play(Joueur &p, Jeu &j);
+	int getCoins();
 };
 
 #endif
