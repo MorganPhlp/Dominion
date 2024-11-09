@@ -1,5 +1,6 @@
 #ifndef __CarteTresor_H__
 #define __CarteTresor_H__
+#include "Carte.h"
 
 class CarteTresor : public Carte{
   private :
@@ -8,8 +9,9 @@ class CarteTresor : public Carte{
 	CarteTresor(std::string name, std::string description, int cost, int coins);
 	CarteTresor(Carte c, int coins);
 	~CarteTresor();
-	void play(Joueur &p, Jeu &j);
-	int getCoins();
+	//void play(Joueur &p, Jeu &j);
+	int getCoins() const;
+	void printCard() const;
 };
 
 #endif

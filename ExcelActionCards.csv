@@ -1,0 +1,40 @@
+Card Type,Name,Cost,Description,Win_Points,Coins,Draws,Actions,Buys,Attack,Reaction
+Trésor,Cuivre,0,,,1,,,,FALSE,FALSE
+Trésor,Argent,3,,,2,,,,FALSE,FALSE
+Trésor,Or,6,,,3,,,,FALSE,FALSE
+Victoire,Malédiction,0,,-1,,,,,FALSE,FALSE
+Victoire,Province,2,,6,,,,,FALSE,FALSE
+Victoire,Duche,5,,3,,,,,FALSE,FALSE
+Victoire,Domaine,8,,1,,,,,FALSE,FALSE
+Action,Atelier,3,Recevez une carte coutant jusqu’à 4 pièces,,,,,,FALSE,FALSE
+Action,Bucheron,3,,,2,,,1,FALSE,FALSE
+Action,Chapelle,2,Jetez jusqu’à 4 cartes de votre main,,,,,,FALSE,FALSE
+Action,Douve,2,"“Lorsqu’un adversaire joue une carte Attaque, vous pouvez dévoiler cette carte de votre main. Dans ce cas, l’Attaque n’a pas d’effet sur vous”",,,2,,,FALSE,TRUE
+Action,Festin,4,Jetez cette carte. Recevez une carte coutant jusqu’à 5 pièces,,,,,,FALSE,FALSE
+Action,Jardins,4,Vaut 1 point de victoire pour chaque 10 cartes dans votre deck (arrondi à l’unité inférieure),,,,,,,
+Action,Laboratoire,5,,,,2,1,,FALSE,FALSE
+Action,Sorcière,5,Chacun des autres joueurs reçoivent une Malédiction,,,2,,,TRUE,FALSE
+Action,Village,3,,,,1,2,,FALSE,FALSE
+Action,Voleur,4,"“Chacun des autres joueurs révèlent les deux premières cartes de leur deck. Si elles révèlent une ou plusieurs carte Trésor, ils doivent jeter une de celles que vous choisissez. Vous pouvez recevoir celles que vous voulez parmi celles jetées. Ils défaussent les autres cartes révelées”",,,,,,TRUE,FALSE
+Action,Artisan,6,Recevez une carte coutant jusqu’à 5 pièces. Mettez une carte de votre main sur votre deck,,,,,,FALSE,FALSE
+Action,Bandit,5,"“Recevez une carte Or. Chacun des autres joueurs révèlent les 2 premières cartes de leur deck, jettent une carte Trésor révélée autre que le Cuivre et défaussent le reste”",,,,,,TRUE,FALSE
+Action,Bureaucrate,4,Recevez un Argent dans votre deck. Chaque autre joueur révèle une carte Victoire de sa main et la mettent sur leur deck (ou révèle une main sans cartes Victoire),,,,,,TRUE,FALSE
+Action,Cave,2,"“Défaussez autant de cartes que vous voulez, ensuite piochez-en le même nombre”",,,,1,,FALSE,FALSE
+Action,Chambre du conseil,5,Chacun des autres joueurs piochent une carte,,,4,,1,FALSE,FALSE
+Action,Festival,5,,,2,,2,1,FALSE,FALSE
+Action,Harbinger,3,Regardez dans votre pile de défausse. Vous pouvez en prendre une carte et la mettre dans votre deck,,,1,1,,FALSE,FALSE
+Action,Bibliothèque,5,Piochez jusqu’à avoir 7 cartes en main. Chaque carte Action piochée peut être mise de côté. Défaussez les cartes mises de côté lorsque vous avez terminé de piocher,,,,,,FALSE,FALSE
+Action,Marché,5,,,1,1,1,1,FALSE,FALSE
+Action,Marchand,3,La première fois que vous jouez un Argent lors de ce tour vous obtenez une pièce en plus,,,1,1,,FALSE,FALSE
+Action,Milice,4,Chacun des autres joueurs défausse jusqu’à n’avoir que 3 cartes en main,,2,,,,TRUE,FALSE
+Action,Mine,5,Vous pouvez jeter un Trésor de votre main. Recevez un Trésor dans votre main coûtant jusqu’à 3 de plus que celui jeté,,,,,,FALSE,FALSE
+Action,Prêteur sur gages,4,Vous pouvez jeter un Cuivre de votre main pour 3 pièces,,,,,,FALSE,FALSE
+Action,Braconnier,4,Défaussez une carte par pile vide ,,1,1,1,,FALSE,FALSE
+Action,Rénovation,4,Jetez une carte de votre main. Recevez une carte coûtant jusqu’à 2 pièces de plus qu’elle,,,,,,FALSE,FALSE
+Action,Sentinelle,5,Regardez les 2 premières cartes de votre deck. Jetez et/ou défaussez autant que vous le voulez. Mettez le reste de retour sur le haut du deck dans l’ordre que vous voulez,,,1,1,,FALSE,FALSE
+Action,Forgeron,4,,,,3,,,FALSE,FALSE
+Action,Salle du Trône,4,Vous pouvez jouer une carte Action de votre main 2 fois,,,,,,FALSE,FALSE
+Action,Vassal,3,"“Défaussez la première carte en haut de votre deck. Si c’est une carte Action, vous pouvez la jouer”",,2,,,,FALSE,FALSE
+Action,Aventurier,3,,,,1,2,,FALSE,FALSE
+Action,Chancelier,3,Vous pouvez immédiatement mettre votre deck dans votre pile de défausse,,2,,,,FALSE,FALSE
+Action,Espion,4,Chaque joueur (vous y compris) révèle la première carte de leur deck et vous choisissez de la défausser ou de la remettre dans le deck du joueur,,,1,1,,TRUE,FALSE

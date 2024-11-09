@@ -1,5 +1,6 @@
 #ifndef __CarteVictoire_H__
 #define __CarteVictoire_H__
+#include "Carte.h"
 
 class CarteVictoire : public Carte{
   private :
@@ -8,8 +9,9 @@ class CarteVictoire : public Carte{
   	CarteVictoire(std::string name, std::string description, int cost, int win_points);
   	CarteVictoire(Carte c, int win_points);
     	~CarteVictoire();
-    	void play(Joueur &p, Jeu &j);
-    	int getWinPoints();
+    	//void play(Joueur &p, Jeu &j);
+    	int getWinPoints() const;
+    	void printCard() const;
 };
 
 #endif
