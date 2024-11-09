@@ -13,6 +13,11 @@ CarteVictoire::CarteVictoire(std::string name, std::string description, int cost
 /*Destructeur*/
 CarteVictoire::~CarteVictoire() {}
 
-void CarteVictoire::play(Joueur &p, Jeu &j){p.addWinPoints(win_points);}
+//void CarteVictoire::play(Joueur &p, Jeu &j){p.addWinPoints(win_points);}
 
-int CarteVictoire::getWinPoints(){return win_points;}
+int CarteVictoire::getWinPoints() const{return m_win_points;}
+
+void CarteVictoire::printCard() const{
+	Carte::printCard();
+	if(m_win_points != 0) std::cout << "+" << m_win_points << " Points Victoires" << std::endl;
+}

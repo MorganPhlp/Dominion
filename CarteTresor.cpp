@@ -13,6 +13,11 @@ CarteTresor::CarteTresor(std::string name, std::string description, int cost, in
 /*Destructeur*/
 CarteTresor::~CarteTresor() {}
 
-void CarteTresor::play(Joueur &p, Jeu &j){p.addCoins(coins);}
+//void CarteTresor::play(Joueur &p, Jeu &j){p.addCoins(coins);}
 
-int CarteTresor::getCoins(){return coins;}
+int CarteTresor::getCoins() const{return m_coins;}
+
+void CarteTresor::printCard() const{
+	Carte::printCard();
+	if(m_coins != 0) std::cout << "+" << m_coins << " Pièces" << std::endl;
+}

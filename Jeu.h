@@ -1,12 +1,27 @@
 #ifndef __Jeu_H__
 #define __Jeu_H__
+#include <vector>
+#include <tuple>
+#include <fstream>
+#include <sstream>
+#include "CarteAction.h"
+#include "CarteVictoire.h"
+#include "CarteTresor.h"
 
 class Jeu{
- private :
- 
- public :
-	
-
+  private :
+    static std::vector< std::tuple< std::string, std::string, int, std::string, int, int, int, int, int, bool, bool>> loadCard();
+    int m_nb_joueurs;
+    static std::vector<CarteAction> listeCarteAction;
+    static std::vector<CarteTresor> listeCarteTresor;
+    static std::vector<CarteVictoire> listeCarteVictoire;
+    
+  public :
+    static void remplirListeCarte();
+    static void printTotalCard();
+    
+    Jeu(int nb_joueurs);
+    ~Jeu();
 };
 
 #endif

@@ -1,5 +1,6 @@
 #ifndef __Carte_H__
 #define __Carte_H__
+#include <iostream>
 
 #include <iostream>
 #include <string>
@@ -10,7 +11,6 @@ enum class TypeCarte {
 	Action,
 	Tresor,
 	Victoire
-
 };
 
 class Carte{
@@ -21,13 +21,13 @@ class Carte{
   public :
   	Carte(std::string name, std::string description, int cost, TypeCarte type);
   	~Carte();
-  	void play(Joueur &p, Jeu &j);
-  	void buy(Joueur &p, Jeu &j);
-  	std::string getName();
-   	std::string getDescription();
-   	int getCost();
-   	TypeCarte getType();
-  	
+  	//void play(Joueur &p, Jeu &j);
+  	//void buy(Joueur &p, Jeu &j);
+  	std::string getName() const;
+   	std::string getDescription() const;
+   	int getCost() const;
+   	void printCard() const;
+   	TypeCarte getType();   	
 };
 
 #endif
