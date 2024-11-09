@@ -18,7 +18,7 @@ std::shared_ptr<Carte> Pile::takeCard(){
 		m_cartes.pop_back();
 		return carte;
 	}
-	return null_ptr;
+	return nullptr;
 }
 
 int Pile::nb_cartesRestantes(){return m_cartes.size();}

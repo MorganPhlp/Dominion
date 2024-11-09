@@ -1,11 +1,8 @@
 #ifndef __CarteTresor_H__
 #define __CarteTresor_H__
-#include "Carte.h"
 
 #include <iostream>
 #include <string>
-#include "Joueur.h"
-#include "Jeu.h"
 #include "Carte.h"
 
 class CarteTresor : public Carte{
@@ -13,7 +10,7 @@ class CarteTresor : public Carte{
   	int m_coins;
   public :
 	CarteTresor(std::string name, std::string description, int cost, int coins);
-	CarteTresor(Carte c, int coins);
+	//CarteTresor(Carte c, int coins);
 	~CarteTresor();
 	//void play(Joueur &p, Jeu &j);
 	int getCoins() const;

@@ -13,12 +13,11 @@ class Pile{
  
 	public :
 		Pile(TypeCarte type);
+		~Pile();
 		void addCard(std::shared_ptr<Carte> c);
-		void takeCard();
+		std::shared_ptr<Carte> takeCard();
 		int nb_cartesRestantes();
 		TypeCarte getType();
-	
-
 };
 
 #endif

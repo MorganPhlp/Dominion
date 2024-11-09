@@ -1,12 +1,9 @@
 #ifndef __CarteAction_H__
 #define __CarteAction_H__
-#include "Carte.h"
 
 #include <iostream>
 #include <string>
 #include "Carte.h"
-#include "Joueur.h"
-#include "Jeu.h"
 
 class CarteAction : public Carte{
   private :
@@ -14,7 +11,7 @@ class CarteAction : public Carte{
     bool m_isAttack, m_isReaction;
   public :
     CarteAction(std::string name, std::string description, int cost, int actions, int buys, int draws, int coins, bool isAttack, bool isReaction);
-    CarteAction(Carte c, int actions, int buys, int draws, int coins, bool isAttack, bool isReaction);
+    //CarteAction(Carte c, int actions, int buys, int draws, int coins, bool isAttack, bool isReaction);
     ~CarteAction();
     //void play(Joueur &p, Jeu &j);
     int getDraws() const;

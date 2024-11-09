@@ -1,14 +1,11 @@
 #include <iostream>
 #include <string>
 #include "CarteVictoire.h"
-#include "Carte.h"
-#include "Joueur.h"
-#include "Jeu.h"
 
 /*Constructeur*/
-CarteVictoire::CarteVictoire(Carte c, int win_points) : Carte(c.getName(), c.getDescription(), c.getCost()), m_win_points(win_points) {}
+//CarteVictoire::CarteVictoire(Carte c, int win_points) : Carte(c.getName(), c.getDescription(), c.getCost()), m_win_points(win_points) {}
 
-CarteVictoire::CarteVictoire(std::string name, std::string description, int cost, int win_points) : Carte(name, description, cost), m_win_points(win_points) {}
+CarteVictoire::CarteVictoire(std::string name, std::string description, int cost, int win_points) : Carte(name, description, cost, TypeCarte::Victoire), m_win_points(win_points) {}
 
 /*Destructeur*/
 CarteVictoire::~CarteVictoire() {}

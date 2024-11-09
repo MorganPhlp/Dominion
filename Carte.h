@@ -1,11 +1,9 @@
 #ifndef __Carte_H__
 #define __Carte_H__
-#include <iostream>
 
 #include <iostream>
 #include <string>
-#include "Joueur.h"
-#include "Jeu.h"
+
 
 enum class TypeCarte {
 	Action,

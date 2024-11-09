@@ -19,15 +19,25 @@ std::string Carte::getName() const{return m_name;}
 
 std::string Carte::getDescription() const{return m_description;}
 
-int Carte::getCost(){return m_cost;}
-
 TypeCarte Carte::getType(){return m_type;}
 
 int Carte::getCost() const{return m_cost;}
 
 void Carte::printCard() const{
 	std::cout<< "Nom : " << m_name << std::endl;
-	std::cout<< "Type : " << m_type << std::endl;
+	std::cout<< "Type : ";
+	switch (m_type) {
+		case TypeCarte::Action:
+			std::cout<< "Action";
+			break;
+		case TypeCarte::Tresor:
+			std::cout<< "Tresor";
+			break;
+		case TypeCarte::Victoire:
+			std::cout<< "Victoire";
+			break;
+	}
+	std::cout<< std::endl;
 	std::cout<< "Coût : " << m_cost << std::endl;
 	std::cout<< "Description : " << m_description << std::endl;
 }
