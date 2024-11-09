@@ -1,6 +1,12 @@
 #ifndef __CarteTresor_H__
 #define __CarteTresor_H__
 
+#include <iostream>
+#include <string>
+#include "Joueur.h"
+#include "Jeu.h"
+#include "Carte.h"
+
 class CarteTresor : public Carte{
   private :
   	int m_coins;

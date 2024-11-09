@@ -1,5 +1,8 @@
 #include <iostream>
+#include <string>
 #include "CarteAction.h"
+#include "Joueur.h"
+#include "Jeu.h"
 
 /*Constructeur*/
 CarteAction::CarteAction(Carte c, int actions, int buys, int draws, int coins, bool isAttack, bool isReaction) : Carte(c.getName(), c.getDescription(), c.getCost()), m_actions(actions), m_buys(buys), m_draws(draws), m_coins(coins), m_isAttack(isAttack), m_isReaction(isReaction) {}

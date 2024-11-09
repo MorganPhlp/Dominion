@@ -1,6 +1,12 @@
 #ifndef __CarteAction_H__
 #define __CarteAction_H__
 
+#include <iostream>
+#include <string>
+#include "Carte.h"
+#include "Joueur.h"
+#include "Jeu.h"
+
 class CarteAction : public Carte{
   private :
     int m_draws, m_buys, m_actions, m_coins;

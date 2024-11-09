@@ -1,6 +1,12 @@
 #ifndef __CarteVictoire_H__
 #define __CarteVictoire_H__
 
+#include <iostream>
+#include <string>
+#include "Carte.h"
+#include "Joueur.h"
+#include "Jeu.h"
+
 class CarteVictoire : public Carte{
   private :
   	int m_win_points;

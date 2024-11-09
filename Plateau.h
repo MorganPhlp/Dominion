@@ -1,4 +1,4 @@
-#ifndef __Pleateau_H__
+#ifndef __Plateau_H__
 #define __Plateau_H__
 
 class Plateau{
