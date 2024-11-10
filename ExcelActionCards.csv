@@ -4,7 +4,7 @@ Trésor,Argent,3,,,2,,,,FALSE,FALSE
 Trésor,Or,6,,,3,,,,FALSE,FALSE
 Victoire,Malédiction,0,,-1,,,,,FALSE,FALSE
 Victoire,Province,2,,6,,,,,FALSE,FALSE
-Victoire,Duche,5,,3,,,,,FALSE,FALSE
+Victoire,Duché,5,,3,,,,,FALSE,FALSE
 Victoire,Domaine,8,,1,,,,,FALSE,FALSE
 Action,Atelier,3,Recevez une carte coutant jusqu’à 4 pièces,,,,,,FALSE,FALSE
 Action,Bucheron,3,,,2,,,1,FALSE,FALSE

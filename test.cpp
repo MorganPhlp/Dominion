@@ -1,8 +1,7 @@
-#include "Jeu.h"
+#include "Plateau.h"
 
 int main(){
-	Jeu j = Jeu(2);
-	Jeu::remplirListeCarte();
-	Jeu::printTotalCard();
+	Plateau p = Plateau();
+	p.init(2);
 	return 0;
 }
