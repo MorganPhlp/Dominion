@@ -1,7 +1,6 @@
 #ifndef __Pile_H__
 #define __Pile_H__
 
-#include <iostream>
 #include <vector>
 #include <memory>
 #include "Carte.h"

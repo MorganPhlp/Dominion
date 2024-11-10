@@ -20,6 +20,7 @@ class Jeu{
   public :
     static void remplirListeCarte();
     static void printTotalCard();
+    std::vector<CarteAction> choisirCarteActionHasard();
     
     Jeu(int nb_joueurs);
     ~Jeu();

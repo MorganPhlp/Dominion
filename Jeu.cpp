@@ -1,4 +1,7 @@
 #include "Jeu.h"
+#include <random>
+#include <chrono>
+#include <functional>
 
 std::vector<CarteTresor> Jeu::listeCarteTresor;
 std::vector<CarteAction> Jeu::listeCarteAction;
@@ -42,10 +45,6 @@ std::vector< std::tuple< std::string, std::string, int, std::string, int, int, i
 						break;
 					}
 					else description.push_back(c);
-				}
-				if (description.front() > 'Z' || description.front() < 'A') { //Bug avec les guillemets qui rajoutent des caractères au début et à la fin de description
-    					description.erase(0, 3);
-    					description.erase(description.size() - 3, 3);
 				}
 				
 				
@@ -123,7 +122,29 @@ void Jeu::printTotalCard(){
 }
 
 
-
+std::vector<CarteAction> Jeu::choisirCarteActionHasard(){
+	std::vector<CarteAction> tab;
+	std::vector<int> nb;
+	std::default_random_engine re(std::chrono::system_clock::now().time_since_epoch().count());
+	int taille = listeCarteAction.size();
+	std::uniform_int_distribution<int> distrib{0, taille};
+	auto rd = bind(distrib, re);
+	for(int i = 0; i < 10; i++){
+		int alea = rd();
+		bool present = false;
+		for(size_t j = 0; j < nb.size(); j++){
+			if(nb.at(j) == alea){
+				present = true;
+				i-=1;
+				break;
+			}
+		}
+		if(!present){
+			tab.push_back(listeCarteAction.at(alea));
+		}
+	}
+	return tab;
+}
 
 
 
