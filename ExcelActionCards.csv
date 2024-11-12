@@ -11,7 +11,7 @@ Action,Bucheron,3,,,2,,,1,FALSE,FALSE
 Action,Chapelle,2,Jetez jusqu’à 4 cartes de votre main,,,,,,FALSE,FALSE
 Action,Douve,2,"“Lorsqu’un adversaire joue une carte Attaque, vous pouvez dévoiler cette carte de votre main. Dans ce cas, l’Attaque n’a pas d’effet sur vous”",,,2,,,FALSE,TRUE
 Action,Festin,4,Jetez cette carte. Recevez une carte coutant jusqu’à 5 pièces,,,,,,FALSE,FALSE
-Action,Jardins,4,Vaut 1 point de victoire pour chaque 10 cartes dans votre deck (arrondi à l’unité inférieure),,,,,,,
+Action,Jardins,4,Vaut 1 point de victoire pour chaque 10 cartes dans votre deck (arrondi à l’unité inférieure),,,,,,FALSE,FALSE
 Action,Laboratoire,5,,,,2,1,,FALSE,FALSE
 Action,Sorcière,5,Chacun des autres joueurs reçoivent une Malédiction,,,2,,,TRUE,FALSE
 Action,Village,3,,,,1,2,,FALSE,FALSE

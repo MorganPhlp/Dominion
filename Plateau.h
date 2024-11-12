@@ -27,6 +27,7 @@ class Plateau{
  	std::vector<CarteAction> getListeCarteAction() const;
  	std::vector<CarteTresor> getListeCarteTresor() const;
  	std::vector<CarteVictoire> getListeCarteVictoire() const;
+ 	void print() const;
  	
  	Plateau();
  	~Plateau();

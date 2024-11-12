@@ -39,5 +39,5 @@ void Carte::printCard() const{
 	}
 	std::cout<< std::endl;
 	std::cout<< "Coût : " << m_cost << std::endl;
-	std::cout<< "Description : " << m_description << std::endl;
+	if(!m_description.empty()) std::cout<< "Description : " << m_description << std::endl;
 }

@@ -194,22 +194,40 @@ void Plateau::remplirPiles(int nb_joueurs){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 void Plateau::init(int nb_joueurs){
 	remplirListeCarte();
 	choisirCarteActionHasard();
 	remplirPiles(nb_joueurs);
 }
+
+
+void Plateau::print() const{
+    std::cout << "======== PLATEAU DOMINION ========\n\n";
+    
+    std::cout << "========== PILES TRESOR ==========\n";
+    for (const auto& pile : m_PilesTresor) {
+        std::cout << "Quantité: " << pile.second << " | ";
+        pile.first.printCard();
+        std::cout << "-----------------------------------\n";
+    }
+
+    std::cout << "\n========== PILES VICTOIRE ==========\n";
+    for (const auto& pile : m_PilesVictoire) {
+        std::cout << "Quantité: " << pile.second << " | ";
+        pile.first.printCard();
+        std::cout << "-----------------------------------\n";
+    }
+
+    std::cout << "\n========== PILES ACTION ==========\n";
+    for (const auto& pile : m_PilesAction) {
+        std::cout << "Quantité: " << pile.second << " | ";
+        pile.first.printCard();
+        std::cout << "-----------------------------------\n";
+    }
+
+    std::cout << "\n===================================\n";
+}
+
+
+
+
