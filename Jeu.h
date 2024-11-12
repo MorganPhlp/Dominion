@@ -14,6 +14,7 @@ class Jeu{
   public :
     Jeu(int nb_joueurs, Plateau plateau, std::vector<Joueur> listeJoueur);
     ~Jeu();
+    Plateau getPlateau();
 };
 
 #endif

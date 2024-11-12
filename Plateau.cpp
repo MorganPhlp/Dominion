@@ -205,23 +205,23 @@ void Plateau::print() const{
     std::cout << "======== PLATEAU DOMINION ========\n\n";
     
     std::cout << "========== PILES TRESOR ==========\n";
-    for (const auto& pile : m_PilesTresor) {
-        std::cout << "Quantité: " << pile.second << " | ";
-        pile.first.printCard();
+    for (size_t i = 0; i < m_PilesTresor.size(); i++) {
+        std::cout << "Quantité: " << m_PilesTresor.at(i).second << " | ";
+        m_PilesTresor.at(i).first.printCard();
         std::cout << "-----------------------------------\n";
     }
 
     std::cout << "\n========== PILES VICTOIRE ==========\n";
-    for (const auto& pile : m_PilesVictoire) {
-        std::cout << "Quantité: " << pile.second << " | ";
-        pile.first.printCard();
+    for (size_t i = 0; i < m_PilesVictoire.size(); i++) {
+        std::cout << "Quantité: " << m_PilesVictoire.at(i).second << " | ";
+        m_PilesVictoire.at(i).first.printCard();
         std::cout << "-----------------------------------\n";
     }
 
     std::cout << "\n========== PILES ACTION ==========\n";
-    for (const auto& pile : m_PilesAction) {
-        std::cout << "Quantité: " << pile.second << " | ";
-        pile.first.printCard();
+    for (size_t i = 0; i < m_PilesAction.size(); i++) {
+        std::cout << "Quantité: " << m_PilesAction.at(i).second << " | ";
+        m_PilesAction.at(i).first.printCard();
         std::cout << "-----------------------------------\n";
     }
 

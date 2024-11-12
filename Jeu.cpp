@@ -4,7 +4,10 @@
 #include <functional>
 
 Jeu::Jeu(int nb_joueurs, Plateau plateau, std::vector<Joueur> listeJoueur) : m_nb_joueurs(nb_joueurs), m_plateau(plateau), m_listeJoueur(listeJoueur) {
-	initJoueurActif(listeJoueur);
+	for(size_t i = 0; i < m_listeJoueur.size(); i++){
+		m_listeJoueur.at(i).initDeck(m_plateau);
+	}
+	initJoueurActif(m_listeJoueur);
 }
 
 Jeu::~Jeu() {}
@@ -18,5 +21,7 @@ void Jeu::initJoueurActif(std::vector<Joueur>& liste){
 	m_joueurActif = &liste.at(alea);
 }
 
-
+Plateau Jeu::getPlateau(){
+	return m_plateau;
+}
 

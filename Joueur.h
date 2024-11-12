@@ -4,14 +4,16 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "Carte.h"
+//#include "Carte.h"
 #include "Pile.h"
+#include "Plateau.h"
 
 class Joueur{
 	private :
 		std::string m_pseudo;
 		int m_nb_actions, m_nb_buys, m_nb_win_points, m_coins;
 		std::vector<Carte*> m_hand, m_deck, m_defausse, m_rebut;
+		void shuffleCartes(std::vector<Carte*> v);
 	public :
 		Joueur(std::string pseudo);
 		~Joueur();
@@ -23,6 +25,10 @@ class Joueur{
 		void playCard(int indexCarte);
 		void buyCard(Pile &pile);
 		int calculateWinPoints();
+		void initDeck(Plateau p);
+		void printDeck() const;
+		void assembleDeckDefausse();
+		void makeHand();
 };
 
 #endif
