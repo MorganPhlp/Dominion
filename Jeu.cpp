@@ -25,3 +25,64 @@ Plateau Jeu::getPlateau(){
 	return m_plateau;
 }
 
+void Jeu::tourJoueur(Joueur* j){
+	j->initNouveauTour();
+	j->printHand();
+	std::string choix;
+	size_t index;
+	
+	//phase action
+	std::cout << "======== Phase Action ========" << std::endl;
+	while(!j->getHand().empty() or choix != "ACHAT" or j->getNbActions() > 0){
+		std::cout << "Entrez le numéro de la carte que vous souhaitez jouer : " << std::endl;
+		std::cin >> index;
+		if(index > 0 and index < j->getHand().size()){
+			try{
+				j->getHand().at(index)->play();		//methode a faire dans la classe Carte
+				j->addActions(-1);
+			}
+			catch (const std::exception& e){
+				std::cerr << "Erreur : " << e.what() << std::endl;
+			}
+			
+		}
+		std::cout << "Ecrivez ACHAT si vous voulez passer à la phase Achat" << std::endl;
+		std::cin >> choix;
+		if(choix == "ACHAT"){
+			break;
+		}
+	}
+	
+	//phase achat
+	std::cout << "======== Phase Achat ========" << std::endl;
+	while(j->getNbBuys() > 0){
+		std::cout << "Choisissez l'index de la pile de carte dont vous souhaitez acheter une carte : " << std::endl;
+		std::cin >> index;
+		try{
+			if(index < m_plateau.getMaxIndex()){
+				j->buyCard(index,m_plateau);
+			} else {
+				std::cerr << "Index invalide. Réessayez. " << std::endl;
+			}
+		}
+		catch (const std::exception& e){
+			std::cerr << "Erreur : " << e.what() << std::endl;
+		}
+	}
+	
+	//phase ajustement
+	std::cout << "======== Phase Ajustement ========" << std::endl;
+	
+    	j->defausser(); //Défausser toutes les cartes jouées et les cartes en main
+
+    	//Reformer le deck si nécessaire et piocher 5 cartes pour une nouvelle main
+    	if (j->getDeck().size() < 5) {
+        	j->assembleDeckDefausse();  // Mélanger la défausse pour reformer le deck
+    	}
+    	j->makeHand();  // Piocher 5 nouvelles cartes
+
+    	std::cout << "Votre nouvelle main pour le prochain tour est prête !" << std::endl;
+    	j->printHand();  // Afficher la nouvelle main du joueur
+	
+}
+

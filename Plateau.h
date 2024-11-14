@@ -16,6 +16,7 @@ class Plateau{
  	static std::vector<CarteAction> listeCarteAction;
  	static std::vector<CarteVictoire> listeCarteVictoire;
  	static std::vector<CarteTresor> listeCarteTresor;
+ 	static const size_t m_maxIndex;
  	
  	static std::vector< std::tuple< std::string, std::string, int, std::string, int, int, int, int, int, bool, bool>> loadCard();
  	static void remplirListeCarte();
@@ -31,9 +32,9 @@ class Plateau{
  	void print() const;
  	Carte* buyCard(int index);
  	std::vector<std::pair<Carte*, int>> getMax(int n);
- 	
  	Plateau();
  	~Plateau();
+ 	size_t getMaxIndex() const;
 
 };
 

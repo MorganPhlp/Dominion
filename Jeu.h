@@ -11,10 +11,14 @@ class Jeu{
     std::vector<Joueur> m_listeJoueur;
     Joueur* m_joueurActif;
     void initJoueurActif(std::vector<Joueur>& liste);
+    void tourJoueur(Joueur* j);
   public :
     Jeu(int nb_joueurs, Plateau plateau, std::vector<Joueur> listeJoueur);
     ~Jeu();
     Plateau getPlateau();
+    void choixAchatCarte();
 };
 
 #endif
+
+//mode fin de partie à tester

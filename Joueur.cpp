@@ -9,6 +9,7 @@
 Joueur::Joueur(std::string pseudo) : m_pseudo(pseudo) {
 	m_nb_win_points = 0;
 	m_coins = 0;
+	m_draws = 0;
 	m_nb_actions = 0;
 	m_nb_buys = 0;
 	m_draws = 0;
@@ -68,11 +69,11 @@ void Joueur::shuffleCartes(std::vector<Carte*> v){
 	shuffle(v.begin(), v.end(), std::default_random_engine(seed));
 }
 
-void Joueur::printDeck() const{
-	std::cout << "======== DECK " << m_pseudo << " ========\n\n";
+void Joueur::printHand() const{
+	std::cout << "======== Main " << m_pseudo << " ========\n\n";
 	
-	for(size_t i = 0; i < m_deck.size(); i++){
-        	m_deck.at(i)->printCard();
+	for(size_t i = 0; i < m_hand.size(); i++){
+        	m_hand.at(i)->printCard();
         	std::cout << "-----------------------------------\n";
 	}
 }
@@ -97,7 +98,30 @@ void Joueur::makeHand(){
 
 void Joueur::defausser(){
 	for(size_t i = 0; i < m_hand.size(); i++){
-		m_defausse.push_back(m_deck.at(i));
+		m_defausse.push_back(m_hand.at(i));
+	}
+	m_hand = {};
+}
+
+void Joueur::defausseCarte(int index){
+	m_defausse.push_back(m_hand.at(index));
+	m_hand.erase(m_hand.begin()+index);
+}
+
+int Joueur::getCoins(){	return m_coins;}
+
+void Joueur::initNouveauTour(){
+	m_coins = 0;
+	m_nb_actions = 1;
+	m_nb_buys = 1;
+}
+
+void Joueur::buyCard(int index, Plateau plat){
+	Carte* c = plat.buyCard(index);
+	if(c->getCost() <= m_coins){
+		m_coins -= c->getCost();
+		m_nb_buys -= 1;
+		m_defausse.push_back(c);
 	}
 	m_hand = {};
 }
@@ -137,4 +161,9 @@ void Joueur::throwMax(int n){ // TODO Gestion erreurs
       break;
     }
   }
+}
+
+//faire les getters
+std::vector<Carte*> Joueur::getHand(){
+	return m_hand;
 }

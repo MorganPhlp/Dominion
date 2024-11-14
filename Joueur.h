@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+//#include "Carte.h"
 #include "Plateau.h"
 
 class Joueur{
@@ -15,6 +16,17 @@ class Joueur{
 	public :
 		Joueur(std::string pseudo);
 		~Joueur();
+		//faire les getters
+		int getNbActions();
+		int getNbBuys();
+		int getNbWinPoints();
+		int getCoins();
+		int getDraws();
+		std::vector<Carte*> getHand();
+		std::vector<Carte*> getDeck();
+		std::vector<Carte*> getDefausse();
+		std::vector<Carte*> getRebut();
+		
 		void addActions(int actions);
 		void addBuys(int buys);
 		void drawCards(int nb);		/*le joueur pioche nb cartes de son deck*/
@@ -24,13 +36,15 @@ class Joueur{
 		void playCard(int indexCarte);
 		int calculateWinPoints();
 		void initDeck(Plateau p);
-		void printDeck() const;
+		void printHand() const;
 		void assembleDeckDefausse();
 		void makeHand();
 		void defausser();
-		void printHand() const;
 		void receiveCard(int n, Plateau &plat);
 		void throwMax(int n);
+		void defausseCarte(int index);
+		void initNouveauTour();
+		void buyCard(int index, Plateau plat);
 };
 
 #endif

@@ -13,7 +13,7 @@ std::vector<CarteAction> m_listeCarteActionHasard;
 std::vector<std::pair<CarteAction, int>> m_PilesAction;
 std::vector<std::pair<CarteTresor, int>> m_PilesTresor;
 std::vector<std::pair<CarteVictoire, int>> m_PilesVictoire;
-
+const size_t m_maxIndex = 17;
 
 Plateau::Plateau() {}
 
@@ -256,6 +256,7 @@ Carte* Plateau::buyCard(int index){
   }
 }
 
+
 std::vector<std::pair<Carte*, int>> Plateau::getMax(int n){
   int somme = 0;
   std::vector<std::pair<Carte*, int>> max;
@@ -284,5 +285,7 @@ std::vector<std::pair<Carte*, int>> Plateau::getMax(int n){
   }
   return max;
 }
+
+size_t Plateau::getMaxIndex () const{return m_maxIndex;}
 
 
