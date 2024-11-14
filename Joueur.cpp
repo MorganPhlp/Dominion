@@ -11,13 +11,14 @@ Joueur::Joueur(std::string pseudo) : m_pseudo(pseudo) {
 	m_coins = 0;
 	m_nb_actions = 0;
 	m_nb_buys = 0;
+	m_draws = 0;
 	m_hand = {};
 	m_deck = {};
 	m_defausse = {};
 	m_rebut = {};
 }
 
-/*Desctruction*/
+/*Destruction*/
 Joueur::~Joueur() {}
 
 void Joueur::addBuys(int buys){m_nb_buys += buys;}
@@ -25,6 +26,8 @@ void Joueur::addBuys(int buys){m_nb_buys += buys;}
 void Joueur::addActions(int actions){m_nb_actions += actions;}
 
 void Joueur::addCoins(int coins){m_coins += coins;}
+
+void Joueur::addDraws(int draws){m_draws += draws;}
 
 void Joueur::addWinPoints(int win_points){m_nb_win_points += win_points;}
 
@@ -96,9 +99,42 @@ void Joueur::defausser(){
 	for(size_t i = 0; i < m_hand.size(); i++){
 		m_defausse.push_back(m_deck.at(i));
 	}
-	m_hand = {}
+	m_hand = {};
 }
 
+void Joueur::receiveCard(int n, Plateau &plat){
+  std::vector<std::pair<Carte*, int>> liste = plat.getMax(n);
+  std::cout << "Quelle carte voulez-vous parmi les suivantes : " << std::endl;
+  for(size_t i = 0; i < liste.size(); i++){
+    if(i== liste.size()-1) std::cout << liste.at(i).first->getName() << std::endl;
+    else std::cout << liste.at(i).first->getName() << "; ";
+  }
+  size_t index = 10000;
+  while(index >= liste.size()){
+    std:: cin >> index;
+    //TODO Gérer si on donne un string que ça renvoie erreur
+  }
+  Carte* c = plat.buyCard(liste.at(index).second);
+  m_hand.push_back(c);
+}
 
-
-
+void Joueur::throwMax(int n){ // TODO Gestion erreurs
+  //printHand();
+  std:: cout << "Vous pouvez jeter jusqu'à " << n << " cartes de votre main" << std::endl;
+  std::string rep;
+  bool stop = false;
+  for(int i = 0; i < n; i++){
+    while(!stop){
+      std:: cout << "Quelle carte voulez-vous jeter ? (Ecrivez l'index de la carte ou STOP si vous ne voulez plus en jeter)" << std::endl;
+      std::cin >> rep;
+      if(rep == "STOP") stop = true;
+      else if(std::stoul(rep) < m_hand.size()){
+        //defausseCarte(std::stoul(rep));
+        break;
+      }
+    }
+    if(stop){
+      break;
+    }
+  }
+}

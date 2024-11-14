@@ -193,7 +193,6 @@ void Plateau::remplirPiles(int nb_joueurs){
 }
 
 
-
 void Plateau::init(int nb_joueurs){
 	remplirListeCarte();
 	choisirCarteActionHasard();
@@ -228,6 +227,62 @@ void Plateau::print() const{
     std::cout << "\n===================================\n";
 }
 
+/*
+int Plateau::chercherCarteAction(std::string name){
+  for(size_t i; i < m_PilesAction; i++){
+    if(m_PilesAction.at(i).first.getName() == name) return i;
+  }
+  throw std::runtime_error("Carte introuvable : " + name);
+}
+*/
 
+Carte* Plateau::buyCard(int index){
+  size_t i = static_cast<size_t>(index);
+  if(i > m_PilesTresor.size() - 1){
+    i -= m_PilesTresor.size() - 1;
+    if(i > m_PilesVictoire.size() - 1){
+      i -= m_PilesVictoire.size() - 1;
+      m_PilesAction.at(i).second -= 1;
+      return &m_PilesAction.at(i).first;
+    }
+    else{
+      m_PilesVictoire.at(i).second -= 1;
+      return &m_PilesVictoire.at(i).first;
+    }
+  }
+  else{
+    m_PilesTresor.at(i).second -= 1;
+    return &m_PilesTresor.at(i).first;
+  }
+}
+
+std::vector<std::pair<Carte*, int>> Plateau::getMax(int n){
+  int somme = 0;
+  std::vector<std::pair<Carte*, int>> max;
+  for(size_t i = 0; i < m_PilesTresor.size(); i++){
+    somme++;
+    if(m_PilesTresor.at(i).first.getCost() <= n && m_PilesTresor.at(i).second !=0){
+      std::pair<Carte*, int> elem = std::make_pair(&m_PilesTresor.at(i).first, somme);
+      max.push_back(elem);
+    }
+  }
+  
+  for(size_t i = 0; i < m_PilesVictoire.size(); i++){
+    somme++;
+    if(m_PilesVictoire.at(i).first.getCost() <= n && m_PilesVictoire.at(i).second !=0){
+      std::pair<Carte*, int> elem = std::make_pair(&m_PilesVictoire.at(i).first, somme);
+      max.push_back(elem);
+    }
+  }
+  
+  for(size_t i = 0; i < m_PilesAction.size(); i++){
+    somme++;
+    if(m_PilesAction.at(i).first.getCost() <= n && m_PilesAction.at(i).second !=0){
+      std::pair<Carte*, int> elem = std::make_pair(&m_PilesAction.at(i).first, somme);
+      max.push_back(elem);
+    }
+  }
+  return max;
+}
 
 

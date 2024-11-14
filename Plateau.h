@@ -21,6 +21,7 @@ class Plateau{
  	static void remplirListeCarte();
  	void choisirCarteActionHasard();
  	void remplirPiles(int nb_joueurs);
+ 	//int chercherCarteAction(std::string name);
  public :
  	static void printTotalCard();
  	void init(int nb_joueurs);
@@ -28,6 +29,8 @@ class Plateau{
  	std::vector<CarteTresor> getListeCarteTresor() const;
  	std::vector<CarteVictoire> getListeCarteVictoire() const;
  	void print() const;
+ 	Carte* buyCard(int index);
+ 	std::vector<std::pair<Carte*, int>> getMax(int n);
  	
  	Plateau();
  	~Plateau();
