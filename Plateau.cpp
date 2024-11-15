@@ -13,7 +13,7 @@ std::vector<CarteAction> m_listeCarteActionHasard;
 std::vector<std::pair<CarteAction, int>> m_PilesAction;
 std::vector<std::pair<CarteTresor, int>> m_PilesTresor;
 std::vector<std::pair<CarteVictoire, int>> m_PilesVictoire;
-const size_t m_maxIndex = 17;
+const size_t Plateau::m_maxIndex = 17;
 
 Plateau::Plateau() {}
 
@@ -227,14 +227,28 @@ void Plateau::print() const{
     std::cout << "\n===================================\n";
 }
 
-/*
+
 int Plateau::chercherCarteAction(std::string name){
-  for(size_t i; i < m_PilesAction; i++){
+  for(size_t i = 0; i < m_PilesAction.size(); i++){
     if(m_PilesAction.at(i).first.getName() == name) return i;
   }
   throw std::runtime_error("Carte introuvable : " + name);
 }
-*/
+
+int Plateau::chercherCarteTresor(std::string name){
+  for(size_t i = 0; i < m_PilesTresor.size(); i++){
+    if(m_PilesTresor.at(i).first.getName() == name) return i;
+  }
+  throw std::runtime_error("Carte introuvable : " + name);
+}
+
+int Plateau::chercherCarteVictoire(std::string name){
+  for(size_t i = 0; i < m_PilesVictoire.size(); i++){
+    if(m_PilesVictoire.at(i).first.getName() == name) return i;
+  }
+  throw std::runtime_error("Carte introuvable : " + name);
+}
+
 
 Carte* Plateau::buyCard(int index){
   size_t i = static_cast<size_t>(index);

@@ -5,6 +5,8 @@
 #include <string>
 #include "Carte.h"
 
+class Joueur;
+
 class CarteVictoire : public Carte{
   private :
   	int m_win_points;
@@ -12,7 +14,7 @@ class CarteVictoire : public Carte{
   	CarteVictoire(std::string name, std::string description, int cost, int win_points);
   	//CarteVictoire(Carte c, int win_points);
     	~CarteVictoire();
-    	//void play(Joueur &p, Jeu &j);
+    	void play(Joueur &p, Plateau &plat, int index, Jeu &j) override;
     	int getWinPoints() const;
     	void printCard() const;
 };

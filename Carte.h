@@ -4,6 +4,9 @@
 #include <iostream>
 #include <string>
 
+class Joueur;
+class Plateau;
+class Jeu;
 
 enum class TypeCarte {
 	Action,
@@ -18,8 +21,8 @@ class Carte{
   	TypeCarte m_type;
   public :
   	Carte(std::string name, std::string description, int cost, TypeCarte type);
-  	~Carte();
-  	//void play(Joueur &p, Jeu &j);
+  	virtual ~Carte();
+  	virtual void play(Joueur &p, Plateau &plat, int index, Jeu &j) = 0;
   	//void buy(Joueur &p, Jeu &j);
   	std::string getName() const;
    	std::string getDescription() const;

@@ -3,6 +3,7 @@
 #include "CarteAction.h"
 #include "Joueur.h"
 #include "Plateau.h"
+#include "Jeu.h"
 
 CarteAction::CarteAction(std::string name, std::string description, int cost, int actions, int buys, int draws, int coins, bool isAttack, bool isReaction) : Carte(name, description, cost, TypeCarte::Action), m_actions(actions), m_buys(buys), m_draws(draws), m_coins(coins), m_isAttack(isAttack), m_isReaction(isReaction) {}
 
@@ -10,13 +11,13 @@ CarteAction::CarteAction(std::string name, std::string description, int cost, in
 CarteAction::~CarteAction() {}
 
 
-void CarteAction::play(Joueur &p, Plateau &plat){ //TODO Ajouter le int index
-  if(!getDescription().empty()) playDescription(getName(), p, plat);
+void CarteAction::play(Joueur &p, Plateau &plat, int index, Jeu &j){
+  if(!getDescription().empty()) playDescription(getName(), p, plat, index, j);
   p.addActions(m_actions);
   p.addBuys(m_buys);
   p.addDraws(m_draws);
   p.addCoins(m_coins);
-  // TODO Ajouter la méthode défausseCarte
+  p.defausseCarte(index);
 }
 
 
@@ -45,9 +46,21 @@ void CarteAction::printCard() const{
 
 
 
-void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat){
+void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, int index, Jeu &j){ 
+        // TODO Faire la Carte Douve qui a un fonctionnement à part (après une carte attaque)
+        // TODO Faire la carte Jardins qui a un fonctionnement à part (comme une carte victoire)
 	if(name == "Atelier") p.receiveCard(4, plat);
-	if(name == "Chapelle") p.throwMax(4);
+	else if(name == "Chapelle") p.throwMax(4);
+	else if(name == "Festin"){
+	  p.jeterCarte(index);
+	  p.receiveCard(5, plat);
+        }
+        else if(name == "Sorcière") j.tousSaufActifMalediction();
+        //else if(name == "Voleur");
+        else if(name == "Artisan"){
+          p.receiveCard(5, plat);
+          p.putCardFromHandToDeck();
+        }
 }
 
 

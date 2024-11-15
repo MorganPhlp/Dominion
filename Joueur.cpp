@@ -32,6 +32,22 @@ void Joueur::addDraws(int draws){m_draws += draws;}
 
 void Joueur::addWinPoints(int win_points){m_nb_win_points += win_points;}
 
+int Joueur::getCoins(){	return m_coins;}
+
+int Joueur::getNbActions(){ return m_nb_actions;}
+
+int Joueur::getNbBuys(){ return m_nb_buys;}
+
+int Joueur::getNbWinPoints(){ return m_nb_win_points;}
+
+int Joueur::getDraws(){ return m_draws;}
+
+std::vector<Carte*> Joueur::getHand(){ return m_hand;}
+
+std::vector<Carte*> Joueur::getDeck(){ return m_deck;}
+
+std::vector<Carte*> Joueur::getDefausse(){ return m_defausse;}
+
 void Joueur::initDeck(Plateau p){
 	m_deck = {};
 	std::vector<CarteTresor> listeTresor = p.getListeCarteTresor();
@@ -108,8 +124,6 @@ void Joueur::defausseCarte(int index){
 	m_hand.erase(m_hand.begin()+index);
 }
 
-int Joueur::getCoins(){	return m_coins;}
-
 void Joueur::initNouveauTour(){
 	m_coins = 0;
 	m_nb_actions = 1;
@@ -136,14 +150,13 @@ void Joueur::receiveCard(int n, Plateau &plat){
   size_t index = 10000;
   while(index >= liste.size()){
     std:: cin >> index;
-    //TODO Gérer si on donne un string que ça renvoie erreur
   }
   Carte* c = plat.buyCard(liste.at(index).second);
   m_hand.push_back(c);
 }
 
 void Joueur::throwMax(int n){ // TODO Gestion erreurs
-  //printHand();
+  printHand();
   std:: cout << "Vous pouvez jeter jusqu'à " << n << " cartes de votre main" << std::endl;
   std::string rep;
   bool stop = false;
@@ -153,7 +166,7 @@ void Joueur::throwMax(int n){ // TODO Gestion erreurs
       std::cin >> rep;
       if(rep == "STOP") stop = true;
       else if(std::stoul(rep) < m_hand.size()){
-        //defausseCarte(std::stoul(rep));
+        jeterCarte(std::stoul(rep));
         break;
       }
     }
@@ -163,7 +176,27 @@ void Joueur::throwMax(int n){ // TODO Gestion erreurs
   }
 }
 
-//faire les getters
-std::vector<Carte*> Joueur::getHand(){
-	return m_hand;
+void Joueur::jeterCarte(int index){
+  m_hand.erase(m_hand.begin()+index);
+}
+
+void Joueur::receiveMalediction(Plateau &plat){
+  int index = plat.chercherCarteVictoire("Malédiction");
+  Carte* c = plat.buyCard(index);
+  m_defausse.push_back(c);
+  addWinPoints(-1);
+}
+
+void Joueur::putCardFromHandToDeck(){
+  size_t rep;
+  bool stop = false;
+  while(!stop){
+      std:: cout << "Quelle carte voulez-vous mettre sr le haut de votre deck ? (Ecrivez l'index de la carte)" << std::endl;
+      std::cin >> rep;
+      if(rep < m_hand.size()){
+        stop = true;
+      }
+  }
+  m_deck.insert(m_deck.begin(), m_hand.at(rep));
+  m_hand.erase(m_hand.begin() + rep);
 }

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "CarteVictoire.h"
+#include "Joueur.h"
 
 /*Constructeur*/
 //CarteVictoire::CarteVictoire(Carte c, int win_points) : Carte(c.getName(), c.getDescription(), c.getCost()), m_win_points(win_points) {}
@@ -10,7 +11,12 @@ CarteVictoire::CarteVictoire(std::string name, std::string description, int cost
 /*Destructeur*/
 CarteVictoire::~CarteVictoire() {}
 
-//void CarteVictoire::play(Joueur &p, Jeu &j){p.addWinPoints(win_points);}
+void CarteVictoire::play(Joueur &p, Plateau &plat, int index, Jeu &j){
+  (void) j;
+  (void) plat;
+  p.addWinPoints(m_win_points);
+  p.defausseCarte(index);
+}
 
 int CarteVictoire::getWinPoints() const{return m_win_points;}
 

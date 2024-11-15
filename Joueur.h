@@ -16,7 +16,6 @@ class Joueur{
 	public :
 		Joueur(std::string pseudo);
 		~Joueur();
-		//faire les getters
 		int getNbActions();
 		int getNbBuys();
 		int getNbWinPoints();
@@ -25,7 +24,7 @@ class Joueur{
 		std::vector<Carte*> getHand();
 		std::vector<Carte*> getDeck();
 		std::vector<Carte*> getDefausse();
-		std::vector<Carte*> getRebut();
+		//std::vector<Carte*> getRebut();
 		
 		void addActions(int actions);
 		void addBuys(int buys);
@@ -45,6 +44,9 @@ class Joueur{
 		void defausseCarte(int index);
 		void initNouveauTour();
 		void buyCard(int index, Plateau plat);
+		void jeterCarte(int index);
+		void receiveMalediction(Plateau &plat);
+		void putCardFromHandToDeck();
 };
 
 #endif

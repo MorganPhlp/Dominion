@@ -17,6 +17,7 @@ class Jeu{
     ~Jeu();
     Plateau getPlateau();
     void choixAchatCarte();
+    void tousSaufActifMalediction();
 };
 
 #endif

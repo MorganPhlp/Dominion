@@ -38,7 +38,7 @@ void Jeu::tourJoueur(Joueur* j){
 		std::cin >> index;
 		if(index > 0 and index < j->getHand().size()){
 			try{
-				j->getHand().at(index)->play();		//methode a faire dans la classe Carte
+				j->getHand().at(index)->play(*j, m_plateau, index, *this);		//methode a faire dans la classe Carte
 				j->addActions(-1);
 			}
 			catch (const std::exception& e){
@@ -86,3 +86,10 @@ void Jeu::tourJoueur(Joueur* j){
 	
 }
 
+void Jeu::tousSaufActifMalediction(){
+  for(size_t i = 0; i < m_listeJoueur.size(); i++){
+    if(&m_listeJoueur.at(i) != m_joueurActif){
+      m_listeJoueur.at(i).receiveMalediction(m_plateau);
+    }
+  }
+}
