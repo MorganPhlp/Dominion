@@ -99,7 +99,7 @@ void Jeu::afficheCartesAdversaires(){
 	bool stop = false;
 	for(size_t i = 0; i < m_listeJoueur.size(); i++){
 		if(&m_listeJoueur.at(i) != m_joueurActif){
-			m_listeJoueur.at(i).devoiler2Cartes();
+			m_listeJoueur.at(i).devoiler2Cartes(m_plateau);
 		}
 	}
 	for(size_t i = 0; i < m_plateau.m_listeCartesDevoilees.size(); i++){
@@ -123,4 +123,23 @@ void Jeu::afficheCartesAdversaires(){
 		m_plateau.m_listeCartesEcartees.erase(m_plateau.m_listeCartesEcartees.begin() + index);
 		
 	}
+}
+
+void Jeu::tousSaufActifPiochent(){
+  for(size_t i = 0; i < m_listeJoueur.size(); i++){
+    if(&m_listeJoueur.at(i) != m_joueurActif){
+      m_listeJoueur.at(i).piocher();
+    }
+  }
+}
+
+void Jeu::tousSaufActifDefausseJusqua(size_t n){
+  for(size_t i = 0; i < m_listeJoueur.size(); i++){
+    if(&m_listeJoueur.at(i) != m_joueurActif){
+      m_listeJoueur.at(i).printHand();
+      while(m_listeJoueur.at(i).getHand().size() > n){
+        m_listeJoueur.at(i).demandeDefausse();
+      }
+    }
+  }
 }

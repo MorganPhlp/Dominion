@@ -208,5 +208,78 @@ void Joueur::devoiler2Cartes(Plateau &plat){
 		m_deck.at(i)->printCard();
 		temp.push_back(m_deck.at(i));
 	}
-	plat.m_listeCartesDevoilees.push_back(temp);
+	(void) plat; //Juste pour enlever les bugs de compilation
+	//plat.m_listeCartesDevoilees.push_back(temp);
+}
+
+void Joueur::receiveOr(Plateau &plat){ // Met dans la defausse
+  Carte* c = plat.buyCard(plat.chercherCarteTresor("Or"));
+  m_defausse.push_back(c);
+}
+
+void Joueur::receiveArgent(Plateau &plat){ //Met sur le haut du deck
+  Carte* c = plat.buyCard(plat.chercherCarteTresor("Argent"));
+  m_deck.insert(m_deck.begin(), c);
+}
+
+void Joueur::defaussePuisPioche(){ //TODO Gerer Gestion Erreurs
+  printHand();
+  size_t nb = 0;
+  std::string rep;
+  bool stop = false;
+  while(!stop && m_hand.size() != 0){
+      std:: cout << "Quelle carte voulez-vous défausser ? (Ecrivez l'index de la carte ou STOP si vous ne voulez plus en jeter)" << std::endl;
+      std::cin >> rep;
+      if(rep == "STOP") stop = true;
+      else if(std::stoul(rep) < m_hand.size()){
+        defausseCarte(std::stoul(rep));
+        nb++;
+      }
+  }
+  if(m_deck.size() < nb) assembleDeckDefausse();
+  for(size_t i = 0; i < nb; i++){
+    m_hand.push_back(m_deck.at(i));
+  }
+  m_deck.erase(m_deck.begin(), m_deck.begin()+nb);
+}
+
+void Joueur::piocher(){
+  m_hand.push_back(m_deck.at(0));
+}
+
+void Joueur::printDefausse(){
+  std::cout << "======== Defausse " << m_pseudo << " ========\n\n";
+
+  for(size_t i = 0; i < m_hand.size(); i++){
+    m_defausse.at(i)->printCard();
+    std::cout << "-----------------------------------\n";
+  }
+}
+
+void Joueur::regarderDefausseEtPrendre(){ //TODO Gerer Gestion Erreurs
+  printDefausse(); // Rajouter les index
+  std::string rep;
+  size_t index;
+  std::cout << "Quelle carte voulez vous prendre et mettre sur le dessus de votre Deck ? (Ecrivez l'index de la carte ou autre chose si vous ne voulez-pas en prendre)" << std::endl;
+  std::cin >> rep;
+  try{
+    index = std::stoul(rep);
+    if(index < m_hand.size()){
+      m_deck.insert(m_deck.begin(), m_defausse.at(index));
+      m_defausse.erase(m_defausse.begin()+index);
+    }
+  } catch (...) {}
+}
+
+void Joueur::demandeDefausse(){
+  std::string rep;
+  size_t index;
+  std::cout << "Quelle carte voulez vous defausser ? (Ecrivez l'index de la carte)" << std::endl;
+  std::cin >> rep;
+  try{
+    index = std::stoul(rep);
+    if(index < m_hand.size()){
+      defausseCarte(index);
+    }
+  } catch (...) {}
 }

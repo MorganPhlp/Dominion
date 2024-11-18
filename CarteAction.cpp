@@ -47,8 +47,8 @@ void CarteAction::printCard() const{
 
 
 void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, int index, Jeu &j){ 
-        // TODO Faire la Carte Douve qui a un fonctionnement à part (après une carte attaque)
-        // TODO Faire la carte Jardins qui a un fonctionnement à part (comme une carte victoire)
+        // TODO Faire la Carte Douve qui a un fonctionnement à part (après une carte attaque) DEMANDER EXPLICATION SUR COMMENT ELLE MARCHE
+        // TODO Faire la carte Jardins qui a un fonctionnement à part (comme une carte victoire) DEMANDER SI LES POINTS NE SONT COMPTES QUE EN FIN DE PARTIE
 	if(name == "Atelier") p.receiveCard(4, plat);
 	else if(name == "Chapelle") p.throwMax(4);
 	else if(name == "Festin"){
@@ -61,6 +61,21 @@ void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, in
           p.receiveCard(5, plat);
           p.putCardFromHandToDeck();
         }
+        else if(name == "Bandit"){
+          p.receiveOr(plat); //Verifier que l'or va bien dans defausse et pas dans deck
+          // TODO Faire après que Fefe ait fait voleur car utilise ses fonctions
+        }
+        else if(name == "Bureaucrate"){
+          p.receiveArgent(plat); //Argent sur haut du deck
+          //TODO Chaque joueur revele une carte Victoire de sa main et place sur me haut du deck
+        }
+        else if(name == "Cave") p.defaussePuisPioche();
+        else if(name == "Chambre du conseil") j.tousSaufActifPiochent();
+        else if(name == "Harbinger") p.regarderDefausseEtPrendre();
+        else if(name == "Bibliothèque"){} // TODO Verifier comment elle marche
+        else if(name == "Marchand") {} // TODO Fonctionnement spécial à faire après
+        else if(name == "Milice") j.tousSaufActifDefausseJusqua(3);
+        else if(name == "Mine"){} // TODO Regarder d'où vient la carte Tresor qu'on récupère (du plateau ou du deck)
 }
 
 

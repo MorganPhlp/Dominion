@@ -48,6 +48,13 @@ class Joueur{
 		void receiveMalediction(Plateau &plat);
 		void putCardFromHandToDeck();
 		void devoiler2Cartes(Plateau &plat);
+		void receiveOr(Plateau &plat);
+		void receiveArgent(Plateau &plat);
+		void defaussePuisPioche();
+		void piocher();
+		void printDefausse();
+		void regarderDefausseEtPrendre();
+		void demandeDefausse();
 };
 
 #endif

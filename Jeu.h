@@ -19,6 +19,8 @@ class Jeu{
     void choixAchatCarte();
     void tousSaufActifMalediction();
     void afficheCartesAdversaires();
+    void tousSaufActifPiochent();
+    void tousSaufActifDefausseJusqua(size_t n);
 };
 
 #endif
