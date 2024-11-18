@@ -56,7 +56,7 @@ void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, in
 	  p.receiveCard(5, plat);
         }
         else if(name == "Sorcière") j.tousSaufActifMalediction();
-        //else if(name == "Voleur");
+        else if(name == "Voleur") j.afficheCartesAdversaires();
         else if(name == "Artisan"){
           p.receiveCard(5, plat);
           p.putCardFromHandToDeck();

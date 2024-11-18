@@ -28,7 +28,7 @@ class Carte{
    	std::string getDescription() const;
    	int getCost() const;
    	void printCard() const;
-   	TypeCarte getType();   	
+   	TypeCarte getType();	
 };
 
 #endif

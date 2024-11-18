@@ -47,6 +47,7 @@ class Joueur{
 		void jeterCarte(int index);
 		void receiveMalediction(Plateau &plat);
 		void putCardFromHandToDeck();
+		void devoiler2Cartes(Plateau &plat);
 };
 
 #endif

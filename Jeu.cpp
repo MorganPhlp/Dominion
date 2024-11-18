@@ -93,3 +93,34 @@ void Jeu::tousSaufActifMalediction(){
     }
   }
 }
+
+void Jeu::afficheCartesAdversaires(){
+	size_t index;
+	bool stop = false;
+	for(size_t i = 0; i < m_listeJoueur.size(); i++){
+		if(&m_listeJoueur.at(i) != m_joueurActif){
+			m_listeJoueur.at(i).devoiler2Cartes();
+		}
+	}
+	for(size_t i = 0; i < m_plateau.m_listeCartesDevoilees.size(); i++){
+		for(size_t j = 0; j < 2; j++){
+			Carte* c = m_plateau.m_listeCartesDevoilees.at(i).at(j);
+			c->printCard();
+			if(c->getType() == TypeCarte::Tresor){
+				m_plateau.m_listeCartesEcartees.push_back(c);
+				break;
+			}
+		}
+	}
+	while(!stop){
+		std::cout << "Entrer l'index de la carte que vous souhaitez récupérer : " << std::endl;
+		std::cin >> index;
+		if(index >= m_plateau.m_listeCartesEcartees.size(){
+			stop = true;
+		}
+		Carte* c = m_plateau.m_listeCartesEcartees.at(index);
+		m_joueurActif.m_defausse.push_back(c);
+		m_plateau.m_listeCartesEcartees.erase(m_plateau.m_listeCartesEcartees.begin() + index);
+		
+	}
+}

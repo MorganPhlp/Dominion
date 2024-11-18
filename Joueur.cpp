@@ -191,7 +191,7 @@ void Joueur::putCardFromHandToDeck(){
   size_t rep;
   bool stop = false;
   while(!stop){
-      std:: cout << "Quelle carte voulez-vous mettre sr le haut de votre deck ? (Ecrivez l'index de la carte)" << std::endl;
+      std:: cout << "Quelle carte voulez-vous mettre sur le haut de votre deck ? (Ecrivez l'index de la carte)" << std::endl;
       std::cin >> rep;
       if(rep < m_hand.size()){
         stop = true;
@@ -199,4 +199,14 @@ void Joueur::putCardFromHandToDeck(){
   }
   m_deck.insert(m_deck.begin(), m_hand.at(rep));
   m_hand.erase(m_hand.begin() + rep);
+}
+
+void Joueur::devoiler2Cartes(Plateau &plat){
+	std::vector<Carte*> temp;
+	for(size_t i = 0; i < 2; i++){
+		//verifier la taille du deck cf. dominions regles 1ere edition
+		m_deck.at(i)->printCard();
+		temp.push_back(m_deck.at(i));
+	}
+	plat.m_listeCartesDevoilees.push_back(temp);
 }

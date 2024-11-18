@@ -18,6 +18,7 @@ class Jeu{
     Plateau getPlateau();
     void choixAchatCarte();
     void tousSaufActifMalediction();
+    void afficheCartesAdversaires();
 };
 
 #endif
