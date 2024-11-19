@@ -44,6 +44,10 @@ class Plateau{
  	std::vector<std::vector<Carte*>>& getListeCartesDevoilees();
  	std::vector<Carte*>& getListeCartesEcartees();
  	std::vector<std::pair<Carte*, int>> getMaxTresor(int n);
+ 	
+ 	std::vector<std::pair<CarteAction, int>> getPilesAction();
+ 	std::vector<std::pair<CarteTresor, int>> getPilesTresor();
+ 	std::vector<std::pair<CarteVictoire, int>> getPilesVictoire();
 
 };
 

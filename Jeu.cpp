@@ -94,23 +94,46 @@ void Jeu::tousSaufActifMalediction(){
   }
 }
 
-void Jeu::afficheCartesAdversaires(){
-	std::vector<std::vector<Carte*>>& listeCartesDevoilees = m_plateau.getListeCartesDevoilees();
-	std::vector<Carte*>& listeCartesEcartees = m_plateau.getListeCartesEcartees();
-	size_t index;
-	bool stop = false;
-	std::string res1,res2;
+void Jeu::revelerCartes(){
 	for(size_t i = 0; i < m_listeJoueur.size(); i++){
 		if(&m_listeJoueur.at(i) != m_joueurActif){
 			m_listeJoueur.at(i).devoiler2Cartes(m_plateau);
 		}
 	}
+}
+
+void Jeu::banditisme(){
+	revelerCartes();
+	std::vector<std::vector<Carte*>>& listeCartesDevoilees = m_plateau.getListeCartesDevoilees();
+	for(size_t i = 0; i < listeCartesDevoilees.size(); i++){
+		if(&m_listeJoueur.at(i) != m_joueurActif){
+			for(size_t j = 0; j < 2; j++){
+				Carte* c = listeCartesDevoilees.at(i).at(j);
+				//c->printCard();
+				if(c->getType() == TypeCarte::Tresor && c->getName() != "Cuivre"){
+					std::vector<Carte*>& rebut = m_listeJoueur.at(i).getRebut();
+					rebut.push_back(c);
+				}
+				std::vector<Carte*>& defausse = m_listeJoueur.at(i).getDefausse();
+				defausse.push_back(c);
+			}
+		}
+	}	
+}
+
+void Jeu::volerCartesAdversaires(){
+	std::vector<std::vector<Carte*>>& listeCartesDevoilees = m_plateau.getListeCartesDevoilees();
+	std::vector<Carte*>& listeCartesEcartees = m_plateau.getListeCartesEcartees();
+	size_t index;
+	bool stop = false;
+	std::string res1,res2;
+	revelerCartes();
 	for(size_t i = 0; i < listeCartesDevoilees.size(); i++){
 		for(size_t j = 0; j < 2; j++){
 			Carte* c = listeCartesDevoilees.at(i).at(j);
 			c->printCard();
 			if(c->getType() == TypeCarte::Tresor){
-				std::cout << "Voulez-vous écarter cette carte ? Répondez par 'Oui' ou 'oui' ou 'O' ou 'o' " << std::endl;
+				std::cout << "Voulez-vous écarter cette carte ? Répondez par 'Oui' ou 'oui' ou 'O' ou 'o' si vous le souhaitez" << std::endl;
 				std::cin >> res1;
 				if(res1 == "O" or res1 == "o" or res1 == "Oui" or res1 == "oui"){
 					listeCartesEcartees.push_back(c);
@@ -171,4 +194,43 @@ void Jeu::tousSaufActifPoseCarteVictoire(){
       else m_listeJoueur.at(i).carteVictoireOnDeck();
     }
   }
+}
+
+void Jeu::defausserCarteParPileVide(Plateau& plat){
+	size_t taillePileAction = plat.getPilesAction().size();
+	for(size_t i = 0; i < taillePileAction; i++){
+		if(plat.getPilesAction().at(i).second == 0){
+			for(size_t j = 0; j < m_listeJoueur.size(); i++){
+				for(size_t k = 0; k < m_listeJoueur.at(j).getHand().size(); k++){
+					if(m_listeJoueur.at(j).getHand().at(k)->getName() == plat.getPilesAction().at(i).first.getName()){
+						m_listeJoueur.at(j).getDefausse().push_back(m_listeJoueur.at(j).getHand().at(k));
+					}
+				}
+			}
+		}
+	}
+	size_t taillePileTresor = plat.getPilesTresor().size();
+	for(size_t i = 0; i < taillePileTresor; i++){
+		if(plat.getPilesTresor().at(i).second == 0){
+			for(size_t j = 0; j < m_listeJoueur.size(); i++){
+				for(size_t k = 0; k < m_listeJoueur.at(j).getHand().size(); k++){
+					if(m_listeJoueur.at(j).getHand().at(k)->getName() == plat.getPilesTresor().at(i).first.getName()){
+						m_listeJoueur.at(j).getDefausse().push_back(m_listeJoueur.at(j).getHand().at(k));
+					}
+				}
+			}
+		}
+	}
+	size_t taillePileVictoire = plat.getPilesVictoire().size();
+	for(size_t i = 0; i < taillePileVictoire; i++){
+		if(plat.getPilesVictoire().at(i).second == 0){
+			for(size_t j = 0; j < m_listeJoueur.size(); i++){
+				for(size_t k = 0; k < m_listeJoueur.at(j).getHand().size(); k++){
+					if(m_listeJoueur.at(j).getHand().at(k)->getName() == plat.getPilesVictoire().at(i).first.getName()){
+						m_listeJoueur.at(j).getDefausse().push_back(m_listeJoueur.at(j).getHand().at(k));
+					}
+				}
+			}
+		}
+	}
 }

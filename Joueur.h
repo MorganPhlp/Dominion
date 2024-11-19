@@ -23,8 +23,8 @@ class Joueur{
 		int getDraws();
 		std::vector<Carte*> getHand();
 		std::vector<Carte*> getDeck();
-		std::vector<Carte*> getDefausse();
-		std::vector<Carte*> getRebut();
+		std::vector<Carte*>& getDefausse();
+		std::vector<Carte*>& getRebut();
 		
 		void addActions(int actions);
 		void addBuys(int buys);
@@ -61,6 +61,10 @@ class Joueur{
 		std::pair<size_t,std::vector<size_t>> getNbCarteTresorHand();
 		void receiveTresor(int n, Plateau &plat);
 		void jeterTresorPourRecuperPlus(size_t n, Plateau &plat);
+		void trocCuivrePieces();
+		int renovation();
+		void defausseCarteDeck(size_t index);
+		void vassal(Plateau &plat, Jeu &j);
 };
 
 #endif

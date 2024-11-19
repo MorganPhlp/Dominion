@@ -18,10 +18,13 @@ class Jeu{
     Plateau getPlateau();
     void choixAchatCarte();
     void tousSaufActifMalediction();
-    void afficheCartesAdversaires();
+    void volerCartesAdversaires();
+    void revelerCartes();
     void tousSaufActifPiochent();
     void tousSaufActifDefausseJusqua(size_t n);
     void tousSaufActifPoseCarteVictoire();
+    void banditisme();
+    void defausserCarteParPileVide(Plateau& plat);
 };
 
 #endif

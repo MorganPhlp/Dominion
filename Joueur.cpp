@@ -47,9 +47,9 @@ std::vector<Carte*> Joueur::getHand(){ return m_hand;}
 
 std::vector<Carte*> Joueur::getDeck(){ return m_deck;}
 
-std::vector<Carte*> Joueur::getDefausse(){ return m_defausse;}
+std::vector<Carte*>& Joueur::getDefausse(){ return m_defausse;}
 
-std::vector<Carte*> Joueur::getRebut(){ return m_rebut;}
+std::vector<Carte*>& Joueur::getRebut(){ return m_rebut;}
 
 void Joueur::initDeck(Plateau p){
 	m_deck = {};
@@ -208,7 +208,6 @@ void Joueur::devoiler2Cartes(Plateau &plat){
 	std::vector<Carte*> temp;
 	size_t taille = m_deck.size();
 	for(size_t i = 0; i < 2; i++){
-		//TODO "Un joueur qui n'a pas deux cartes à dévoiler après avoir mélangé sa pioche dévoile ce qu'il peut"
 		switch (taille) {
 			case 0:
 				assembleDeckDefausse();
@@ -434,4 +433,64 @@ void Joueur::jeterTresorPourRecuperPlus(size_t n, Plateau &plat){
       }
     }
   }
+}
+
+void Joueur::trocCuivrePieces(){
+	std::string res;
+	for(size_t i = 0; i < m_hand.size(); i++){
+		if(m_hand.at(i)->getName() == "Cuivre"){
+			m_hand.at(i)->printCard();
+			std::cout << "Voulez-vous jeter cette carte Cuivre pour 3 pièces ?  Répondez par 'Oui' ou 'oui' ou 'O' ou 'o' si vous le souhaitez." << std::endl;
+			std::cin >> res;
+			if(res == "O" or res == "o" or res == "Oui" or res == "oui"){
+				addCoins(3);
+				m_rebut.push_back(m_hand.at(i));
+				m_hand.erase(m_hand.begin()+i);	
+			}
+		}
+	}
+}
+
+int Joueur::renovation(){
+	size_t index;
+	int cost;
+	std::cout << "Vous devez jeter une carte. Entrez l'index de la carte que vous souhaitez jeter : " << std::endl;
+	std::cin >> index;		
+	while(index >= m_hand.size()){
+		std::cout << "Index invalide. Veuillez entrer un index valide." << std::endl;
+		std::cin >> index;
+	}
+	cost = m_hand.at(index)->getCost();
+	jeterCarte(index);
+	return cost;
+}
+
+void Joueur::defausseCarteDeck(size_t index){
+	if (index < m_deck.size()) {
+        	m_defausse.push_back(m_deck.at(index));
+        	m_deck.erase(m_deck.begin() + index);
+    	} else {
+        	std::cerr << "Index invalide pour defausseCarteDeck !" << std::endl;
+    	}
+}
+
+void Joueur::vassal(Plateau &plat, Jeu &j){
+	if (m_deck.empty()) {
+        	std::cout << "Votre deck est vide, rien à défausser !" << std::endl;
+        	return;
+    	}
+    	
+	std::string res;
+	Carte* c = m_deck.front();
+    	c->printCard();
+    	
+	if (c->getType() == TypeCarte::Action){
+		std::cout << "Voulez-vous jouer cette carte Action ? Répondez par 'Oui' ou 'oui' ou 'O' ou 'o' si vous le souhaitez." << std::endl;
+			std::cin >> res;
+			if(res == "O" or res == "o" or res == "Oui" or res == "oui"){
+				dynamic_cast<CarteAction*>(c)->play(*this, plat, 0, j);
+            			return;	
+			}
+	} 
+	defausseCarteDeck(0);
 }

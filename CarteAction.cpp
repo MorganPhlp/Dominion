@@ -56,14 +56,14 @@ void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, in
 	  p.receiveCard(5, plat);
         }
         else if(name == "Sorcière") j.tousSaufActifMalediction();
-        else if(name == "Voleur") j.afficheCartesAdversaires();
+        else if(name == "Voleur") j.volerCartesAdversaires();
         else if(name == "Artisan"){
           p.receiveCard(5, plat);
           p.putCardFromHandToDeck();
         }
         else if(name == "Bandit"){
           p.receiveOr(plat);
-          // TODO Faire après que Fefe ait fait voleur car utilise ses fonctions
+          j.banditisme();
         }
         else if(name == "Bureaucrate"){
           p.receiveArgent(plat); //Argent sur haut du deck
@@ -76,6 +76,13 @@ void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, in
         else if(name == "Marchand") {} // TODO Fonctionnement spécial à faire après
         else if(name == "Milice") j.tousSaufActifDefausseJusqua(3);
         else if(name == "Mine") p.jeterTresorPourRecuperPlus(3, plat);
+        else if(name == "Prêteur sur gages") p.trocCuivrePieces();
+        else if(name == "Braconnier") j.defausserCarteParPileVide(plat);
+        else if(name == "Rénovation") {
+        	int cost = p.renovation();
+        	p.receiveCard(cost,plat);
+        }
+        else if (name == "Vassal") p.vassal(plat,j);
 }
 
 

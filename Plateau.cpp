@@ -163,6 +163,12 @@ std::vector<CarteTresor> Plateau::getListeCarteTresor() const{ return listeCarte
 
 std::vector<CarteVictoire> Plateau::getListeCarteVictoire() const{ return listeCarteVictoire; }
 
+std::vector<std::pair<CarteAction, int>> Plateau::getPilesAction() {return m_PilesAction;}
+
+std::vector<std::pair<CarteTresor, int>> Plateau::getPilesTresor() {return m_PilesTresor;}
+
+std::vector<std::pair<CarteVictoire, int>> Plateau::getPilesVictoire() {return m_PilesVictoire;}
+
 
 void Plateau::remplirPiles(int nb_joueurs){
 	m_PilesAction = {};
