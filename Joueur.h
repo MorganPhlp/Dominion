@@ -55,6 +55,12 @@ class Joueur{
 		void printDefausse();
 		void regarderDefausseEtPrendre();
 		void demandeDefausse();
+		std::pair<size_t,std::vector<size_t>> getNbCarteVictoireHand();
+		void carteVictoireOnDeck();
+		void piocherJusquaEtDefausseAction(size_t n);
+		std::pair<size_t,std::vector<size_t>> getNbCarteTresorHand();
+		void receiveTresor(int n, Plateau &plat);
+		void jeterTresorPourRecuperPlus(size_t n, Plateau &plat);
 };
 
 #endif

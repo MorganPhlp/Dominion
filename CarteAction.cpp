@@ -62,20 +62,20 @@ void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, in
           p.putCardFromHandToDeck();
         }
         else if(name == "Bandit"){
-          p.receiveOr(plat); //Verifier que l'or va bien dans defausse et pas dans deck
+          p.receiveOr(plat);
           // TODO Faire après que Fefe ait fait voleur car utilise ses fonctions
         }
         else if(name == "Bureaucrate"){
           p.receiveArgent(plat); //Argent sur haut du deck
-          //TODO Chaque joueur revele une carte Victoire de sa main et place sur me haut du deck
+          j.tousSaufActifPoseCarteVictoire();
         }
         else if(name == "Cave") p.defaussePuisPioche();
         else if(name == "Chambre du conseil") j.tousSaufActifPiochent();
         else if(name == "Harbinger") p.regarderDefausseEtPrendre();
-        else if(name == "Bibliothèque"){} // TODO Verifier comment elle marche
+        else if(name == "Bibliothèque") p.piocherJusquaEtDefausseAction(7);
         else if(name == "Marchand") {} // TODO Fonctionnement spécial à faire après
         else if(name == "Milice") j.tousSaufActifDefausseJusqua(3);
-        else if(name == "Mine"){} // TODO Regarder d'où vient la carte Tresor qu'on récupère (du plateau ou du deck)
+        else if(name == "Mine") p.jeterTresorPourRecuperPlus(3, plat);
 }
 
 

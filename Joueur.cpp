@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <random>
 #include <chrono>
+#include <algorithm>
 #include "Joueur.h"
 #include "Jeu.h"
 
@@ -226,7 +227,6 @@ void Joueur::devoiler2Cartes(Plateau &plat){
 		m_deck.at(i)->printCard();
 		temp.push_back(m_deck.at(i));
 	}
-	(void) plat; //Juste pour enlever les bugs de compilation
 	std::vector<std::vector<Carte*>>& listeCartesDevoilees = plat.getListeCartesDevoilees();
 	listeCartesDevoilees.push_back(temp);
 }
@@ -264,6 +264,7 @@ void Joueur::defaussePuisPioche(){ //TODO Gerer Gestion Erreurs
 
 void Joueur::piocher(){
   m_hand.push_back(m_deck.at(0));
+  m_deck.erase(m_deck.begin());
 }
 
 void Joueur::printDefausse(){
@@ -275,7 +276,7 @@ void Joueur::printDefausse(){
   }
 }
 
-void Joueur::regarderDefausseEtPrendre(){ //TODO Gerer Gestion Erreurs
+void Joueur::regarderDefausseEtPrendre(){
   printDefausse(); // Rajouter les index
   std::string rep;
   size_t index;
@@ -301,4 +302,136 @@ void Joueur::demandeDefausse(){
       defausseCarte(index);
     }
   } catch (...) {}
+}
+
+std::pair<size_t,std::vector<size_t>> Joueur::getNbCarteVictoireHand(){
+  size_t nb = 0; 
+  std::vector<size_t> indexs;
+  for(size_t i = 0; i < m_hand.size(); i++){
+    if(m_hand.at(i)->getType() == TypeCarte::Victoire){
+      nb++;
+      indexs.push_back(i);
+    }
+  }
+  return std::make_pair(nb,indexs);
+}
+
+void Joueur::carteVictoireOnDeck(){
+  size_t index;
+  if(getNbCarteVictoireHand().first == 1){
+    for(size_t i = 0; i < m_hand.size(); i++){
+      if(m_hand.at(i)->getType() == TypeCarte::Victoire){
+        index = i;
+        m_deck.insert(m_deck.begin(), m_hand.at(index));
+        m_hand.erase(m_defausse.begin()+index);
+      }
+    }
+    std::cout << "Votre seule carte victoire de la main qui était index " << index << " a été mis sur le haut de votre deck" << std::endl;
+  }
+  else{
+    std::pair<size_t,std::vector<size_t>> nbVictoire = getNbCarteVictoireHand();
+    bool valide = false;
+    std::string rep;
+    while(!valide){
+      std::cout << "Quelle carte victoire voulez vous prendre et mettre sur le dessus de votre Deck ? (Ecrivez l'index de la carte)" << std::endl;
+      std::cin >> rep;
+      try{
+        index = std::stoul(rep);
+        if(index < m_hand.size() && std::find(nbVictoire.second.begin(), nbVictoire.second.end(), index) != nbVictoire.second.end()){
+          m_deck.insert(m_deck.begin(), m_hand.at(index));
+          m_hand.erase(m_hand.begin()+index);
+          valide = true;
+        }
+      }
+      catch(...) {}
+    }
+  }
+}
+
+void Joueur::piocherJusquaEtDefausseAction(size_t n){
+  if(m_hand.size() >= n) std::cout << "Vous avez déjà plus de " << n << " cartes en main" << std::endl;
+  else{
+    std::vector<Carte*> temp;
+    while(m_hand.size() < n){
+      Carte* c = m_deck.at(0);
+      m_deck.erase(m_deck.begin());
+      if(c->getType() == TypeCarte::Action){
+        bool valide = false;
+        std::string rep;
+        while(!valide){
+          std::cout << "Vous venez de piocher la carte " << c->getName() << " \nVoulez vous la garder dans votre main (OUI pour la garder et NON pour la défausser)" << std::endl;
+          std::cin >> rep;
+          if(rep == "oui" || rep == "OUI" || rep == "Oui"){
+            m_hand.push_back(c);
+            valide = true;
+          }
+          else if(rep == "non" || rep == "NON" || rep == "Non"){
+            temp.push_back(c);
+            valide = true;
+          }
+        }
+      }
+      else m_hand.push_back(c);
+    }
+    for(size_t i = 0; i < temp.size(); i++){
+      m_defausse.push_back(temp.at(i));
+    }
+  }
+}
+
+std::pair<size_t,std::vector<size_t>> Joueur::getNbCarteTresorHand(){
+  size_t nb = 0; 
+  std::vector<size_t> indexs;
+  for(size_t i = 0; i < m_hand.size(); i++){
+    if(m_hand.at(i)->getType() == TypeCarte::Tresor){
+      nb++;
+      indexs.push_back(i);
+    }
+  }
+  return std::make_pair(nb,indexs);
+}
+
+void Joueur::receiveTresor(int n, Plateau &plat){
+  std::vector<std::pair<Carte*, int>> liste = plat.getMaxTresor(n);
+  std::cout << "Quelle carte voulez-vous parmi les suivantes : " << std::endl;
+  for(size_t i = 0; i < liste.size(); i++){
+    if(i== liste.size()-1) std::cout << liste.at(i).first->getName() << std::endl;
+    else std::cout << liste.at(i).first->getName() << "; ";
+  }
+  size_t index = 10000;
+  while(index >= liste.size()){
+    std:: cin >> index;
+  }
+  Carte* c = plat.buyCard(liste.at(index).second);
+  m_hand.push_back(c);
+}
+
+void Joueur::jeterTresorPourRecuperPlus(size_t n, Plateau &plat){
+  std::pair<size_t,std::vector<size_t>> nbTresor = getNbCarteTresorHand();
+  if(nbTresor.first == 0){
+    std::cout << "Vous n'avez pas de cartes Tresor à jeter" << std::endl;
+  }
+  else{
+    size_t index;
+    bool valide = false;
+    std::string rep;
+    while(!valide){
+      std::cout << "Quelle carte trésor voulez vous jeter pour recevoir une carte Tresor coûtant jusqu'à 3 pièces de plus ? (Ecrivez l'index de la carte ou STOP si vous ne voulez pas en jeter)" << std::endl;
+      std::cin >> rep;
+      if(rep == "STOP" || rep == "stop" || rep == "Stop") break;
+      else{
+        try{
+          index = std::stoul(rep);
+          if(index < m_hand.size() && std::find(nbTresor.second.begin(), nbTresor.second.end(), index) != nbTresor.second.end()){
+            size_t cout = m_hand.at(index)->getCost();
+            m_rebut.push_back(m_hand.at(index));
+            m_hand.erase(m_hand.begin()+index);
+            valide = true;
+            receiveTresor(cout+n, plat);
+          }
+        }
+        catch(...) {}
+      }
+    }
+  }
 }

@@ -160,3 +160,15 @@ void Jeu::tousSaufActifDefausseJusqua(size_t n){
     }
   }
 }
+
+void Jeu::tousSaufActifPoseCarteVictoire(){
+  for(size_t i = 0; i < m_listeJoueur.size(); i++){
+    if(&m_listeJoueur.at(i) != m_joueurActif){
+      m_listeJoueur.at(i).printHand();
+      if(m_listeJoueur.at(i).getNbCarteVictoireHand().first == 0){
+        m_listeJoueur.at(i).printHand(); // TODO Dévoiler la main aux autres joueurs (peut-être à changer)
+      }
+      else m_listeJoueur.at(i).carteVictoireOnDeck();
+    }
+  }
+}

@@ -43,6 +43,7 @@ class Plateau{
  	size_t getMaxIndex() const;
  	std::vector<std::vector<Carte*>>& getListeCartesDevoilees();
  	std::vector<Carte*>& getListeCartesEcartees();
+ 	std::vector<std::pair<Carte*, int>> getMaxTresor(int n);
 
 };
 

@@ -308,4 +308,17 @@ std::vector<std::vector<Carte*>>& Plateau::getListeCartesDevoilees(){return m_li
 
 std::vector<Carte*>& Plateau::getListeCartesEcartees(){return m_listeCartesEcartees;}
 
+std::vector<std::pair<Carte*, int>> Plateau::getMaxTresor(int n){
+  int somme = 0;
+  std::vector<std::pair<Carte*, int>> max;
+  for(size_t i = 0; i < m_PilesTresor.size(); i++){
+    somme++;
+    if(m_PilesTresor.at(i).first.getCost() <= n && m_PilesTresor.at(i).second !=0){
+      std::pair<Carte*, int> elem = std::make_pair(&m_PilesTresor.at(i).first, somme);
+      max.push_back(elem);
+    }
+  }
+  return max;
+}
+
 

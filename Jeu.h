@@ -21,6 +21,7 @@ class Jeu{
     void afficheCartesAdversaires();
     void tousSaufActifPiochent();
     void tousSaufActifDefausseJusqua(size_t n);
+    void tousSaufActifPoseCarteVictoire();
 };
 
 #endif
