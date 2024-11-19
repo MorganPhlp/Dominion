@@ -95,34 +95,51 @@ void Jeu::tousSaufActifMalediction(){
 }
 
 void Jeu::afficheCartesAdversaires(){
+	std::vector<std::vector<Carte*>>& listeCartesDevoilees = m_plateau.getListeCartesDevoilees();
+	std::vector<Carte*>& listeCartesEcartees = m_plateau.getListeCartesEcartees();
 	size_t index;
 	bool stop = false;
+	std::string res1,res2;
 	for(size_t i = 0; i < m_listeJoueur.size(); i++){
 		if(&m_listeJoueur.at(i) != m_joueurActif){
 			m_listeJoueur.at(i).devoiler2Cartes(m_plateau);
 		}
 	}
-	for(size_t i = 0; i < m_plateau.m_listeCartesDevoilees.size(); i++){
+	for(size_t i = 0; i < listeCartesDevoilees.size(); i++){
 		for(size_t j = 0; j < 2; j++){
-			Carte* c = m_plateau.m_listeCartesDevoilees.at(i).at(j);
+			Carte* c = listeCartesDevoilees.at(i).at(j);
 			c->printCard();
 			if(c->getType() == TypeCarte::Tresor){
-				m_plateau.m_listeCartesEcartees.push_back(c);
-				break;
+				std::cout << "Voulez-vous écarter cette carte ? Répondez par 'Oui' ou 'oui' ou 'O' ou 'o' " << std::endl;
+				std::cin >> res1;
+				if(res1 == "O" or res1 == "o" or res1 == "Oui" or res1 == "oui"){
+					listeCartesEcartees.push_back(c);
+					break;
+				}
 			}
 		}
 	}
-	while(!stop){
-		std::cout << "Entrer l'index de la carte que vous souhaitez récupérer : " << std::endl;
-		std::cin >> index;
-		if(index >= m_plateau.m_listeCartesEcartees.size(){
-			stop = true;
+	while(!stop or res2 != "O" or res2 != "o" or res2 != "Oui" or res2 != "oui"){
+		std::cout << "Souhaitez-vous récupérer une des cartes écartées ?" << std::endl;
+		std::cin >> res2;
+		if(res2 == "O" or res2 == "o" or res2 == "Oui" or res2 == "oui"){
+			std::cout << "Entrer l'index de la carte que vous souhaitez récupérer : " << std::endl;
+			std::cin >> index;
+			if(index >= listeCartesEcartees.size()){
+				stop = true;
+			}
+			Carte* c = listeCartesEcartees.at(index);
+			m_joueurActif->getDefausse().push_back(c);
+			listeCartesEcartees.erase(listeCartesEcartees.begin() + index);
 		}
-		Carte* c = m_plateau.m_listeCartesEcartees.at(index);
-		m_joueurActif.m_defausse.push_back(c);
-		m_plateau.m_listeCartesEcartees.erase(m_plateau.m_listeCartesEcartees.begin() + index);
 		
 	}
+	for(size_t i = 0; i < listeCartesEcartees.size(); i++){
+		Carte* c = listeCartesEcartees.at(i);
+		m_joueurActif->getRebut().push_back(c);
+	}
+	listeCartesDevoilees.clear();
+	listeCartesEcartees.clear();
 }
 
 void Jeu::tousSaufActifPiochent(){

@@ -304,8 +304,8 @@ std::vector<std::pair<Carte*, int>> Plateau::getMax(int n){
 
 size_t Plateau::getMaxIndex () const{return m_maxIndex;}
 
-//std::vector<std::vector<Carte*>> Plateau::getListeCartesDevoilees(){return m_listeCartesDevoilees};
+std::vector<std::vector<Carte*>>& Plateau::getListeCartesDevoilees(){return m_listeCartesDevoilees;}
 
-//std::vector<Carte*> Plateau::getListeCartesEcartees(){return m_listeCartesEcartees};
+std::vector<Carte*>& Plateau::getListeCartesEcartees(){return m_listeCartesEcartees;}
 
 

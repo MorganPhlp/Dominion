@@ -24,7 +24,7 @@ class Joueur{
 		std::vector<Carte*> getHand();
 		std::vector<Carte*> getDeck();
 		std::vector<Carte*> getDefausse();
-		//std::vector<Carte*> getRebut();
+		std::vector<Carte*> getRebut();
 		
 		void addActions(int actions);
 		void addBuys(int buys);

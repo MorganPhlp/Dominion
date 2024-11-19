@@ -48,6 +48,8 @@ std::vector<Carte*> Joueur::getDeck(){ return m_deck;}
 
 std::vector<Carte*> Joueur::getDefausse(){ return m_defausse;}
 
+std::vector<Carte*> Joueur::getRebut(){ return m_rebut;}
+
 void Joueur::initDeck(Plateau p){
 	m_deck = {};
 	std::vector<CarteTresor> listeTresor = p.getListeCarteTresor();
@@ -203,13 +205,30 @@ void Joueur::putCardFromHandToDeck(){
 
 void Joueur::devoiler2Cartes(Plateau &plat){
 	std::vector<Carte*> temp;
+	size_t taille = m_deck.size();
 	for(size_t i = 0; i < 2; i++){
-		//verifier la taille du deck cf. dominions regles 1ere edition
+		//TODO "Un joueur qui n'a pas deux cartes à dévoiler après avoir mélangé sa pioche dévoile ce qu'il peut"
+		switch (taille) {
+			case 0:
+				assembleDeckDefausse();
+				for(size_t j = 0; j < 2; j++){
+					m_deck.at(j)->printCard();
+					temp.push_back(m_deck.at(j));	
+				}
+				break;
+			case 1:
+				m_deck.at(0)->printCard();
+				temp.push_back(m_deck.at(0));
+				assembleDeckDefausse();
+				temp.push_back(m_deck.at(0));
+				break;
+		}
 		m_deck.at(i)->printCard();
 		temp.push_back(m_deck.at(i));
 	}
 	(void) plat; //Juste pour enlever les bugs de compilation
-	//plat.m_listeCartesDevoilees.push_back(temp);
+	std::vector<std::vector<Carte*>>& listeCartesDevoilees = plat.getListeCartesDevoilees();
+	listeCartesDevoilees.push_back(temp);
 }
 
 void Joueur::receiveOr(Plateau &plat){ // Met dans la defausse

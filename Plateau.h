@@ -41,8 +41,8 @@ class Plateau{
  	Plateau();
  	~Plateau();
  	size_t getMaxIndex() const;
- 	//std::vector<std::vector<Carte*>> getListeCartesDevoilees;
- 	//std::vector<Carte*> getListeCartesEcartees;
+ 	std::vector<std::vector<Carte*>>& getListeCartesDevoilees();
+ 	std::vector<Carte*>& getListeCartesEcartees();
 
 };
 
