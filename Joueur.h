@@ -65,6 +65,7 @@ class Joueur{
 		int renovation();
 		void defausseCarteDeck(size_t index);
 		void vassal(Plateau &plat, Jeu &j);
+		void sentinelle();
 };
 
 #endif

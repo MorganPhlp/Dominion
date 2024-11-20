@@ -3,6 +3,7 @@
 #include <random>
 #include <chrono>
 #include <algorithm>
+#include <sstream>
 #include "Joueur.h"
 #include "Jeu.h"
 
@@ -470,7 +471,7 @@ void Joueur::defausseCarteDeck(size_t index){
         	m_defausse.push_back(m_deck.at(index));
         	m_deck.erase(m_deck.begin() + index);
     	} else {
-        	std::cerr << "Index invalide pour defausseCarteDeck !" << std::endl;
+        	std::cerr << "Index invalide !" << std::endl;
     	}
 }
 
@@ -493,4 +494,73 @@ void Joueur::vassal(Plateau &plat, Jeu &j){
 			}
 	} 
 	defausseCarteDeck(0);
+}
+
+void Joueur::sentinelle(){
+	std::string rep;
+	std::vector<Carte*> temp;
+	if(m_deck.size() <= 1) assembleDeckDefausse();
+	for(size_t i = 0; i < 2; i++){
+		temp.push_back(m_deck.at(i));
+		m_deck.at(i)->printCard();
+		bool actionChoisie = false;
+        	while (!actionChoisie) {
+            		std::cout << "Souhaitez-vous jeter et/ou défausser cette carte ?\n"
+                      << "Répondez 'JETER' pour jeter, 'DEFAUSSER' pour défausser, ou 'STOP' pour ne rien faire." << std::endl;
+            		std::cin >> rep;
+
+            		if (rep == "JETER" || rep == "jeter") {
+                		m_rebut.push_back(m_deck.at(i));
+                		actionChoisie = true;
+            		} else if (rep == "DEFAUSSER" || rep == "defausser") {
+                		m_defausse.push_back(m_deck.at(i));
+                		actionChoisie = true;
+            		} else if (rep == "STOP" || rep == "stop") {
+                		actionChoisie = true;
+            		} else {
+                		std::cout << "Entrée invalide. Veuillez réessayer." << std::endl;
+            		}
+            	}
+	}
+	
+	for (Carte* c : temp) {
+        	auto it = std::find(m_deck.begin(), m_deck.end(), c);
+        	if (it != m_deck.end()) {
+            		m_deck.erase(it);
+        	}
+    	}
+	
+	if (!temp.empty()) {
+	        std::cout << "Vous avez décidé de garder certaines cartes. Dans quel ordre voulez-vous les replacer sur le haut de votre deck ?" << std::endl;
+        	std::cout << "Indiquez l'ordre des indices des cartes à replacer (0 pour la première carte révélée, 1 pour la deuxième) séparés par un espace." << std::endl;
+
+        	for (size_t i = 0; i < temp.size(); i++) {
+            		std::cout << i << ": ";
+            		temp.at(i)->printCard();
+        	}
+
+        	std::vector<size_t> ordre;
+        	while (ordre.size() != temp.size()) {
+            		std::cout << "Entrez l'ordre exact (par exemple, '1 0' si vous voulez mettre la deuxième carte en haut) :" << std::endl;
+            		ordre.clear();
+
+            		std::string input;
+            		std::getline(std::cin >> std::ws, input);
+            		std::istringstream ss(input);
+            		size_t index;
+            		while (ss >> index) {
+                		if (index < temp.size() && std::find(ordre.begin(), ordre.end(), index) == ordre.end()) {
+                    			ordre.push_back(index);
+                		} else {
+                    			std::cout << "Indice invalide ou déjà utilisé. Veuillez réessayer." << std::endl;
+                    			ordre.clear();
+                    			break;
+                		}
+            		}
+        	}
+        	for (size_t i = 0; i < ordre.size(); i++) {
+            		m_deck.insert(m_deck.begin(), temp.at(ordre.at(i)));
+        	}
+    	}
+    	std::cout << "Les cartes ont été replacées sur le haut de votre deck." << std::endl;
 }

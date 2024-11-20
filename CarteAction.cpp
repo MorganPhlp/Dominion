@@ -82,7 +82,7 @@ void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, in
         	int cost = p.renovation();
         	p.receiveCard(cost,plat);
         }
-        else if(name == "Sentinelle") {} //TODO
+        else if(name == "Sentinelle") {	p.sentinelle();} //TODO
         else if(name == "Salle du Trône") {} //TODO
         else if (name == "Vassal") p.vassal(plat,j);
         else if(name == "Chancellier") {}
