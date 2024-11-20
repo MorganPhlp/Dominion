@@ -9,6 +9,7 @@ class Jeu{
     int m_nb_joueurs;
     Plateau m_plateau;
     std::vector<Joueur> m_listeJoueur;
+    std::vector<size_t> m_joueursImmunises;
     Joueur* m_joueurActif;
     void initJoueurActif(std::vector<Joueur>& liste);
     void tourJoueur(Joueur* j);
@@ -28,6 +29,8 @@ class Jeu{
     bool verifWin();
     void calculerScoreFinal();
     void jouerPartie();
+    void verifDouve();
+    void viderImmunises();
 };
 
 #endif

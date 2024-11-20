@@ -9,6 +9,7 @@ Jeu::Jeu(int nb_joueurs, Plateau plateau, std::vector<Joueur> listeJoueur) : m_n
 		m_listeJoueur.at(i).initDeck(m_plateau);
 	}
 	initJoueurActif(m_listeJoueur);
+	std::vector<size_t> m_joueursImmunises = {};
 }
 
 Jeu::~Jeu() {}
@@ -38,13 +39,17 @@ void Jeu::tourJoueur(Joueur* j){
 		std::cout << "Entrez le numéro de la carte que vous souhaitez jouer : " << std::endl;
 		std::cin >> index;
 		if(index > 0 and index < j->getHand().size()){
-			try{
-				j->getHand().at(index)->play(*j, m_plateau, index, *this);		//methode a faire dans la classe Carte
-				j->addActions(-1);
-			}
-			catch (const std::exception& e){
-				std::cerr << "Erreur : " << e.what() << std::endl;
-			}
+		        if(j->getHand().at(index)->getType() == TypeCarte::Victoire || j->getHand().at(index)->getName() == "Jardins"){
+		                std::cout << "Vous ne pouvez pas jouer cette carte" << std::endl;
+		        }
+		
+	                try{
+		                j->getHand().at(index)->play(*j, m_plateau, index, *this);		//methode a faire dans la classe Carte
+		                j->addActions(-1);
+	                }
+	                catch (const std::exception& e){
+		                std::cerr << "Erreur : " << e.what() << std::endl;
+	                }
 			
 		}
 		std::cout << "Ecrivez ACHAT si vous voulez passer à la phase Achat" << std::endl;
@@ -89,7 +94,7 @@ void Jeu::tourJoueur(Joueur* j){
 
 void Jeu::tousSaufActifMalediction(){
   for(size_t i = 0; i < m_listeJoueur.size(); i++){
-    if(&m_listeJoueur.at(i) != m_joueurActif){
+    if(&m_listeJoueur.at(i) != m_joueurActif && std::find(m_joueursImmunises.begin(), m_joueursImmunises.end(), i) == m_joueursImmunises.end()){
       m_listeJoueur.at(i).receiveMalediction(m_plateau);
     }
   }
@@ -176,7 +181,7 @@ void Jeu::tousSaufActifPiochent(){
 
 void Jeu::tousSaufActifDefausseJusqua(size_t n){
   for(size_t i = 0; i < m_listeJoueur.size(); i++){
-    if(&m_listeJoueur.at(i) != m_joueurActif){
+    if(&m_listeJoueur.at(i) != m_joueurActif && std::find(m_joueursImmunises.begin(), m_joueursImmunises.end(), i) == m_joueursImmunises.end()){
       m_listeJoueur.at(i).printHand();
       while(m_listeJoueur.at(i).getHand().size() > n){
         m_listeJoueur.at(i).demandeDefausse();
@@ -187,7 +192,7 @@ void Jeu::tousSaufActifDefausseJusqua(size_t n){
 
 void Jeu::tousSaufActifPoseCarteVictoire(){
   for(size_t i = 0; i < m_listeJoueur.size(); i++){
-    if(&m_listeJoueur.at(i) != m_joueurActif){
+    if(&m_listeJoueur.at(i) != m_joueurActif && std::find(m_joueursImmunises.begin(), m_joueursImmunises.end(), i) == m_joueursImmunises.end()){
       m_listeJoueur.at(i).printHand();
       if(m_listeJoueur.at(i).getNbCarteVictoireHand().first == 0){
         m_listeJoueur.at(i).printHand(); // TODO Dévoiler la main aux autres joueurs (peut-être à changer)
@@ -239,16 +244,16 @@ void Jeu::defausserCarteParPileVide(Plateau& plat){
 bool Jeu::verifWin(){
   int pilesVide = 0;
   
-  for(const auto& pile : m_plateau.getPilesVictoire()){
+  for(auto& pile : m_plateau.getPilesVictoire()){
     if(pile.second == 0){
       if(pile.first.getName() == "Province") return true;
       pilesVide++;
     }
   }
-  for(const auto& pile : m_plateau.getPilesAction()){
+  for(auto& pile : m_plateau.getPilesAction()){
     if(pile.second == 0) pilesVide++;
   }
-  for(const auto& pile : m_plateau.getPilesTresor()){
+  for(auto& pile : m_plateau.getPilesTresor()){
     if(pile.second == 0) pilesVide++;
   }
   
@@ -298,4 +303,17 @@ void Jeu::jouerPartie(){
     }
   }
   calculerScoreFinal();
+}
+
+void Jeu::verifDouve(){
+  for(size_t i = 0; i < m_listeJoueur.size(); i++){
+    if(m_listeJoueur.at(i).handContainsDouve()){
+      std::cout << "Le joueur " << m_listeJoueur.at(i).getPseudo() << " est immunisé grâce à sa carte Douve" << std::endl;
+      m_joueursImmunises.push_back(i);
+    }
+  }
+}
+
+void Jeu::viderImmunises(){
+  m_joueursImmunises = {};
 }

@@ -69,6 +69,7 @@ class Joueur{
 		void sentinelle();
 		void putDeckInDefausse();
 		int calculerPoints();
+		bool handContainsDouve();
 };
 
 #endif

@@ -14,7 +14,6 @@ CarteVictoire::~CarteVictoire() {}
 void CarteVictoire::play(Joueur &p, Plateau &plat, int index, Jeu &j){
   (void) j;
   (void) plat;
-  p.addWinPoints(m_win_points);
   p.defausseCarte(index);
 }
 
