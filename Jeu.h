@@ -25,6 +25,9 @@ class Jeu{
     void tousSaufActifPoseCarteVictoire();
     void banditisme();
     void defausserCarteParPileVide(Plateau& plat);
+    bool verifWin();
+    void calculerScoreFinal();
+    void jouerPartie();
 };
 
 #endif

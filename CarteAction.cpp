@@ -47,8 +47,8 @@ void CarteAction::printCard() const{
 
 
 void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, int index, Jeu &j){ 
-        // TODO Faire la Carte Douve qui a un fonctionnement à part (après une carte attaque) DEMANDER EXPLICATION SUR COMMENT ELLE MARCHE
-        // TODO Faire la carte Jardins qui a un fonctionnement à part (comme une carte victoire) DEMANDER SI LES POINTS NE SONT COMPTES QUE EN FIN DE PARTIE
+        // TODO Faire la Carte Douve qui a un fonctionnement à part (après une carte attaque) 
+        // TODO EMPECHER DE JOUER CARTE JARDINS
 	if(name == "Atelier") p.receiveCard(4, plat);
 	else if(name == "Chapelle") p.throwMax(4);
 	else if(name == "Festin"){
@@ -82,10 +82,11 @@ void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, in
         	int cost = p.renovation();
         	p.receiveCard(cost,plat);
         }
-        else if(name == "Sentinelle") {	p.sentinelle();} //TODO
-        else if(name == "Salle du Trône") {} //TODO
+
+        else if(name == "Sentinelle")p.sentinelle();
+        else if(name == "Salle du Trône") {} //TODO Fonctionnement spécial à faire après
         else if (name == "Vassal") p.vassal(plat,j);
-        else if(name == "Chancellier") {}
+        else if(name == "Chancellier") p.putDeckInDefausse();
         else if(name == "Espion") {}
 }
 

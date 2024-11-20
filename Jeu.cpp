@@ -2,6 +2,7 @@
 #include <random>
 #include <chrono>
 #include <functional>
+#include <iomanip>
 
 Jeu::Jeu(int nb_joueurs, Plateau plateau, std::vector<Joueur> listeJoueur) : m_nb_joueurs(nb_joueurs), m_plateau(plateau), m_listeJoueur(listeJoueur) {
 	for(size_t i = 0; i < m_listeJoueur.size(); i++){
@@ -233,4 +234,68 @@ void Jeu::defausserCarteParPileVide(Plateau& plat){
 			}
 		}
 	}
+}
+
+bool Jeu::verifWin(){
+  int pilesVide = 0;
+  
+  for(const auto& pile : m_plateau.getPilesVictoire()){
+    if(pile.second == 0){
+      if(pile.first.getName() == "Province") return true;
+      pilesVide++;
+    }
+  }
+  for(const auto& pile : m_plateau.getPilesAction()){
+    if(pile.second == 0) pilesVide++;
+  }
+  for(const auto& pile : m_plateau.getPilesTresor()){
+    if(pile.second == 0) pilesVide++;
+  }
+  
+  return pilesVide >= 3;
+}
+
+void Jeu::calculerScoreFinal() {
+    std::cout << "======== Affichage des scores ========" << std::endl;
+    std::vector<std::pair<Joueur, int>> tabScore;
+    for (auto& joueur : m_listeJoueur) {
+        int score = joueur.calculerPoints();
+        tabScore.push_back(std::make_pair(joueur, score));
+    }
+    
+    std::sort(tabScore.begin(), tabScore.end(), [](const auto &p1, const auto &p2){
+      return p1.second > p2.second;
+    });
+    
+    std::cout << std::left << std::setw(15) << "Joueur" << "Score" << std::endl;
+    std::cout << "-------------------------------" << std::endl;
+    for (size_t i = 0; i < tabScore.size(); ++i) {
+        if (i == 0) {
+            std::cout << std::left << std::setw(15) << tabScore[i].first.getPseudo() 
+                      << tabScore[i].second << " (GAGNANT)" << std::endl;
+        } else {
+            std::cout << std::left << std::setw(15) << tabScore[i].first.getPseudo() 
+                      << tabScore[i].second << std::endl;
+        }
+    }
+    std::cout << "===============================" << std::endl;
+}
+
+void Jeu::jouerPartie(){
+  std::cout << "======== Début de la partie ========" << std::endl;
+  int nbTour = 0;
+  while (!verifWin()) {
+    nbTour++;
+    std::cout << "Tour numéro " << nbTour << std::endl;
+    for (size_t i = 0; i < m_listeJoueur.size(); i++) {
+      m_joueurActif = &m_listeJoueur.at(i);
+      std::cout << "Tour de " << m_joueurActif->getPseudo() << " !" << std::endl;
+      tourJoueur(m_joueurActif);
+      if (verifWin()) {
+        std::cout << "Fin de la partie atteinte en " << nbTour << " tours" << std::endl;
+        break;
+      }
+    }
+  }
+  calculerScoreFinal();
 }
