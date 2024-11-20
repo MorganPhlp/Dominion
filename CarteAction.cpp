@@ -18,6 +18,7 @@ void CarteAction::play(Joueur &p, Plateau &plat, int index, Jeu &j){
   p.addDraws(m_draws);
   p.addCoins(m_coins);
   p.defausseCarte(index);
+  if(m_isAttack) j.viderImmunises();
 }
 
 
@@ -47,8 +48,9 @@ void CarteAction::printCard() const{
 
 
 void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, int index, Jeu &j){ 
-        // TODO Faire la Carte Douve qui a un fonctionnement à part (après une carte attaque) 
-        // TODO EMPECHER DE JOUER CARTE JARDINS
+        if(m_isAttack){
+          j.verifDouve();
+        }
 	if(name == "Atelier") p.receiveCard(4, plat);
 	else if(name == "Chapelle") p.throwMax(4);
 	else if(name == "Festin"){
@@ -56,12 +58,12 @@ void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, in
 	  p.receiveCard(5, plat);
         }
         else if(name == "Sorcière") j.tousSaufActifMalediction();
-        else if(name == "Voleur") j.volerCartesAdversaires();
+        else if(name == "Voleur") j.volerCartesAdversaires(); // TODO Ajouter gestion Douve
         else if(name == "Artisan"){
           p.receiveCard(5, plat);
           p.putCardFromHandToDeck();
         }
-        else if(name == "Bandit"){
+        else if(name == "Bandit"){ // TODO Ajouter gestion Douve
           p.receiveOr(plat);
           j.banditisme();
         }

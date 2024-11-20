@@ -597,7 +597,13 @@ int Joueur::calculerPoints(){
     else if(m_deck.at(i)->getName() == "Jardins")score += m_deck.size()/10;
   }
   return score;
+}
 
+bool Joueur::handContainsDouve(){
+  for(size_t i = 0; i < m_hand.size(); i++){
+    if(m_hand.at(i)->getName() == "Douve")return true;
+  }
+  return false;
 }
 
 std::vector<bool> Joueur::decideDefausse(std::vector<Joueur> listeJoueur){
