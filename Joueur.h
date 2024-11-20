@@ -21,6 +21,7 @@ class Joueur{
 		int getNbWinPoints();
 		int getCoins();
 		int getDraws();
+		std::string getPseudo();
 		std::vector<Carte*> getHand();
 		std::vector<Carte*> getDeck();
 		std::vector<Carte*>& getDefausse();
@@ -65,6 +66,8 @@ class Joueur{
 		int renovation();
 		void defausseCarteDeck(size_t index);
 		void vassal(Plateau &plat, Jeu &j);
+		void putDeckInDefausse();
+		int calculerPoints();
 };
 
 #endif

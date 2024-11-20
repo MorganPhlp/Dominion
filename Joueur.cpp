@@ -43,6 +43,8 @@ int Joueur::getNbWinPoints(){ return m_nb_win_points;}
 
 int Joueur::getDraws(){ return m_draws;}
 
+std::string Joueur::getPseudo(){ return m_pseudo;}
+
 std::vector<Carte*> Joueur::getHand(){ return m_hand;}
 
 std::vector<Carte*> Joueur::getDeck(){ return m_deck;}
@@ -493,4 +495,35 @@ void Joueur::vassal(Plateau &plat, Jeu &j){
 			}
 	} 
 	defausseCarteDeck(0);
+}
+
+void Joueur::putDeckInDefausse(){
+  std::string rep;
+  bool fin = false;
+  std::cout << "Voulez-vous défausser tout votre deck ? (Répondez par OUI ou NON)" << std::endl;
+  while(!fin){
+    std::cin >> rep;
+    if(rep == "OUI" || rep == "Oui" || rep == "oui"){
+      for(size_t i = 0; i < m_deck.size(); i++){
+        m_defausse.push_back(m_deck.at(i));
+        m_deck.erase(m_deck.begin());
+        assembleDeckDefausse();
+      }
+      fin = true;
+    }
+    else if(rep == "NON" || rep == "Non" || rep == "non") fin = true;
+  }
+}
+
+int Joueur::calculerPoints(){
+  assembleDeckDefausse();
+  int score = 0;
+  for(size_t i = 0; i < m_deck.size(); i++){
+    if(m_deck.at(i)->getType() == TypeCarte::Victoire){
+      CarteVictoire* c = dynamic_cast<CarteVictoire*>(m_deck.at(i));
+      if(c) score += c->getWinPoints();
+    }
+    else if(m_deck.at(i)->getName() == "Jardins")score += m_deck.size()/10;
+  }
+  return score;
 }
