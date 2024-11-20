@@ -299,3 +299,15 @@ void Jeu::jouerPartie(){
   }
   calculerScoreFinal();
 }
+
+void Jeu::espionnage(){
+	std::vector<bool> reponse = m_joueurActif->decideDefausse(m_listeJoueur);
+	for(size_t i = 0; i < m_listeJoueur.size(); i++){
+		std::cout << m_listeJoueur.at(i).getPseudo() << " dévoile la 1ère carte de son deck : " << std::endl;
+		m_listeJoueur.at(i).getDeck().at(0)->printCard();
+		if(reponse.at(i) == true){
+			m_listeJoueur.at(i).defausseCarteDeck(0);
+		}
+	}
+	
+}

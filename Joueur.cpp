@@ -566,6 +566,7 @@ void Joueur::sentinelle(){
         	}
     	}
     	std::cout << "Les cartes ont été replacées sur le haut de votre deck." << std::endl;
+}
 
 void Joueur::putDeckInDefausse(){
   std::string rep;
@@ -597,4 +598,16 @@ int Joueur::calculerPoints(){
   }
   return score;
 
+}
+
+std::vector<bool> Joueur::decideDefausse(std::vector<Joueur> listeJoueur){
+	std::vector<bool> reponse;
+	std::string res;
+	for(size_t i = 0; i < listeJoueur.size(); i++){  
+		std::cout << "Voulez-vous défausser la carte de " << listeJoueur.at(i).getPseudo() << " ? Répondez par 'OUI' ou par 'NON'. "<< std::endl;
+		std::cin >> res;
+		if(res == "OUI") reponse.push_back(true);
+		if(res == "NON") reponse.push_back(false);
+	}
+	return reponse;
 }

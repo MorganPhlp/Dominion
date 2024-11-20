@@ -28,6 +28,7 @@ class Jeu{
     bool verifWin();
     void calculerScoreFinal();
     void jouerPartie();
+    void espionnage();
 };
 
 #endif

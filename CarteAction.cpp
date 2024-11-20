@@ -83,11 +83,11 @@ void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, in
         	p.receiveCard(cost,plat);
         }
 
-        else if(name == "Sentinelle")p.sentinelle();
+        else if(name == "Sentinelle") p.sentinelle();
         else if(name == "Salle du Trône") {} //TODO Fonctionnement spécial à faire après
         else if (name == "Vassal") p.vassal(plat,j);
         else if(name == "Chancellier") p.putDeckInDefausse();
-        else if(name == "Espion") {}
+        else if(name == "Espion") j.espionnage();
 }
 
 

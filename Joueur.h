@@ -69,6 +69,7 @@ class Joueur{
 		void sentinelle();
 		void putDeckInDefausse();
 		int calculerPoints();
+		std::vector<bool> decideDefausse(std::vector<Joueur> listeJoueur);
 };
 
 #endif
