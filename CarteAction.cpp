@@ -56,12 +56,12 @@ void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, in
 	  p.receiveCard(5, plat);
         }
         else if(name == "Sorcière") j.tousSaufActifMalediction();
-        else if(name == "Voleur") j.volerCartesAdversaires(); // TODO Ajouter gestion Douve
+        else if(name == "Voleur") j.volerCartesAdversaires();
         else if(name == "Artisan"){
           p.receiveCard(5, plat);
           p.putCardFromHandToDeck();
         }
-        else if(name == "Bandit"){ // TODO Ajouter gestion Douve
+        else if(name == "Bandit"){
           p.receiveOr(plat);
           j.banditisme();
         }
@@ -87,7 +87,7 @@ void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, in
         else if(name == "Salle du Trône") {} //TODO Fonctionnement spécial à faire après
         else if (name == "Vassal") p.vassal(plat,j);
         else if(name == "Chancellier") p.putDeckInDefausse();
-        else if(name == "Espion") j.espionnage(); // TODO Ajouter Gestion Douve
+        else if(name == "Espion") j.espionnage();
 }
 
 

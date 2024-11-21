@@ -102,7 +102,7 @@ void Jeu::tousSaufActifMalediction(){
 
 void Jeu::revelerCartes(){
 	for(size_t i = 0; i < m_listeJoueur.size(); i++){
-		if(&m_listeJoueur.at(i) != m_joueurActif){
+		if(&m_listeJoueur.at(i) != m_joueurActif && std::find(m_joueursImmunises.begin(), m_joueursImmunises.end(), i) == m_joueursImmunises.end()){
 			m_listeJoueur.at(i).devoiler2Cartes(m_plateau);
 		}
 	}
@@ -112,7 +112,7 @@ void Jeu::banditisme(){
 	revelerCartes();
 	std::vector<std::vector<Carte*>>& listeCartesDevoilees = m_plateau.getListeCartesDevoilees();
 	for(size_t i = 0; i < listeCartesDevoilees.size(); i++){
-		if(&m_listeJoueur.at(i) != m_joueurActif){
+		if(&m_listeJoueur.at(i) != m_joueurActif && std::find(m_joueursImmunises.begin(), m_joueursImmunises.end(), i) == m_joueursImmunises.end()){
 			for(size_t j = 0; j < 2; j++){
 				Carte* c = listeCartesDevoilees.at(i).at(j);
 				//c->printCard();
@@ -308,12 +308,16 @@ void Jeu::jouerPartie(){
 
 void Jeu::espionnage(){
 	std::vector<bool> reponse = m_joueurActif->decideDefausse(m_listeJoueur);
+	
 	for(size_t i = 0; i < m_listeJoueur.size(); i++){
-		std::cout << m_listeJoueur.at(i).getPseudo() << " dévoile la 1ère carte de son deck : " << std::endl;
-		m_listeJoueur.at(i).getDeck().at(0)->printCard();
-		if(reponse.at(i) == true){
-			m_listeJoueur.at(i).defausseCarteDeck(0);
+		if(std::find(m_joueursImmunises.begin(), m_joueursImmunises.end(), i) == m_joueursImmunises.end()){
+			std::cout << m_listeJoueur.at(i).getPseudo() << " dévoile la 1ère carte de son deck : " << std::endl;
+			m_listeJoueur.at(i).getDeck().at(0)->printCard();
+			if(reponse.at(i) == true){
+				m_listeJoueur.at(i).defausseCarteDeck(0);
+			}		
 		}
+		
 	}
 }
 	
