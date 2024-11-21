@@ -17,80 +17,104 @@ std::vector<std::vector<Carte*>> m_listeCartesDevoilees;
 std::vector<Carte*> m_listeCartesEcartees;
 const size_t Plateau::m_maxIndex = 17;
 
-Plateau::Plateau() {}
+Plateau::Plateau() {} // Constructeur
+// TODO Peut-être remplacer le init et le mettre dans le constructeur
 
-Plateau::~Plateau() {}
+Plateau::~Plateau() {} // Destructeur
 
-std::vector< std::tuple< std::string, std::string, int, std::string, int, int, int, int, int, bool, bool>> Plateau::loadCard(){
-	std::vector< std::tuple< std::string, std::string, int, std::string, int, int, int, int, int, bool, bool>> data;
-	std::ifstream file("ExcelActionCards.csv");
-	std::string line;
-	
-	if(file.is_open()){
-		std::getline(file, line); //Pour ignorer en-tête
-		
-		while(std::getline(file, line)){
-			std::stringstream ss(line);
-			std::string name, description, cardType, col;
-			int cost, win_points = 0, coins = 0, draws = 0, actions = 0, buys = 0;
-			bool attack = false, reaction = false;
-			
-			try{
-				std::getline(ss, cardType, ',');
-				std::getline(ss, name, ',');
-				
-				std::getline(ss, col, ',');
-				cost = col.empty() ? 0 : std::stoi(col);
-				
-				bool entreGuillemets = false;
-				char c;
-				while(ss.get(c)){
-					if(c == '"' && !entreGuillemets){
-						entreGuillemets = true;
-					}
-					else if(c == '"' && entreGuillemets){
-						entreGuillemets = false;
-					}
-					else if(c == ',' && !entreGuillemets){
-						break;
-					}
-					else description.push_back(c);
-				}
-				
-				
-				std::getline(ss, col, ',');
-				win_points = col.empty() ? 0 : std::stoi(col);
-				std::getline(ss, col, ',');
-				coins = col.empty() ? 0 : std::stoi(col);
-				std::getline(ss, col, ',');
-				draws = col.empty() ? 0 : std::stoi(col);
-				std::getline(ss, col, ',');
-				actions = col.empty() ? 0 : std::stoi(col);
-				std::getline(ss, col, ',');
-				buys = col.empty() ? 0 : std::stoi(col);
-				
-				std::getline(ss, col, ',');
-				attack = (col == "1");
-				std::getline(ss, col, ',');
-				reaction = (col == "1");
-				
-				std::tuple< std::string, std::string, int, std::string, int, int, int, int, int, bool, bool> t {cardType, name, cost, description, win_points, coins, draws, actions, buys, attack, reaction};
-				data.push_back(t);
-			} catch (const std::invalid_argument& e) {
-                		std::cerr << "Erreur de conversion dans la ligne : " << line << "\n";
-                		std::cerr << "Exception: " << e.what() << std::endl;
-			} catch (const std::out_of_range& e) {
-				std::cerr << "Valeur hors limite dans la ligne : " << line << "\n";
-				std::cerr << "Exception: " << e.what() << std::endl;
-			}
-			
-		}
-		file.close();
-	} else{
-		std::cerr << "Impossible d'ouvrir le fichier donné" << std::endl;
-	}
-	return data;
+// Getters
+std::vector<CarteAction> Plateau::getListeCarteAction() const{ return m_listeCarteActionChoisie; }
+
+std::vector<CarteTresor> Plateau::getListeCarteTresor() const{ return listeCarteTresor; }
+
+std::vector<CarteVictoire> Plateau::getListeCarteVictoire() const{ return listeCarteVictoire; }
+
+std::vector<std::pair<CarteAction, int>> Plateau::getPilesAction() {return m_PilesAction;}
+
+std::vector<std::pair<CarteTresor, int>> Plateau::getPilesTresor() {return m_PilesTresor;}
+
+std::vector<std::pair<CarteVictoire, int>> Plateau::getPilesVictoire() {return m_PilesVictoire;}
+
+size_t Plateau::getMaxIndex () const{return m_maxIndex;}
+
+std::vector<std::vector<Carte*>>& Plateau::getListeCartesDevoilees(){return m_listeCartesDevoilees;}
+
+std::vector<Carte*>& Plateau::getListeCartesEcartees(){return m_listeCartesEcartees;}
+
+// Méthode pour lire un int dans un string stream
+int Plateau::lireInt(std::stringstream& ss) {
+    std::string col;
+    std::getline(ss, col, ',');
+    return col.empty() ? 0 : std::stoi(col); // Si la colonne est vide on met 0 sinon la valeur
 }
+
+// Méthode pour lire un booléen dans un string stream
+bool Plateau::lireBool(std::stringstream& ss) {
+    std::string col;
+    std::getline(ss, col, ',');
+    return col == "1";
+}
+
+// Méthode pour lire un string dans un string stream mais qui est entreGuillemets à cause des virgules contenues dans ce string
+std::string Plateau::lireGuillemets(std::stringstream& ss) {
+    std::string col;
+    bool entreGuillemets = false;
+    char c;
+    while (ss.get(c)) { // Tant qu'il reste des caractères dans ce string stream
+        if (c == '"' && !entreGuillemets) { // Cas où on entre dans les guillemets
+            entreGuillemets = true;
+        } else if (c == '"' && entreGuillemets) { // Cas où on sort des guillemets
+            entreGuillemets = false;
+        } else if (c == ',' && !entreGuillemets) { // Cas où on a la virgule de fin de champ
+            break;
+        } else { // Quand on est dans les guillemets on renvoie tous les caractères
+            col.push_back(c);
+        }
+    }
+    return col;
+}
+
+// Méthode pour charger toutes les cartes avec tous leurs paramètres depuis le fichier csv contenu dans le même dossier
+std::vector< std::tuple< std::string, std::string, int, std::string, int, int, int, int, int, bool, bool>> Plateau::loadCard(){
+  std::vector< std::tuple< std::string, std::string, int, std::string, int, int, int, int, int, bool, bool>> data;
+  std::ifstream file("ExcelActionCards.csv"); // Récupère le fichier csv
+  std::string line;
+	
+  if (!file.is_open()) { // Si le fichier ne peut pas être ouvert alors on s'arrête
+    std::cerr << "Impossible d'ouvrir le fichier donné" << std::endl;
+    return data;
+  }
+  
+  std::getline(file, line); //Pour ignorer en-tête
+  while(std::getline(file, line)){ // Tant qu'il reste des lignes dans le fichier on continue et on la met dans la variable line
+    std::stringstream ss(line); // transforme la ligne en stringstream pour pouvoir la segmenter plus facilement
+    std::string name, description, cardType;
+    int cost = 0, win_points = 0, coins = 0, draws = 0, actions = 0, buys = 0;
+    bool attack = false, reaction = false;
+		
+    try{
+      std::getline(ss, cardType, ',');
+      std::getline(ss, name, ',');
+      cost = lireInt(ss);
+      description = lireGuillemets(ss);
+      win_points = lireInt(ss);
+      coins = lireInt(ss);
+      draws = lireInt(ss);
+      actions = lireInt(ss);
+      buys = lireInt(ss);
+      attack = lireBool(ss);
+      reaction = lireBool(ss);
+				
+      data.emplace_back(cardType, name, cost, description, win_points, coins, draws, actions, buys, attack, reaction); // Ajoute un nouvel objet à la fin de data
+    } catch (const std::exception& e) { // Vérifie les erreurs comme par exemple des erreurs de conversion avec std::stoi
+      std::cerr << "Erreur dans la ligne : " << line << "\nException" << e.what() << std::endl;
+    }
+  }
+  file.close(); // Fermer le fichier
+  return data;
+}
+
+
 
 void Plateau::remplirListeCarte(){
 	std::vector< std::tuple< std::string, std::string, int, std::string, int, int, int, int, int, bool, bool>> data = loadCard();
@@ -133,13 +157,8 @@ void Plateau::printTotalCard(){
 
 void Plateau::choisirCarteActionHasard() {
     m_listeCarteActionChoisie.clear(); // Vide la liste au cas où elle contiendrait déjà des cartes
-    std::vector<int> indices;
-    int taille = listeCarteAction.size();
- 
-    // Crée une liste d'indices possibles (de 0 à taille-1)
-    for (int i = 0; i < taille; i++) {
-        indices.push_back(i);
-    }
+    std::vector<int> indices(listeCarteAction.size());
+    std::iota(indices.begin(), indices.end(), 0); // Génère la liste de 0 à taille-1
 
     // Mélange aléatoirement les indices
     std::default_random_engine re(std::chrono::system_clock::now().time_since_epoch().count());
@@ -157,19 +176,6 @@ void Plateau::choisirCarteActionSetBase(){
     m_listeCarteActionChoisie.push_back(listeCarteAction.at(i));
   }
 }
-
-std::vector<CarteAction> Plateau::getListeCarteAction() const{ return m_listeCarteActionChoisie; }
-
-std::vector<CarteTresor> Plateau::getListeCarteTresor() const{ return listeCarteTresor; }
-
-std::vector<CarteVictoire> Plateau::getListeCarteVictoire() const{ return listeCarteVictoire; }
-
-std::vector<std::pair<CarteAction, int>> Plateau::getPilesAction() {return m_PilesAction;}
-
-std::vector<std::pair<CarteTresor, int>> Plateau::getPilesTresor() {return m_PilesTresor;}
-
-std::vector<std::pair<CarteVictoire, int>> Plateau::getPilesVictoire() {return m_PilesVictoire;}
-
 
 void Plateau::remplirPiles(int nb_joueurs){
 	m_PilesAction = {};
@@ -242,7 +248,7 @@ void Plateau::print() const{
     std::cout << "\n===================================\n";
 }
 
-
+// TODO Remplacer ces 3 méthodes par une méthode générique
 int Plateau::chercherCarteAction(std::string name){
   for(size_t i = 0; i < m_PilesAction.size(); i++){
     if(m_PilesAction.at(i).first.getName() == name) return i;
@@ -285,7 +291,7 @@ Carte* Plateau::buyCard(int index){
   }
 }
 
-
+// TODO Remplacer ces 2 méthodes par des méthodes génériques
 std::vector<std::pair<Carte*, int>> Plateau::getMax(int n){
   int somme = 0;
   std::vector<std::pair<Carte*, int>> max;
@@ -315,12 +321,6 @@ std::vector<std::pair<Carte*, int>> Plateau::getMax(int n){
   return max;
 }
 
-size_t Plateau::getMaxIndex () const{return m_maxIndex;}
-
-std::vector<std::vector<Carte*>>& Plateau::getListeCartesDevoilees(){return m_listeCartesDevoilees;}
-
-std::vector<Carte*>& Plateau::getListeCartesEcartees(){return m_listeCartesEcartees;}
-
 std::vector<std::pair<Carte*, int>> Plateau::getMaxTresor(int n){
   int somme = 0;
   std::vector<std::pair<Carte*, int>> max;
@@ -333,5 +333,3 @@ std::vector<std::pair<Carte*, int>> Plateau::getMaxTresor(int n){
   }
   return max;
 }
-
-

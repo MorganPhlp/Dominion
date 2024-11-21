@@ -29,7 +29,7 @@ class Joueur{
 		
 		void addActions(int actions);
 		void addBuys(int buys);
-		void drawCards(int nb);		/*le joueur pioche nb cartes de son deck*/
+		void drawCards(int nb); // le joueur pioche nb cartes de son deck
 		void addCoins(int coins);
 		void addDraws(int draws);
 		void addWinPoints(int win_points);

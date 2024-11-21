@@ -46,9 +46,7 @@ void CarteAction::printCard() const{ // Méthode pour afficher les cartes
 
 
 void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, int index, Jeu &j){ // Méthode pour gérer les différents cas spécifiques des cartes actions
-        if(m_isAttack){
-          j.verifDouve();
-        }
+        if(m_isAttack) j.verifDouve();
 	if(name == "Atelier") p.receiveCard(4, plat);
 	else if(name == "Chapelle") p.throwMax(4);
 	else if(name == "Festin"){
@@ -73,7 +71,7 @@ void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, in
         else if(name == "Chambre du conseil") j.tousSaufActifPiochent();
         else if(name == "Harbinger") p.regarderDefausseEtPrendre();
         else if(name == "Bibliothèque") p.piocherJusquaEtDefausseAction(7);
-        else if(name == "Marchand") {} // TODO Fonctionnement spécial à faire après
+        else if(name == "Marchand") j.addNbMarchand();
         else if(name == "Milice") j.tousSaufActifDefausseJusqua(3);
         else if(name == "Mine") p.jeterTresorPourRecuperPlus(3, plat);
         else if(name == "Prêteur sur gages") p.trocCuivrePieces();

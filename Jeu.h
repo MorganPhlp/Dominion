@@ -11,6 +11,7 @@ class Jeu{
     std::vector<Joueur> m_listeJoueur;
     std::vector<size_t> m_joueursImmunises;
     Joueur* m_joueurActif;
+    int m_nbMarchand;
     void initJoueurActif(std::vector<Joueur>& liste);
     void tourJoueur(Joueur* j);
   public :
@@ -32,6 +33,7 @@ class Jeu{
     void espionnage();
     void verifDouve();
     void viderImmunises();
+    void addNbMarchand();
 };
 
 #endif

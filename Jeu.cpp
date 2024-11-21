@@ -4,12 +4,14 @@
 #include <functional>
 #include <iomanip>
 
+std::vector<size_t> m_joueursImmunises = {};
+int m_nbMarchand = 0;
+
 Jeu::Jeu(int nb_joueurs, Plateau plateau, std::vector<Joueur> listeJoueur) : m_nb_joueurs(nb_joueurs), m_plateau(plateau), m_listeJoueur(listeJoueur) {
 	for(size_t i = 0; i < m_listeJoueur.size(); i++){
 		m_listeJoueur.at(i).initDeck(m_plateau);
 	}
 	initJoueurActif(m_listeJoueur);
-	std::vector<size_t> m_joueursImmunises = {};
 }
 
 Jeu::~Jeu() {}
@@ -40,15 +42,21 @@ void Jeu::tourJoueur(Joueur* j){
 		std::cin >> index;
 		if(index > 0 and index < j->getHand().size()){
 		        if(j->getHand().at(index)->getType() == TypeCarte::Victoire || j->getHand().at(index)->getName() == "Jardins"){
-		                std::cout << "Vous ne pouvez pas jouer cette carte" << std::endl;
+		                  std::cout << "Vous ne pouvez pas jouer cette carte" << std::endl;
 		        }
-		
-	                try{
-		                j->getHand().at(index)->play(*j, m_plateau, index, *this);		//methode a faire dans la classe Carte
-		                j->addActions(-1);
-	                }
-	                catch (const std::exception& e){
-		                std::cerr << "Erreur : " << e.what() << std::endl;
+		        else if(j->getHand().at(index)->getName() == "Argent" && m_nbMarchand != 0){
+		                  j->getHand().at(index)->play(*j, m_plateau, index, *this);
+		                  j->addCoins(m_nbMarchand);
+		                  m_nbMarchand = 0;
+		        }
+		        else{
+	                          try{
+		                          j->getHand().at(index)->play(*j, m_plateau, index, *this);		//methode a faire dans la classe Carte
+		                          j->addActions(-1);
+	                          }
+	                          catch (const std::exception& e){
+		                          std::cerr << "Erreur : " << e.what() << std::endl;
+	                          }
 	                }
 			
 		}
@@ -333,4 +341,8 @@ void Jeu::verifDouve(){
 
 void Jeu::viderImmunises(){
   m_joueursImmunises = {};
+}
+
+void Jeu::addNbMarchand(){
+  m_nbMarchand++;
 }
