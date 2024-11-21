@@ -6,9 +6,9 @@
 
 class Joueur;
 class Plateau;
-class Jeu;
+class Jeu; //Des Forward Declarations ici car on a besoin de ces objets dans la méthode virtuelle play et qu'ils sont compilés après Carte
 
-enum class TypeCarte {
+enum class TypeCarte { // Représente le type de carte
 	Action,
 	Tresor,
 	Victoire
@@ -20,15 +20,18 @@ class Carte{
   	int m_cost;
   	TypeCarte m_type;
   public :
-  	Carte(std::string name, std::string description, int cost, TypeCarte type);
-  	virtual ~Carte();
-  	virtual void play(Joueur &p, Plateau &plat, int index, Jeu &j) = 0;
+  	Carte(std::string name, std::string description, int cost, TypeCarte type); // Constructeur
+  	virtual ~Carte(); // Destructeur virtuel car au moins une méthode virtuelle
+  	virtual void play(Joueur &p, Plateau &plat, int index, Jeu &j) = 0; // Méthode virtuelle pour jouer la carte qui ne sera défini que dans ses classes héritées
   	//void buy(Joueur &p, Jeu &j);
+  	
+  	// Getters
   	std::string getName() const;
    	std::string getDescription() const;
    	int getCost() const;
-   	void printCard() const;
-   	TypeCarte getType();	
+   	TypeCarte getType() const;
+   	
+   	void printCard() const; // Méthode pour afficher la carte
 };
 
 #endif

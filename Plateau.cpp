@@ -9,7 +9,7 @@
 std::vector<CarteTresor> Plateau::listeCarteTresor;
 std::vector<CarteAction> Plateau::listeCarteAction;
 std::vector<CarteVictoire> Plateau::listeCarteVictoire;
-std::vector<CarteAction> m_listeCarteActionHasard;
+std::vector<CarteAction> m_listeCarteActionChoisie;
 std::vector<std::pair<CarteAction, int>> m_PilesAction;
 std::vector<std::pair<CarteTresor, int>> m_PilesTresor;
 std::vector<std::pair<CarteVictoire, int>> m_PilesVictoire;
@@ -131,33 +131,34 @@ void Plateau::printTotalCard(){
     }
 }
 
+void Plateau::choisirCarteActionHasard() {
+    m_listeCarteActionChoisie.clear(); // Vide la liste au cas où elle contiendrait déjà des cartes
+    std::vector<int> indices;
+    int taille = listeCarteAction.size();
+ 
+    // Crée une liste d'indices possibles (de 0 à taille-1)
+    for (int i = 0; i < taille; i++) {
+        indices.push_back(i);
+    }
 
-void Plateau::choisirCarteActionHasard(){
-	m_listeCarteActionHasard = {};
-	std::vector<int> nb;
-	
-	std::default_random_engine re(std::chrono::system_clock::now().time_since_epoch().count());
-	int taille = listeCarteAction.size();
-	std::uniform_int_distribution<int> distrib{0, taille-1};
-	auto rd = bind(distrib, re);
-	
-	for(int i = 0; i < 10; i++){
-		int alea = rd();
-		bool present = false;
-		for(size_t j = 0; j < nb.size(); j++){
-			if(nb.at(j) == alea){
-				present = true;
-				i-=1;
-				break;
-			}
-		}
-		if(!present){
-			m_listeCarteActionHasard.push_back(listeCarteAction.at(alea));
-		}
-	}
+    // Mélange aléatoirement les indices
+    std::default_random_engine re(std::chrono::system_clock::now().time_since_epoch().count());
+    std::shuffle(indices.begin(), indices.end(), re);
+
+    // Sélectionne les 10 premières cartes des indices mélangés
+    for (int i = 0; i < 10; i++) {
+        m_listeCarteActionChoisie.push_back(listeCarteAction.at(indices[i]));
+    }
 }
 
-std::vector<CarteAction> Plateau::getListeCarteAction() const{ return m_listeCarteActionHasard; }
+void Plateau::choisirCarteActionSetBase(){
+  m_listeCarteActionChoisie = {};
+  for(size_t i = 0; i < 10; i++){
+    m_listeCarteActionChoisie.push_back(listeCarteAction.at(i));
+  }
+}
+
+std::vector<CarteAction> Plateau::getListeCarteAction() const{ return m_listeCarteActionChoisie; }
 
 std::vector<CarteTresor> Plateau::getListeCarteTresor() const{ return listeCarteTresor; }
 
@@ -193,8 +194,8 @@ void Plateau::remplirPiles(int nb_joueurs){
     		else if(c.getName() == "Malédiction") m_PilesVictoire.push_back(std::make_pair(c, (10*nb_joueurs) - 10));
     	}
     	
-    	for(size_t i = 0; i < m_listeCarteActionHasard.size(); i++){
-    		CarteAction c = m_listeCarteActionHasard.at(i);
+    	for(size_t i = 0; i < m_listeCarteActionChoisie.size(); i++){
+    		CarteAction c = m_listeCarteActionChoisie.at(i);
     		if(c.getName() == "Jardins") m_PilesAction.push_back(std::make_pair(c, nb_joueurs));
     		else m_PilesAction.push_back(std::make_pair(c, 10));
     	}
@@ -203,7 +204,13 @@ void Plateau::remplirPiles(int nb_joueurs){
 
 void Plateau::init(int nb_joueurs){
 	remplirListeCarte();
-	choisirCarteActionHasard();
+	size_t rep;
+	std::cout << "Voulez-vous jouer avec un set de cartes Action au hasard ou avec le set de base ? (Répondez 1 ou 2 suivant la réponse)"<<std::endl;
+	while(rep!=1 && rep != 2){
+	  std::cin >> rep;
+	}
+	if(rep == 1) choisirCarteActionHasard();
+	else choisirCarteActionSetBase();
 	remplirPiles(nb_joueurs);
 }
 

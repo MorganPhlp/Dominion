@@ -8,7 +8,7 @@
 
 class Plateau{
  private :
- 	std::vector<CarteAction> m_listeCarteActionHasard;
+ 	std::vector<CarteAction> m_listeCarteActionChoisie;
  	std::vector<std::pair<CarteAction, int>> m_PilesAction;
  	std::vector<std::pair<CarteTresor, int>> m_PilesTresor;
  	std::vector<std::pair<CarteVictoire, int>> m_PilesVictoire;
@@ -25,6 +25,7 @@ class Plateau{
  	static std::vector< std::tuple< std::string, std::string, int, std::string, int, int, int, int, int, bool, bool>> loadCard();
  	static void remplirListeCarte();
  	void choisirCarteActionHasard();
+ 	void choisirCarteActionSetBase();
  	void remplirPiles(int nb_joueurs);
  public :
  	static void printTotalCard();

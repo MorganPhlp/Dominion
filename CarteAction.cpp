@@ -5,13 +5,11 @@
 #include "Plateau.h"
 #include "Jeu.h"
 
+// Constructeur
 CarteAction::CarteAction(std::string name, std::string description, int cost, int actions, int buys, int draws, int coins, bool isAttack, bool isReaction) : Carte(name, description, cost, TypeCarte::Action), m_actions(actions), m_buys(buys), m_draws(draws), m_coins(coins), m_isAttack(isAttack), m_isReaction(isReaction) {}
 
-/*Destructeur*/
-CarteAction::~CarteAction() {}
 
-
-void CarteAction::play(Joueur &p, Plateau &plat, int index, Jeu &j){
+void CarteAction::play(Joueur &p, Plateau &plat, int index, Jeu &j){ // Méthode pour jouer une carte
   if(!getDescription().empty()) playDescription(getName(), p, plat, index, j);
   p.addActions(m_actions);
   p.addBuys(m_buys);
@@ -22,7 +20,7 @@ void CarteAction::play(Joueur &p, Plateau &plat, int index, Jeu &j){
 }
 
 
-/*Getters*/
+// Getters
 int CarteAction::getDraws() const{return m_draws;}
 
 int CarteAction::getBuys() const{return m_buys;}
@@ -35,7 +33,7 @@ bool CarteAction::getIsAttack() const{return m_isAttack;}
 
 bool CarteAction::getIsReaction() const{return m_isReaction;}
 
-void CarteAction::printCard() const{
+void CarteAction::printCard() const{ // Méthode pour afficher les cartes
 	Carte::printCard();
 	if(m_draws != 0) std::cout << "+" << m_draws << " Cartes" << std::endl;
 	if(m_actions != 0) std::cout << "+" << m_actions << " Actions" << std::endl;
@@ -47,7 +45,7 @@ void CarteAction::printCard() const{
 
 
 
-void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, int index, Jeu &j){ 
+void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, int index, Jeu &j){ // Méthode pour gérer les différents cas spécifiques des cartes actions
         if(m_isAttack){
           j.verifDouve();
         }
@@ -89,7 +87,7 @@ void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, in
         else if(name == "Salle du Trône") {} //TODO Fonctionnement spécial à faire après
         else if (name == "Vassal") p.vassal(plat,j);
         else if(name == "Chancellier") p.putDeckInDefausse();
-        else if(name == "Espion") j.espionnage();
+        else if(name == "Espion") j.espionnage(); // TODO Ajouter Gestion Douve
 }
 
 

@@ -315,6 +315,7 @@ void Jeu::espionnage(){
 			m_listeJoueur.at(i).defausseCarteDeck(0);
 		}
 	}
+}
 	
 
 void Jeu::verifDouve(){
@@ -328,5 +329,4 @@ void Jeu::verifDouve(){
 
 void Jeu::viderImmunises(){
   m_joueursImmunises = {};
-
 }
