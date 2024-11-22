@@ -17,8 +17,17 @@ std::vector<std::vector<Carte*>> m_listeCartesDevoilees;
 std::vector<Carte*> m_listeCartesEcartees;
 const size_t Plateau::m_maxIndex = 17;
 
-Plateau::Plateau() {} // Constructeur
-// TODO Peut-être remplacer le init et le mettre dans le constructeur
+Plateau::Plateau(int nb_joueurs) { // Constructeur
+  remplirListeCarte();
+  size_t rep;
+  std::cout << "Voulez-vous jouer avec un set de cartes Action au hasard ou avec le set de base ? (Répondez 1 ou 2 suivant la réponse)"<<std::endl;
+  while(rep!=1 && rep != 2){
+    std::cin >> rep;
+  }
+  if(rep == 1) choisirCarteActionHasard();
+  else choisirCarteActionSetBase();
+  remplirPiles(nb_joueurs);
+}
 
 Plateau::~Plateau() {} // Destructeur
 
@@ -114,27 +123,26 @@ std::vector< std::tuple< std::string, std::string, int, std::string, int, int, i
   return data;
 }
 
-
-
+// Méthode pour remplire les listes de cartes
 void Plateau::remplirListeCarte(){
-	std::vector< std::tuple< std::string, std::string, int, std::string, int, int, int, int, int, bool, bool>> data = loadCard();
+	std::vector< std::tuple< std::string, std::string, int, std::string, int, int, int, int, int, bool, bool>> data = loadCard(); // On appelle la fonction pour charger toutes les cartes dans un vector
 	for(const auto& t : data){
-		if(std::get<0>(t) == "Trésor"){
+		if(std::get<0>(t) == "Trésor"){ // Pour les cartes trésor
 			CarteTresor c = CarteTresor(std::get<1>(t), std::get<3>(t), std::get<2>(t), std::get<5>(t));
 			listeCarteTresor.push_back(c);
 		}
-		else if(std::get<0>(t) == "Victoire"){
+		else if(std::get<0>(t) == "Victoire"){ // Pour les cartes victoire
 			CarteVictoire c = CarteVictoire(std::get<1>(t), std::get<3>(t), std::get<2>(t), std::get<4>(t));
 			listeCarteVictoire.push_back(c);
 		}
-		else{
+		else{ // Pour les cartes action
 			CarteAction c = CarteAction(std::get<1>(t), std::get<3>(t), std::get<2>(t), std::get<7>(t), std::get<8>(t), std::get<6>(t), std::get<5>(t), std::get<9>(t), std::get<10>(t));
 			listeCarteAction.push_back(c);
 		}
 	}
 }
 
-
+// Méthode pour afficher toutes les cartes (seulement pour vérifier qu'on les avait toutes)
 void Plateau::printTotalCard(){
     std::cout << "========== CARTES TRESOR ==========" << std::endl;
     for (const CarteTresor& carte : listeCarteTresor) {
@@ -155,72 +163,54 @@ void Plateau::printTotalCard(){
     }
 }
 
+// Méthode pour choisir 10 cartes action au hasard parmi la liste de cartes action
 void Plateau::choisirCarteActionHasard() {
-    m_listeCarteActionChoisie.clear(); // Vide la liste au cas où elle contiendrait déjà des cartes
+    m_listeCarteActionChoisie.clear();
     std::vector<int> indices(listeCarteAction.size());
     std::iota(indices.begin(), indices.end(), 0); // Génère la liste de 0 à taille-1
 
-    // Mélange aléatoirement les indices
     std::default_random_engine re(std::chrono::system_clock::now().time_since_epoch().count());
-    std::shuffle(indices.begin(), indices.end(), re);
+    std::shuffle(indices.begin(), indices.end(), re); // Mélange aléatoirement les indices
 
-    // Sélectionne les 10 premières cartes des indices mélangés
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; i++) { // Sélectionne les 10 premières cartes des indices mélangés
         m_listeCarteActionChoisie.push_back(listeCarteAction.at(indices[i]));
     }
 }
 
+// Méthode pour choisir les 10 cartes action du set de base
 void Plateau::choisirCarteActionSetBase(){
-  m_listeCarteActionChoisie = {};
-  for(size_t i = 0; i < 10; i++){
+  m_listeCarteActionChoisie.clear();
+  for(size_t i = 0; i < 10; i++){ // On prend les 10 premières cartes car ce sont les 10 premières qu'on a ajouté dans la liste
     m_listeCarteActionChoisie.push_back(listeCarteAction.at(i));
   }
 }
 
-void Plateau::remplirPiles(int nb_joueurs){
-	m_PilesAction = {};
-	m_PilesTresor = {};
-	m_PilesVictoire = {};
-	
-	for(size_t i = 0; i < listeCarteTresor.size(); i++){
-		CarteTresor c = listeCarteTresor.at(i);
-		if(c.getName() == "Cuivre") m_PilesTresor.push_back(std::make_pair(c, 60));
-		else if(c.getName() == "Argent") m_PilesTresor.push_back(std::make_pair(c, 40));
-		else if(c.getName() == "Or") m_PilesTresor.push_back(std::make_pair(c, 30));
-	}
-	
-	int nbVictoire = 8;
-	if(nb_joueurs != 2) nbVictoire = 12;
-	
-	for (size_t i = 0; i < listeCarteVictoire.size(); i++) {
-        	CarteVictoire c = listeCarteVictoire.at(i);
-        	if(c.getName() == "Domaine") m_PilesVictoire.push_back(std::make_pair(c, nbVictoire));
-        	else if(c.getName() == "Duché") m_PilesVictoire.push_back(std::make_pair(c, nbVictoire));
-    		else if(c.getName() == "Province") m_PilesVictoire.push_back(std::make_pair(c, nbVictoire));
-    		else if(c.getName() == "Malédiction") m_PilesVictoire.push_back(std::make_pair(c, (10*nb_joueurs) - 10));
-    	}
-    	
-    	for(size_t i = 0; i < m_listeCarteActionChoisie.size(); i++){
-    		CarteAction c = m_listeCarteActionChoisie.at(i);
-    		if(c.getName() == "Jardins") m_PilesAction.push_back(std::make_pair(c, nb_joueurs));
-    		else m_PilesAction.push_back(std::make_pair(c, 10));
-    	}
+// Méthode pour remplir les piles du plateau suivant le nombre de joueurs
+void Plateau::remplirPiles(int nb_joueurs) {
+    m_PilesTresor.clear(); 
+    m_PilesVictoire.clear();
+    m_PilesAction.clear(); // On vide les piles au cas où
+
+    for (auto& carte : listeCarteTresor) { // On parcourt les cartes trésor
+        int quantite = (carte.getName() == "Cuivre") ? 60 : // 60 cuivres
+                       (carte.getName() == "Argent") ? 40 : 30; // 40 argent et 30 or
+        m_PilesTresor.push_back(std::make_pair(carte, quantite)); // On ajoute dans la pile
+    }
+
+    int nbVictoire = (nb_joueurs <= 2) ? 8 : 12; // Nb de cartes victoires dans les piles selon le nombre de joueurs
+    for (auto& carte : listeCarteVictoire) { // On parcourt les cartes victoire
+        int quantite = (carte.getName() == "Malédiction") ? (10 * nb_joueurs - 10) : nbVictoire; // Cas spécial pour les malédictions
+        m_PilesVictoire.push_back(std::make_pair(carte, quantite));
+    }
+
+    for (auto& carte : m_listeCarteActionChoisie) { // On parcourt les cartes action choisies précédemment
+        int quantite = (carte.getName() == "Jardins") ? nbVictoire : 10; // Jardins fonctionne comme les cartes victoires sur le nombre
+        m_PilesAction.push_back(std::make_pair(carte, quantite));
+    }
 }
 
-
-void Plateau::init(int nb_joueurs){
-	remplirListeCarte();
-	size_t rep;
-	std::cout << "Voulez-vous jouer avec un set de cartes Action au hasard ou avec le set de base ? (Répondez 1 ou 2 suivant la réponse)"<<std::endl;
-	while(rep!=1 && rep != 2){
-	  std::cin >> rep;
-	}
-	if(rep == 1) choisirCarteActionHasard();
-	else choisirCarteActionSetBase();
-	remplirPiles(nb_joueurs);
-}
-
-
+// Méthode pour afficher le plateau
+// TODO A changer avec index et en plus beau
 void Plateau::print() const{
     std::cout << "======== PLATEAU DOMINION ========\n\n";
     
@@ -248,54 +238,55 @@ void Plateau::print() const{
     std::cout << "\n===================================\n";
 }
 
-// TODO Remplacer ces 3 méthodes par une méthode générique
-int Plateau::chercherCarteAction(std::string name){
-  for(size_t i = 0; i < m_PilesAction.size(); i++){
-    if(m_PilesAction.at(i).first.getName() == name) return i;
+// Méthode pour chercher une carte dans les piles et donner l'index de cette carte dans la pile
+template <typename T> // Template pour pouvoir mettre plusieurs types suivant le type de la carte
+size_t Plateau::chercherCarte(const std::vector<std::pair<T, int>>& pile, const std::string& name){
+  for(size_t i = 0; i < pile.size(); i++){
+    if(pile.at(i).first.getName() == name) return i; // On renvoie l'index de la carte dans la pile
   }
-  throw std::runtime_error("Carte introuvable : " + name);
+  throw std::runtime_error("Carte introuvable : " + name); // Renvoie une erreur si on ne trouve pas la carte cherchée
 }
 
-int Plateau::chercherCarteTresor(std::string name){
-  for(size_t i = 0; i < m_PilesTresor.size(); i++){
-    if(m_PilesTresor.at(i).first.getName() == name) return i;
-  }
-  throw std::runtime_error("Carte introuvable : " + name);
+// Méthode pour chercher l'index d'une carte action dans sa pile
+size_t Plateau::chercherCarteAction(std::string name){
+  return chercherCarte(m_PilesAction, name);
 }
 
-int Plateau::chercherCarteVictoire(std::string name){
-  for(size_t i = 0; i < m_PilesVictoire.size(); i++){
-    if(m_PilesVictoire.at(i).first.getName() == name) return i;
-  }
-  throw std::runtime_error("Carte introuvable : " + name);
+// Méthode pour chercher l'index d'une carte trésor dans sa pile
+size_t Plateau::chercherCarteTresor(std::string name){
+  return chercherCarte(m_PilesTresor, name);
 }
 
+// Méthode pour chercher l'index d'une carte victoire dans sa pile
+size_t Plateau::chercherCarteVictoire(std::string name){
+  return chercherCarte(m_PilesVictoire, name);
+}
 
-Carte* Plateau::buyCard(int index){
-  size_t i = static_cast<size_t>(index);
-  if(i > m_PilesTresor.size() - 1){
-    i -= m_PilesTresor.size() - 1;
-    if(i > m_PilesVictoire.size() - 1){
-      i -= m_PilesVictoire.size() - 1;
-      m_PilesAction.at(i).second -= 1;
-      return &m_PilesAction.at(i).first;
+// Méthode pour retirer un exemplaire d'une carte du plateau
+Carte* Plateau::buyCard(size_t index){
+  if(index > m_PilesTresor.size() - 1){ // Vérifie si l'index est plus loin que les cartes trésor
+    index -= m_PilesTresor.size() - 1;
+    if(index > m_PilesVictoire.size() - 1){ // Vérifie si l'index est plus loin que les cartes victoire
+      index -= m_PilesVictoire.size() - 1;
+      m_PilesAction.at(index).second -= 1; // On est dans les cartes action
+      return &m_PilesAction.at(index).first;
     }
-    else{
-      m_PilesVictoire.at(i).second -= 1;
-      return &m_PilesVictoire.at(i).first;
+    else{ // On est dans les cartes victoire
+      m_PilesVictoire.at(index).second -= 1;
+      return &m_PilesVictoire.at(index).first;
     }
   }
-  else{
-    m_PilesTresor.at(i).second -= 1;
-    return &m_PilesTresor.at(i).first;
+  else{ // On est dans les cartes trésor
+    m_PilesTresor.at(index).second -= 1;
+    return &m_PilesTresor.at(index).first;
   }
 }
 
-// TODO Remplacer ces 2 méthodes par des méthodes génériques
+// Méthode pour récupérer la liste des cartes avec leur index (pour pouvoir les récupérer) qui ont un coût maximal de n
 std::vector<std::pair<Carte*, int>> Plateau::getMax(int n){
   int somme = 0;
   std::vector<std::pair<Carte*, int>> max;
-  for(size_t i = 0; i < m_PilesTresor.size(); i++){
+  for(size_t i = 0; i < m_PilesTresor.size(); i++){ // Vérifie dans les cartes trésor celles qui valident la condition d'avoir un coût inférieur et où il reste des exemplaires de cette carte
     somme++;
     if(m_PilesTresor.at(i).first.getCost() <= n && m_PilesTresor.at(i).second !=0){
       std::pair<Carte*, int> elem = std::make_pair(&m_PilesTresor.at(i).first, somme);
@@ -303,7 +294,7 @@ std::vector<std::pair<Carte*, int>> Plateau::getMax(int n){
     }
   }
   
-  for(size_t i = 0; i < m_PilesVictoire.size(); i++){
+  for(size_t i = 0; i < m_PilesVictoire.size(); i++){ // Vérifie dans les cartes victoire
     somme++;
     if(m_PilesVictoire.at(i).first.getCost() <= n && m_PilesVictoire.at(i).second !=0){
       std::pair<Carte*, int> elem = std::make_pair(&m_PilesVictoire.at(i).first, somme);
@@ -311,7 +302,7 @@ std::vector<std::pair<Carte*, int>> Plateau::getMax(int n){
     }
   }
   
-  for(size_t i = 0; i < m_PilesAction.size(); i++){
+  for(size_t i = 0; i < m_PilesAction.size(); i++){ // Vérifie dans les cartes actions
     somme++;
     if(m_PilesAction.at(i).first.getCost() <= n && m_PilesAction.at(i).second !=0){
       std::pair<Carte*, int> elem = std::make_pair(&m_PilesAction.at(i).first, somme);
@@ -321,10 +312,11 @@ std::vector<std::pair<Carte*, int>> Plateau::getMax(int n){
   return max;
 }
 
+// Méthode pour récupérer la liste des cartes trésor avec leur index qui ont un coût inférieur à n
 std::vector<std::pair<Carte*, int>> Plateau::getMaxTresor(int n){
   int somme = 0;
   std::vector<std::pair<Carte*, int>> max;
-  for(size_t i = 0; i < m_PilesTresor.size(); i++){
+  for(size_t i = 0; i < m_PilesTresor.size(); i++){ // Regarde dans les cartes trésor celles qui ont un coût inférieur et dont il reste des exemplaires
     somme++;
     if(m_PilesTresor.at(i).first.getCost() <= n && m_PilesTresor.at(i).second !=0){
       std::pair<Carte*, int> elem = std::make_pair(&m_PilesTresor.at(i).first, somme);
@@ -333,3 +325,4 @@ std::vector<std::pair<Carte*, int>> Plateau::getMaxTresor(int n){
   }
   return max;
 }
+
