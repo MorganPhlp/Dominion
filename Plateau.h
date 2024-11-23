@@ -62,6 +62,7 @@ class Plateau{
     Carte* buyCard(size_t index); // Prendre une carte sur le plateau
     std::vector<std::pair<Carte*, int>> getMax(int n); // Avoir toutes les cartes disponibles d'un coût maximal n
     std::vector<std::pair<Carte*, int>> getMaxTresor(int n); // Avoir toutes les cartes trésor disponibles d'un coût maximal n
+    int chercherCoutParIndex(size_t index);
 
 };
 

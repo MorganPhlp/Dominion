@@ -50,7 +50,7 @@ class Joueur{
     void throwMax(int n);
     void defausseCarte(int index);
     void initNouveauTour();
-    void buyCard(int index, Plateau plat);
+    void buyCard(int index, Plateau &plat);
     void jeterCarte(int index);
     void receiveMalediction(Plateau &plat);
     void putCardFromHandToDeck();
@@ -78,6 +78,7 @@ class Joueur{
     int calculerPoints();
     std::vector<bool> decideDefausse(std::vector<Joueur> listeJoueur);
     bool handContainsDouve();
+    void resetDraws();
 };
 
 #endif

@@ -15,7 +15,7 @@ void CarteAction::play(Joueur &p, Plateau &plat, int index, Jeu &j){ // Méthode
   p.addBuys(m_buys);
   p.addDraws(m_draws);
   p.addCoins(m_coins);
-  p.defausseCarte(index);
+  if(getName() != "Festin")p.defausseCarte(index);
   if(m_isAttack) j.viderImmunises();
 }
 
@@ -45,10 +45,10 @@ void CarteAction::printCard() const{ // Méthode pour afficher les cartes
 
 
 
-void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, int index, Jeu &j){ // Méthode pour gérer les différents cas spécifiques des cartes actions
+void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, int &index, Jeu &j){ // Méthode pour gérer les différents cas spécifiques des cartes actions
         if(m_isAttack) j.verifDouve();
 	if(name == "Atelier") p.receiveCard(4, plat);
-	else if(name == "Chapelle") p.throwMax(4);
+	else if(name == "Chapelle") p.throwMax(4); // TODO Modifier index suivant les cartes supprimées pour défausser la bonne carte
 	else if(name == "Festin"){
 	  p.jeterCarte(index);
 	  p.receiveCard(5, plat);

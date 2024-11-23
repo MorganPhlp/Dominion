@@ -217,29 +217,29 @@ void Plateau::print() const{
     
   std::cout << "========== PILES TRESOR ==========\n";
   for (size_t i = 0; i < m_PilesTresor.size(); i++) {
-    somme++;
     std::cout << '[' << somme << ']';
     std::cout << "Quantité: " << m_PilesTresor.at(i).second << " | ";
     m_PilesTresor.at(i).first.printCard();
     std::cout << "-----------------------------------\n";
+    somme++;
   }
 
   std::cout << "\n========== PILES VICTOIRE ==========\n";
   for (size_t i = 0; i < m_PilesVictoire.size(); i++) {
-    somme++;
     std::cout << '[' << somme << ']';
     std::cout << "Quantité: " << m_PilesVictoire.at(i).second << " | ";
     m_PilesVictoire.at(i).first.printCard();
     std::cout << "-----------------------------------\n";
+    somme++;
   }
 
   std::cout << "\n========== PILES ACTION ==========\n";
   for (size_t i = 0; i < m_PilesAction.size(); i++) {
-    somme++;
     std::cout << '[' << somme << ']';
     std::cout << "Quantité: " << m_PilesAction.at(i).second << " | ";
     m_PilesAction.at(i).first.printCard();
     std::cout << "-----------------------------------\n";
+    somme++;
   }
 
   std::cout << "\n===================================\n";
@@ -272,9 +272,9 @@ size_t Plateau::chercherCarteVictoire(std::string name){
 // Méthode pour retirer un exemplaire d'une carte du plateau
 Carte* Plateau::buyCard(size_t index){
   if(index > m_PilesTresor.size() - 1){ // Vérifie si l'index est plus loin que les cartes trésor
-    index -= m_PilesTresor.size() - 1;
+    index -= m_PilesTresor.size();
     if(index > m_PilesVictoire.size() - 1){ // Vérifie si l'index est plus loin que les cartes victoire
-      index -= m_PilesVictoire.size() - 1;
+      index -= m_PilesVictoire.size();
       m_PilesAction.at(index).second -= 1; // On est dans les cartes action
       return &m_PilesAction.at(index).first;
     }
@@ -294,27 +294,27 @@ std::vector<std::pair<Carte*, int>> Plateau::getMax(int n){
   int somme = 0;
   std::vector<std::pair<Carte*, int>> max;
   for(size_t i = 0; i < m_PilesTresor.size(); i++){ // Vérifie dans les cartes trésor celles qui valident la condition d'avoir un coût inférieur et où il reste des exemplaires de cette carte
-    somme++;
     if(m_PilesTresor.at(i).first.getCost() <= n && m_PilesTresor.at(i).second !=0){
       std::pair<Carte*, int> elem = std::make_pair(&m_PilesTresor.at(i).first, somme);
       max.push_back(elem);
     }
+    somme++;
   }
   
   for(size_t i = 0; i < m_PilesVictoire.size(); i++){ // Vérifie dans les cartes victoire
-    somme++;
     if(m_PilesVictoire.at(i).first.getCost() <= n && m_PilesVictoire.at(i).second !=0){
       std::pair<Carte*, int> elem = std::make_pair(&m_PilesVictoire.at(i).first, somme);
       max.push_back(elem);
     }
+    somme++;
   }
   
   for(size_t i = 0; i < m_PilesAction.size(); i++){ // Vérifie dans les cartes actions
-    somme++;
     if(m_PilesAction.at(i).first.getCost() <= n && m_PilesAction.at(i).second !=0){
       std::pair<Carte*, int> elem = std::make_pair(&m_PilesAction.at(i).first, somme);
       max.push_back(elem);
     }
+    somme++;
   }
   return max;
 }
@@ -331,5 +331,21 @@ std::vector<std::pair<Carte*, int>> Plateau::getMaxTresor(int n){
     }
   }
   return max;
+}
+
+int Plateau::chercherCoutParIndex(size_t index){
+  if(index > m_PilesTresor.size() - 1){ // Vérifie si l'index est plus loin que les cartes trésor
+    index -= m_PilesTresor.size();
+    if(index > m_PilesVictoire.size() - 1){ // Vérifie si l'index est plus loin que les cartes victoire
+      index -= m_PilesVictoire.size(); 
+      return m_PilesAction.at(index).first.getCost(); // On est dans les cartes action
+    }
+    else{ // On est dans les cartes victoire
+      return m_PilesVictoire.at(index).first.getCost();
+    }
+  }
+  else{ // On est dans les cartes trésor
+    return m_PilesTresor.at(index).first.getCost();
+  }
 }
 

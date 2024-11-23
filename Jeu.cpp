@@ -5,7 +5,6 @@
 #include <iomanip>
 
 std::vector<size_t> m_joueursImmunises = {};
-int m_nbMarchand = 0;
 
 Jeu::Jeu(Plateau plateau, std::vector<Joueur> listeJoueur) : m_nb_joueurs(listeJoueur.size()), m_plateau(plateau), m_listeJoueur(listeJoueur) {
 	for(size_t i = 0; i < m_listeJoueur.size(); i++){
@@ -13,6 +12,7 @@ Jeu::Jeu(Plateau plateau, std::vector<Joueur> listeJoueur) : m_nb_joueurs(listeJ
 		m_listeJoueur.at(i).makeHand();
 	}
 	initJoueurActif(m_listeJoueur);
+	m_nbMarchand = 0;
 }
 
 Jeu::~Jeu() {}
@@ -64,7 +64,13 @@ void Jeu::tourJoueur(Joueur* j){
     catch (...){
       std::cerr << "Erreur lors de la lecture de l'index" << std::endl;
     }
-  }	
+    int nb = j->getDraws();
+    if(nb != 0){
+      for(int i = 0; i < nb; i++) j->piocher();
+    }
+    j->resetDraws();
+  }
+  
   
   //Phase Achat
   std::cout << "======== Phase Achat ========" << std::endl;
@@ -107,19 +113,25 @@ void Jeu::tourJoueur(Joueur* j){
     std::cin >> choix;
     if (choix == "PASSER") break;
     try{
-      if (index < m_plateau.getMaxIndex()) {
-        try {
-          j->buyCard(index, m_plateau);
-        } catch (const std::exception& e) {
-          std::cerr << "Erreur : " << e.what() << std::endl;
+      index = std::stoi(choix);
+      if (index < m_plateau.getMaxIndex()){
+        if(j->getCoins() >= m_plateau.chercherCoutParIndex(index)){
+          try {
+            j->buyCard(index, m_plateau);
+          } catch (const std::exception& e) {
+            std::cerr << "Erreur : " << e.what() << std::endl;
+          }
+        }
+        else{
+          std::cout << "Vous n'avez pas assez de pièces" << std::endl;
         }
       }
       else{
         std::cout << "Index invalide" << std::endl;
       }
     }
-    catch (...){
-      std::cerr << "Erreur lors de la lecture de l'index" << std::endl;
+    catch (const std::exception& e){
+      std::cerr << "Erreur lors de la lecture de l'index \n Erreur " << e.what() << std::endl;
     }
   }
 	

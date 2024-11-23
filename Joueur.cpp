@@ -116,20 +116,18 @@ void Joueur::initNouveauTour(){
   m_nb_buys = 1;
 }
 
-void Joueur::buyCard(int index, Plateau plat){
+void Joueur::buyCard(int index, Plateau &plat){
   Carte* c = plat.buyCard(index);
-  if(c->getCost() <= m_coins){
-    m_coins -= c->getCost();
-    m_nb_buys -= 1;
-    m_defausse.push_back(c);
-  }
+  m_coins -= c->getCost();
+  m_nb_buys -= 1;
+  m_defausse.push_back(c);
 }
 
 void Joueur::receiveCard(int n, Plateau &plat){
   std::vector<std::pair<Carte*, int>> liste = plat.getMax(n);
   std::cout << "Quelle carte voulez-vous parmi les suivantes : " << std::endl;
   for(size_t i = 0; i < liste.size(); i++){
-    if(i== liste.size()-1) std::cout << liste.at(i).first->getName() << std::endl;
+    if(i == liste.size()-1) std::cout << liste.at(i).first->getName() << std::endl;
     else std::cout << liste.at(i).first->getName() << "; ";
   }
   size_t index = 10000;
@@ -137,7 +135,7 @@ void Joueur::receiveCard(int n, Plateau &plat){
     std:: cin >> index;
   }
   Carte* c = plat.buyCard(liste.at(index).second);
-  m_hand.push_back(c);
+  m_defausse.push_back(c);
 }
 
 void Joueur::throwMax(int n){ // TODO Gestion erreurs
@@ -146,13 +144,23 @@ void Joueur::throwMax(int n){ // TODO Gestion erreurs
   std::string rep;
   bool stop = false;
   for(int i = 0; i < n; i++){
+    printHand();
     while(!stop){
       std:: cout << "Quelle carte voulez-vous jeter ? (Ecrivez l'index de la carte ou STOP si vous ne voulez plus en jeter)" << std::endl;
       std::cin >> rep;
-      if(rep == "STOP") stop = true;
-      else if(std::stoul(rep) < m_hand.size()){
-        jeterCarte(std::stoul(rep));
+      if(rep == "STOP"){
+        stop = true;
         break;
+      }
+      try{
+        std::stoul(rep);
+        if(std::stoul(rep) < m_hand.size()){
+          jeterCarte(std::stoul(rep));
+          break;
+        }
+      }
+      catch(...){
+        std::cerr << "Index Invalide" << std::endl;
       }
     }
     if(stop){
@@ -578,4 +586,8 @@ std::vector<bool> Joueur::decideDefausse(std::vector<Joueur> listeJoueur){
 		if(res == "NON") reponse.push_back(false);
 	}
 	return reponse;
+}
+
+void Joueur::resetDraws(){
+  m_draws = 0;
 }
