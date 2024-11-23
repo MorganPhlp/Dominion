@@ -6,9 +6,6 @@
 // Constructeur
 CarteTresor::CarteTresor(std::string name, std::string description, int cost, int coins) : Carte(name, description, cost, TypeCarte::Tresor), m_coins(coins) {}
 
-// Destructeur
-CarteTresor::~CarteTresor() {}
-
 void CarteTresor::play(Joueur &p, Plateau &plat, int index, Jeu &j){ // Méthode pour jouer la carte qui ajoute les pièces correspondantes au joueur et défausse la carte utilisée
   (void) j; 
   (void) plat; // Obligatoires car le Plateau et le Jeu sont dans la définition de base de Carte mais non utilisés ici

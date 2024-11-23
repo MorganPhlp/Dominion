@@ -31,7 +31,7 @@ class Carte{
    	int getCost() const;
    	TypeCarte getType() const;
    	
-   	void printCard() const; // Méthode pour afficher la carte
+   	virtual void printCard() const = 0; // Méthode pour afficher la carte
 };
 
 #endif

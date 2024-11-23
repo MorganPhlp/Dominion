@@ -6,9 +6,6 @@
 // Constructeur
 CarteVictoire::CarteVictoire(std::string name, std::string description, int cost, int win_points) : Carte(name, description, cost, TypeCarte::Victoire), m_win_points(win_points) {}
 
-// Destructeur
-CarteVictoire::~CarteVictoire() {}
-
 // Getters
 int CarteVictoire::getWinPoints() const{return m_win_points;}
 

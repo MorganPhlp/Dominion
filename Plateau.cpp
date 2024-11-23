@@ -32,11 +32,11 @@ Plateau::Plateau(int nb_joueurs) { // Constructeur
 Plateau::~Plateau() {} // Destructeur
 
 // Getters
-std::vector<CarteAction> Plateau::getListeCarteAction() const{ return m_listeCarteActionChoisie; }
+std::vector<CarteAction>& Plateau::getListeCarteAction(){ return m_listeCarteActionChoisie; }
 
-std::vector<CarteTresor> Plateau::getListeCarteTresor() const{ return listeCarteTresor; }
+std::vector<CarteTresor>& Plateau::getListeCarteTresor(){ return listeCarteTresor; }
 
-std::vector<CarteVictoire> Plateau::getListeCarteVictoire() const{ return listeCarteVictoire; }
+std::vector<CarteVictoire>& Plateau::getListeCarteVictoire(){ return listeCarteVictoire; }
 
 std::vector<std::pair<CarteAction, int>> Plateau::getPilesAction() {return m_PilesAction;}
 
@@ -212,30 +212,37 @@ void Plateau::remplirPiles(int nb_joueurs) {
 // Méthode pour afficher le plateau
 // TODO A changer avec index et en plus beau
 void Plateau::print() const{
-    std::cout << "======== PLATEAU DOMINION ========\n\n";
+  size_t somme = 0;
+  std::cout << "======== PLATEAU DOMINION ========\n\n";
     
-    std::cout << "========== PILES TRESOR ==========\n";
-    for (size_t i = 0; i < m_PilesTresor.size(); i++) {
-        std::cout << "Quantité: " << m_PilesTresor.at(i).second << " | ";
-        m_PilesTresor.at(i).first.printCard();
-        std::cout << "-----------------------------------\n";
-    }
+  std::cout << "========== PILES TRESOR ==========\n";
+  for (size_t i = 0; i < m_PilesTresor.size(); i++) {
+    somme++;
+    std::cout << '[' << somme << ']';
+    std::cout << "Quantité: " << m_PilesTresor.at(i).second << " | ";
+    m_PilesTresor.at(i).first.printCard();
+    std::cout << "-----------------------------------\n";
+  }
 
-    std::cout << "\n========== PILES VICTOIRE ==========\n";
-    for (size_t i = 0; i < m_PilesVictoire.size(); i++) {
-        std::cout << "Quantité: " << m_PilesVictoire.at(i).second << " | ";
-        m_PilesVictoire.at(i).first.printCard();
-        std::cout << "-----------------------------------\n";
-    }
+  std::cout << "\n========== PILES VICTOIRE ==========\n";
+  for (size_t i = 0; i < m_PilesVictoire.size(); i++) {
+    somme++;
+    std::cout << '[' << somme << ']';
+    std::cout << "Quantité: " << m_PilesVictoire.at(i).second << " | ";
+    m_PilesVictoire.at(i).first.printCard();
+    std::cout << "-----------------------------------\n";
+  }
 
-    std::cout << "\n========== PILES ACTION ==========\n";
-    for (size_t i = 0; i < m_PilesAction.size(); i++) {
-        std::cout << "Quantité: " << m_PilesAction.at(i).second << " | ";
-        m_PilesAction.at(i).first.printCard();
-        std::cout << "-----------------------------------\n";
-    }
+  std::cout << "\n========== PILES ACTION ==========\n";
+  for (size_t i = 0; i < m_PilesAction.size(); i++) {
+    somme++;
+    std::cout << '[' << somme << ']';
+    std::cout << "Quantité: " << m_PilesAction.at(i).second << " | ";
+    m_PilesAction.at(i).first.printCard();
+    std::cout << "-----------------------------------\n";
+  }
 
-    std::cout << "\n===================================\n";
+  std::cout << "\n===================================\n";
 }
 
 // Méthode pour chercher une carte dans les piles et donner l'index de cette carte dans la pile

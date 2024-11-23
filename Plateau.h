@@ -41,9 +41,9 @@ class Plateau{
     ~Plateau(); // Destructeur
     
     // Getters
-    std::vector<CarteAction> getListeCarteAction() const;
-    std::vector<CarteTresor> getListeCarteTresor() const;
-    std::vector<CarteVictoire> getListeCarteVictoire() const;
+    std::vector<CarteAction>& getListeCarteAction();
+    std::vector<CarteTresor>& getListeCarteTresor();
+    std::vector<CarteVictoire>& getListeCarteVictoire();
     std::vector<std::pair<CarteAction, int>> getPilesAction();
     std::vector<std::pair<CarteTresor, int>> getPilesTresor();
     std::vector<std::pair<CarteVictoire, int>> getPilesVictoire();

@@ -11,10 +11,10 @@ class CarteTresor : public Carte{
   	int m_coins;
   public :
 	CarteTresor(std::string name, std::string description, int cost, int coins); // Constructeur
-	~CarteTresor(); // Destructeur
+	~CarteTresor() override = default; // Destructeur
 	void play(Joueur &p, Plateau &plat, int index, Jeu &j) override; // Méthode pour jouer la carte
 	int getCoins() const;
-	void printCard() const; // Méthode pour afficher la carte
+	void printCard() const override; // Méthode pour afficher la carte
 };
 
 #endif

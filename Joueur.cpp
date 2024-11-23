@@ -2,148 +2,127 @@
 #include <algorithm>
 #include <random>
 #include <chrono>
-#include <algorithm>
 #include <sstream>
 #include "Joueur.h"
 #include "Jeu.h"
 
-/*Constructeur*/
+//Constructeur
 Joueur::Joueur(std::string pseudo) : m_pseudo(pseudo) {
-	m_nb_win_points = 0;
-	m_coins = 0;
-	m_draws = 0;
-	m_nb_actions = 0;
-	m_nb_buys = 0;
-	m_draws = 0;
-	m_hand = {};
-	m_deck = {};
-	m_defausse = {};
-	m_rebut = {};
+  m_nb_win_points = 0;
+  m_coins = 0;
+  m_draws = 0;
+  m_nb_actions = 0;
+  m_nb_buys = 0;
+  m_hand = {};
+  m_deck = {};
+  m_defausse = {};
+  m_rebut = {};
 }
 
-/*Destruction*/
+//Destructeur
 Joueur::~Joueur() {}
 
+// Ajouts de ressources au joueur
 void Joueur::addBuys(int buys){m_nb_buys += buys;}
-
 void Joueur::addActions(int actions){m_nb_actions += actions;}
-
 void Joueur::addCoins(int coins){m_coins += coins;}
-
 void Joueur::addDraws(int draws){m_draws += draws;}
-
 void Joueur::addWinPoints(int win_points){m_nb_win_points += win_points;}
 
+// Getters d'attributs simples
 int Joueur::getCoins(){	return m_coins;}
-
 int Joueur::getNbActions(){ return m_nb_actions;}
-
 int Joueur::getNbBuys(){ return m_nb_buys;}
-
 int Joueur::getNbWinPoints(){ return m_nb_win_points;}
-
 int Joueur::getDraws(){ return m_draws;}
-
 std::string Joueur::getPseudo(){ return m_pseudo;}
 
-std::vector<Carte*> Joueur::getHand(){ return m_hand;}
-
-std::vector<Carte*> Joueur::getDeck(){ return m_deck;}
-
+// Getters de vector
+std::vector<Carte*>& Joueur::getHand(){ return m_hand;}
+std::vector<Carte*>& Joueur::getDeck(){ return m_deck;}
 std::vector<Carte*>& Joueur::getDefausse(){ return m_defausse;}
-
 std::vector<Carte*>& Joueur::getRebut(){ return m_rebut;}
 
-void Joueur::initDeck(Plateau p){
-	m_deck = {};
-	std::vector<CarteTresor> listeTresor = p.getListeCarteTresor();
-	int indexCuivre;
-	for(size_t i = 0; i < listeTresor.size(); i++){
-		if(listeTresor.at(i).getName() == "Cuivre"){
-			indexCuivre = i;
-			break;
-		}
-	} 
-	Carte* c = &listeTresor.at(indexCuivre);
-	for(size_t i = 0; i < 7; i++){
-		m_deck.push_back(c);
-	}
-	
-	std::vector<CarteVictoire> listeVictoire = p.getListeCarteVictoire();
-	int indexDomaine;
-	for(size_t i = 0; i < listeVictoire.size(); i++){
-		if(listeVictoire.at(i).getName() == "Domaine"){
-			indexDomaine = i;
-			break;
-		}
-	} 
-	c = &listeVictoire.at(indexDomaine);
-	for(size_t i = 0; i < 3; i++){
-		m_deck.push_back(c);
-		addWinPoints(1);
-	}
-	
-	shuffleCartes(m_deck);
+template <typename T>
+void Joueur::addCardsByNameInDeck(const std::string& name, int nb,std::vector<T>& cardList, int winPoints) {
+    auto point = std::find_if(cardList.begin(), cardList.end(), [&](T& c) {
+        return c.getName() == name;
+    });
+    if (point != cardList.end()) {
+        Carte* c = &(*point); // Récupère un pointeur vers la carte
+        for (int i = 0; i < nb; ++i) {
+            m_deck.push_back(c);
+            addWinPoints(winPoints);
+        }
+    } else {
+        std::cerr << "Carte " << name << " non trouvée dans la liste.\n";
+    }
 }
 
-void Joueur::shuffleCartes(std::vector<Carte*> v){
+
+// Méthode pour initialiser le deck du joueur
+void Joueur::initDeck(Plateau& p) {
+    m_deck.clear();
+    addCardsByNameInDeck("Cuivre", 7, p.getListeCarteTresor());
+    addCardsByNameInDeck("Domaine", 3, p.getListeCarteVictoire(), 1);
+    shuffleCartes(m_deck);
+}
+
+void Joueur::shuffleCartes(std::vector<Carte*>& v){
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	shuffle(v.begin(), v.end(), std::default_random_engine(seed));
 }
 
-void Joueur::printHand() const{
-	std::cout << "======== Main " << m_pseudo << " ========\n\n";
-	
-	for(size_t i = 0; i < m_hand.size(); i++){
-        	m_hand.at(i)->printCard();
-        	std::cout << "-----------------------------------\n";
-	}
+// TODO Méthode à changer pour plus joli avec index
+void Joueur::printCards(const std::vector<Carte*>& cards, const std::string& name) const{
+  std::cout << "======== " << name << " " << m_pseudo << " ========\n\n";
+  for(size_t i = 0; i < cards.size(); i++){
+    std::cout << '[' << i << ']';
+    cards.at(i)->printCard();
+    std::cout << "-----------------------------------\n";
+  }
+}
+
+void Joueur::printHand() const{ printCards(m_hand, "Main");}
+void Joueur::printDefausse() const{ printCards(m_defausse, "Défausse");}
+void Joueur::printDeck() const{ printCards(m_deck, "Deck");}
+
+void Joueur::transferCards(std::vector<Carte*>& source, std::vector<Carte*>& destination, size_t nb) {
+  nb = std::min(nb, source.size());
+  destination.insert(destination.end(), source.begin(), source.begin() + nb);
+  source.erase(source.begin(), source.begin() + nb);
 }
 
 void Joueur::assembleDeckDefausse(){
-	shuffleCartes(m_defausse);
-	for(size_t i = 0; i < m_defausse.size(); i++){
-		m_deck.push_back(m_defausse.at(i));
-	}
-	m_defausse = {};
+  shuffleCartes(m_defausse);
+  transferCards(m_defausse, m_deck, m_defausse.size());
 }
 
 void Joueur::makeHand(){
-	m_hand = {};
-	if(m_deck.size() < 5) assembleDeckDefausse();
-	for(size_t i = 0; i < 5; i++){
-		m_hand.push_back(m_deck.at(i));
-	}
-	
-	m_deck.erase(m_deck.begin(), m_deck.begin()+5);
+  if(m_deck.size() < 5) assembleDeckDefausse();
+  transferCards(m_deck, m_hand, 5);
 }
 
-void Joueur::defausser(){
-	for(size_t i = 0; i < m_hand.size(); i++){
-		m_defausse.push_back(m_hand.at(i));
-	}
-	m_hand = {};
-}
+void Joueur::defausser(){ transferCards(m_hand, m_defausse, m_hand.size()); }
 
 void Joueur::defausseCarte(int index){
-	m_defausse.push_back(m_hand.at(index));
-	m_hand.erase(m_hand.begin()+index);
+  m_defausse.push_back(m_hand.at(index));
+  m_hand.erase(m_hand.begin()+index);
 }
 
 void Joueur::initNouveauTour(){
-	m_coins = 0;
-	m_nb_actions = 1;
-	m_nb_buys = 1;
+  m_coins = 0;
+  m_nb_actions = 1;
+  m_nb_buys = 1;
 }
 
 void Joueur::buyCard(int index, Plateau plat){
-	Carte* c = plat.buyCard(index);
-	if(c->getCost() <= m_coins){
-		m_coins -= c->getCost();
-		m_nb_buys -= 1;
-		m_defausse.push_back(c);
-	}
-	m_hand = {};
+  Carte* c = plat.buyCard(index);
+  if(c->getCost() <= m_coins){
+    m_coins -= c->getCost();
+    m_nb_buys -= 1;
+    m_defausse.push_back(c);
+  }
 }
 
 void Joueur::receiveCard(int n, Plateau &plat){
@@ -269,15 +248,6 @@ void Joueur::piocher(){
   m_deck.erase(m_deck.begin());
 }
 
-void Joueur::printDefausse(){
-  std::cout << "======== Defausse " << m_pseudo << " ========\n\n";
-
-  for(size_t i = 0; i < m_hand.size(); i++){
-    m_defausse.at(i)->printCard();
-    std::cout << "-----------------------------------\n";
-  }
-}
-
 void Joueur::regarderDefausseEtPrendre(){
   printDefausse(); // Rajouter les index
   std::string rep;
@@ -306,17 +276,21 @@ void Joueur::demandeDefausse(){
   } catch (...) {}
 }
 
-std::pair<size_t,std::vector<size_t>> Joueur::getNbCarteVictoireHand(){
-  size_t nb = 0; 
-  std::vector<size_t> indexs;
-  for(size_t i = 0; i < m_hand.size(); i++){
-    if(m_hand.at(i)->getType() == TypeCarte::Victoire){
-      nb++;
-      indexs.push_back(i);
+std::pair<size_t, std::vector<size_t>> Joueur::getNbCarteHandByType(TypeCarte type) {
+    size_t nb = 0;
+    std::vector<size_t> indices;
+    for (size_t i = 0; i < m_hand.size(); i++) {
+        if (m_hand.at(i)->getType() == type) {
+            nb++;
+            indices.push_back(i);
+        }
     }
-  }
-  return std::make_pair(nb,indexs);
+    return std::make_pair(nb, indices);
 }
+
+std::pair<size_t,std::vector<size_t>> Joueur::getNbCarteVictoireHand(){ return getNbCarteHandByType(TypeCarte::Victoire);}
+std::pair<size_t,std::vector<size_t>> Joueur::getNbCarteTresorHand(){ return getNbCarteHandByType(TypeCarte::Tresor);}
+std::pair<size_t,std::vector<size_t>> Joueur::getNbCarteActionHand(){ return getNbCarteHandByType(TypeCarte::Action);}
 
 void Joueur::carteVictoireOnDeck(){
   size_t index;
@@ -379,18 +353,6 @@ void Joueur::piocherJusquaEtDefausseAction(size_t n){
       m_defausse.push_back(temp.at(i));
     }
   }
-}
-
-std::pair<size_t,std::vector<size_t>> Joueur::getNbCarteTresorHand(){
-  size_t nb = 0; 
-  std::vector<size_t> indexs;
-  for(size_t i = 0; i < m_hand.size(); i++){
-    if(m_hand.at(i)->getType() == TypeCarte::Tresor){
-      nb++;
-      indexs.push_back(i);
-    }
-  }
-  return std::make_pair(nb,indexs);
 }
 
 void Joueur::receiveTresor(int n, Plateau &plat){

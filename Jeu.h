@@ -6,7 +6,7 @@
 
 class Jeu{
   private :
-    int m_nb_joueurs;
+    size_t m_nb_joueurs;
     Plateau m_plateau;
     std::vector<Joueur> m_listeJoueur;
     std::vector<size_t> m_joueursImmunises;
@@ -15,7 +15,7 @@ class Jeu{
     void initJoueurActif(std::vector<Joueur>& liste);
     void tourJoueur(Joueur* j);
   public :
-    Jeu(int nb_joueurs, Plateau plateau, std::vector<Joueur> listeJoueur);
+    Jeu(Plateau plateau, std::vector<Joueur> listeJoueur);
     ~Jeu();
     Plateau getPlateau();
     void choixAchatCarte();
