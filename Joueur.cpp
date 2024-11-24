@@ -5,6 +5,9 @@
 #include <sstream>
 #include "Joueur.h"
 #include "Jeu.h"
+#include <ncurses.h>
+#include <string>
+#include <vector>
 
 //Constructeur
 Joueur::Joueur(std::string pseudo) : m_pseudo(pseudo) {
@@ -74,6 +77,7 @@ void Joueur::shuffleCartes(std::vector<Carte*>& v){
 }
 
 // TODO Méthode à changer pour plus joli avec index
+/*
 void Joueur::printCards(const std::vector<Carte*>& cards, const std::string& name) const{
   std::cout << "======== " << name << " " << m_pseudo << " ========\n\n";
   for(size_t i = 0; i < cards.size(); i++){
@@ -82,6 +86,236 @@ void Joueur::printCards(const std::vector<Carte*>& cards, const std::string& nam
     std::cout << "-----------------------------------\n";
   }
 }
+*/
+
+
+// Méthode pour afficher les cartes d'un joueur
+/*
+void Joueur::printCards(const std::vector<Carte*>& cards, const std::string& name) const {
+    initscr();
+    start_color();
+    cbreak();
+    noecho();
+
+    // Initialisation des couleurs pour les cartes
+    init_pair(1, COLOR_YELLOW, COLOR_BLACK); // Trésor
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);  // Victoire
+    init_pair(3, COLOR_RED, COLOR_BLACK);    // Action
+
+    clear();
+
+    // Dimensions des cartes
+    const int card_width = 20;  // Largeur de la carte
+    const int card_height = 7;  // Hauteur de la carte
+    const int spacing = 4;      // Espacement entre les cartes
+    int cards_per_line = std::min(5, COLS / (card_width + spacing)); // Cartes par ligne
+    int total_lines = (cards.size() + cards_per_line - 1) / cards_per_line; // Nombre total de lignes nécessaires
+
+    // Calcul de la position verticale pour centrer les cartes
+    int total_height = total_lines * (card_height + spacing) + 2; // Hauteur totale (lignes de cartes + espacement + titre)
+    int start_y = (LINES - total_height) / 2; // Centrer verticalement
+
+    // Calcul de la position horizontale pour centrer le titre
+    std::string title = "======== " + name + " : " + m_pseudo + " ========";
+    int title_x = (COLS - title.size()) / 2;
+    mvprintw(start_y, title_x, "%s", title.c_str());
+
+    // Calcul de la position horizontale pour centrer les cartes
+    int start_x = (COLS - (cards_per_line * card_width + (cards_per_line - 1) * spacing)) / 2;
+
+    // Dessiner les cartes
+    auto draw_card = [&](int y, int x, Carte* card, int index) {
+        // Déterminer la couleur de la carte en fonction de son type
+        int color_pair = 1;
+        switch (card->getType()) {
+            case TypeCarte::Victoire: color_pair = 2; break;
+            case TypeCarte::Action: color_pair = 3; break;
+            default: break; // Trésor reste 1
+        }
+
+        attron(COLOR_PAIR(color_pair));
+
+        // Dessiner la bordure
+        mvhline(y, x, '-', card_width);
+        mvhline(y + card_height - 1, x, '-', card_width);
+        mvvline(y, x, '|', card_height);
+        mvvline(y, x + card_width - 1, '|', card_height);
+        mvaddch(y, x, '+');
+        mvaddch(y, x + card_width - 1, '+');
+        mvaddch(y + card_height - 1, x, '+');
+        mvaddch(y + card_height - 1, x + card_width - 1, '+');
+
+        // Ajouter les informations de la carte
+        mvprintw(y + 1, x + 2, "Nom: %s", card->getName().c_str());
+        mvprintw(y + 2, x + 2, "Coût: %d", card->getCost());
+        mvprintw(y + 3, x + 2, "Type: %s", 
+            card->getType() == TypeCarte::Victoire ? "Victoire" : 
+            card->getType() == TypeCarte::Action ? "Action" : "Tresor");
+
+        // Centrer l'index sur la dernière ligne
+        std::string index_str = std::to_string(index + 1); // Passer à une numérotation de 1
+        int index_x = x + (card_width - index_str.size()) / 2; // Centrer l'index
+        mvprintw(y + card_height - 2, index_x, "%s", index_str.c_str());
+
+        attroff(COLOR_PAIR(color_pair));
+    };
+
+    // Variables pour le positionnement
+    int current_x = start_x;
+    int current_y = start_y + 2; // Position après le titre
+
+    for (size_t i = 0; i < cards.size(); i++) {
+        draw_card(current_y, current_x, cards[i], i);
+
+        // Passer à la carte suivante
+        current_x += card_width + spacing;
+
+        // Retour à la ligne si nécessaire
+        if ((i + 1) % cards_per_line == 0) {
+            current_x = start_x;
+            current_y += card_height + spacing;
+        }
+    }
+
+    // Pause pour visualisation
+    mvprintw(LINES - 1, 0, "Appuyez sur une touche pour continuer...");
+    refresh();
+    getch();
+
+    endwin();
+}
+*/
+
+void Joueur::printCards(const std::vector<Carte*>& cards, const std::string& name) const {
+    initscr();
+    start_color();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE); // Activer la prise en charge des touches spéciales comme TAB
+
+    // Initialisation des couleurs pour les cartes
+    init_pair(1, COLOR_YELLOW, COLOR_BLACK); // Trésor
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);  // Victoire
+    init_pair(3, COLOR_RED, COLOR_BLACK);    // Action
+
+    while (true) {
+        clear();
+
+        // Dimensions des cartes
+        const int card_width = 20;  // Largeur de la carte
+        const int card_height = 7;  // Hauteur de la carte
+        const int spacing = 4;      // Espacement entre les cartes
+        int cards_per_line = std::min(5, COLS / (card_width + spacing)); // Cartes par ligne
+        int total_lines = (cards.size() + cards_per_line - 1) / cards_per_line; // Nombre total de lignes nécessaires
+
+        // Calcul de la position verticale pour centrer les cartes
+        int total_height = total_lines * (card_height + spacing) + 2; // Hauteur totale (lignes de cartes + espacement + titre)
+        int start_y = (LINES - total_height) / 2; // Centrer verticalement
+
+        // Calcul de la position horizontale pour centrer le titre
+        std::string title = "======== " + name + " : " + m_pseudo + " ========";
+        int title_x = (COLS - title.size()) / 2;
+        mvprintw(start_y, title_x, "%s", title.c_str());
+
+        // Calcul de la position horizontale pour centrer les cartes
+        int start_x = (COLS - (cards_per_line * card_width + (cards_per_line - 1) * spacing)) / 2;
+
+        // Dessiner les cartes
+        auto draw_card = [&](int y, int x, Carte* card, int index) {
+            // Déterminer la couleur de la carte en fonction de son type
+            int color_pair = 1;
+            switch (card->getType()) {
+                case TypeCarte::Victoire: color_pair = 2; break;
+                case TypeCarte::Action: color_pair = 3; break;
+                default: break; // Trésor reste 1
+            }
+
+            attron(COLOR_PAIR(color_pair));
+
+            // Dessiner la bordure
+            mvhline(y, x, '-', card_width);
+            mvhline(y + card_height - 1, x, '-', card_width);
+            mvvline(y, x, '|', card_height);
+            mvvline(y, x + card_width - 1, '|', card_height);
+            mvaddch(y, x, '+');
+            mvaddch(y, x + card_width - 1, '+');
+            mvaddch(y + card_height - 1, x, '+');
+            mvaddch(y + card_height - 1, x + card_width - 1, '+');
+
+            // Ajouter les informations de la carte
+            mvprintw(y + 1, x + 2, "Nom: %s", card->getName().c_str());
+            mvprintw(y + 2, x + 2, "Coût: %d", card->getCost());
+            mvprintw(y + 3, x + 2, "Type: %s", 
+                card->getType() == TypeCarte::Victoire ? "Victoire" : 
+                card->getType() == TypeCarte::Action ? "Action" : "Tresor");
+
+            // Centrer l'index sur la dernière ligne
+            std::string index_str = std::to_string(index); // Passer à une numérotation de 1
+            int index_x = x + (card_width - index_str.size()) / 2; // Centrer l'index
+            mvprintw(y + card_height - 2, index_x, "%s", index_str.c_str());
+
+            attroff(COLOR_PAIR(color_pair));
+        };
+
+        // Variables pour le positionnement
+        int current_x = start_x;
+        int current_y = start_y + 2; // Position après le titre
+
+        for (size_t i = 0; i < cards.size(); i++) {
+            draw_card(current_y, current_x, cards[i], i);
+
+            // Passer à la carte suivante
+            current_x += card_width + spacing;
+
+            // Retour à la ligne si nécessaire
+            if ((i + 1) % cards_per_line == 0) {
+                current_x = start_x;
+                current_y += card_height + spacing;
+            }
+        }
+
+        // Indications pour l'utilisateur
+        mvprintw(LINES - 2, 0, "Appuyez sur TAB pour voir une carte en détail, ou sur 'q' pour quitter.");
+
+        // Rafraîchir l'écran
+        refresh();
+
+        // Attendre l'entrée utilisateur
+        int ch = getch();
+
+        if (ch == 'q') {
+            break; // Quitter
+        } else if (ch == '\t') { // Touche TAB
+            // Demander l'index de la carte à afficher
+            clear();
+            mvprintw(LINES / 2 - 1, (COLS - 40) / 2, "Entrez l'index de la carte (1-%zu): ", cards.size());
+            refresh();
+
+            int index = -1;
+            echo(); // Activer l'affichage de l'entrée utilisateur
+            scanw("%d", &index);
+            noecho(); // Désactiver l'affichage de l'entrée utilisateur
+
+            // Valider l'index
+            if (index >= 1 && index <= static_cast<int>(cards.size())) {
+                // Afficher la carte choisie
+                clear();
+                cards[index - 1]->printCard(); // Appelle printCard propre au type
+                mvprintw(LINES - 2, 0, "Appuyez sur une touche pour revenir...");
+                refresh();
+                getch(); // Attendre une touche pour revenir
+            } else {
+                mvprintw(LINES - 2, 0, "Index invalide. Appuyez sur une touche pour continuer...");
+                refresh();
+                getch();
+            }
+        }
+    }
+
+    endwin();
+}
+
+
 
 void Joueur::printHand() const{ printCards(m_hand, "Main");}
 void Joueur::printDefausse() const{ printCards(m_defausse, "Défausse");}
