@@ -5,6 +5,7 @@
 #include <tuple>
 #include <fstream>
 #include <sstream>
+#include <ncurses.h>
 
 std::vector<CarteTresor> Plateau::listeCarteTresor;
 std::vector<CarteAction> Plateau::listeCarteAction;
@@ -209,6 +210,7 @@ void Plateau::remplirPiles(int nb_joueurs) {
     }
 }
 
+/*
 // Méthode pour afficher le plateau
 // TODO A changer avec index et en plus beau
 void Plateau::print() const{
@@ -244,6 +246,228 @@ void Plateau::print() const{
 
   std::cout << "\n===================================\n";
 }
+*/
+
+/*
+void Plateau::print() const {
+    
+    initscr();
+    start_color();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+
+    // Initialisation des paires de couleurs (si ce n'est pas déjà fait dans Plateau::print())
+    init_pair(1, COLOR_YELLOW, COLOR_BLACK); // Trésor
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);  // Victoire
+    init_pair(3, COLOR_RED, COLOR_BLACK);    // Action
+
+
+    int y = 0; // Position verticale initiale
+
+    attron(A_BOLD);
+    mvprintw(y++, 0, "======== PLATEAU DOMINION ========");
+    attroff(A_BOLD);
+
+    // Affichage des piles Trésor
+    attron(COLOR_PAIR(1));
+    mvprintw(y++, 0, "========== PILES TRESOR ==========");
+    attroff(COLOR_PAIR(1));
+
+    for (size_t i = 0; i < m_PilesTresor.size(); i++) {
+        attron(COLOR_PAIR(1));
+        mvprintw(y++, 2, "Quantité: %d | Nom: %s | Coût: %d | Valeur: %d",
+                 m_PilesTresor[i].second,
+                 m_PilesTresor[i].first.getName().c_str(),
+                 m_PilesTresor[i].first.getCost(),
+                 m_PilesTresor[i].first.getCoins());
+        attroff(COLOR_PAIR(1));
+    }
+
+    // Affichage des piles Victoire
+    attron(COLOR_PAIR(2));
+    mvprintw(y++, 0, "========== PILES VICTOIRE ==========");
+    attroff(COLOR_PAIR(2));
+
+    for (size_t i = 0; i < m_PilesVictoire.size(); i++) {
+        attron(COLOR_PAIR(2));
+        mvprintw(y++, 2, "Quantité: %d | Nom: %s | Coût: %d | Points: %d",
+                 m_PilesVictoire[i].second,
+                 m_PilesVictoire[i].first.getName().c_str(),
+                 m_PilesVictoire[i].first.getCost(),
+                 m_PilesVictoire[i].first.getWinPoints());
+        attroff(COLOR_PAIR(2));
+    }
+
+    // Affichage des piles Action
+    attron(COLOR_PAIR(3));
+    mvprintw(y++, 0, "========== PILES ACTION ==========");
+    attroff(COLOR_PAIR(3));
+
+    for (size_t i = 0; i < m_PilesAction.size(); i++) {
+        attron(COLOR_PAIR(3));
+        mvprintw(y++, 2, "Quantité: %d | Nom: %s | Coût: %d",
+                 m_PilesAction[i].second,
+                 m_PilesAction[i].first.getName().c_str(),
+                 m_PilesAction[i].first.getCost());
+        attroff(COLOR_PAIR(3));
+    }
+
+    // Rafraîchir l'affichage
+    refresh();
+    
+    // Attendre une entrée avant de quitter
+    mvprintw(LINES - 1, 0, "Appuyez sur une touche pour quitter...");
+    refresh();
+    getch();
+
+    // Terminaison de ncurses
+    endwin();
+}
+*/
+
+//PLUS BEAU QUE LA PRÉCÉDENTE
+void Plateau::print() const {
+    initscr();
+    start_color();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+
+    // Initialisation des couleurs
+    init_pair(1, COLOR_YELLOW, COLOR_BLACK); // Trésor
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);  // Victoire
+    init_pair(3, COLOR_RED, COLOR_BLACK);    // Action
+
+    clear(); // Nettoie l'écran
+
+    // Centrer le titre
+    std::string title = "======== PLATEAU DOMINION ========";
+    int title_x = (COLS - title.size()) / 2;
+    mvprintw(0, title_x, "%s", title.c_str());
+
+    // Fonction pour dessiner une carte complète
+    auto draw_card_rectangle = [&](int y, int x, int width, int height, const std::string& name, int quantity, int cost, const std::string& extra, int color_pair) {
+        attron(COLOR_PAIR(color_pair));
+
+        // Dessiner la bordure haut
+        mvhline(y, x, '-', width);
+        mvaddch(y, x, '+');
+        mvaddch(y, x + width - 1, '+');
+
+        // Dessiner la bordure bas
+        mvhline(y + height - 1, x, '-', width);
+        mvaddch(y + height - 1, x, '+');
+        mvaddch(y + height - 1, x + width - 1, '+');
+
+        // Dessiner les bordures verticales
+        for (int i = 1; i < height - 1; ++i) {
+            mvaddch(y + i, x, '|');
+            mvaddch(y + i, x + width - 1, '|');
+        }
+
+        // Gestion des noms UTF-8 (éviter les débordements)
+        std::string truncated_name = name;
+        if (truncated_name.size() > 20) {
+            truncated_name = truncated_name.substr(0, 17) + "..."; // Tronquer avec "..."
+        }
+
+        // Contenu bien aligné
+        mvprintw(y + 1, x + 2, "Nom: %s", truncated_name.c_str());
+        mvprintw(y + 2, x + 2, "Quantité: %d", quantity);
+        mvprintw(y + 3, x + 2, "Coût: %d", cost);
+        mvprintw(y + 4, x + 2, "%s", extra.c_str());
+
+        attroff(COLOR_PAIR(color_pair));
+    };
+
+    const int card_width = 25;  // Largeur fixe de la carte
+    const int card_height = 7; // Hauteur fixe de la carte
+    const int spacing = 4;     // Espacement entre les cartes
+
+    int current_y = 2; // Position verticale initiale
+
+    // Calcul pour centrer les cartes horizontalement
+    int cards_per_line = 5; // Nombre de cartes par ligne pour les Actions
+    int total_width = (cards_per_line * card_width) + ((cards_per_line - 1) * spacing);
+    int start_x = (COLS - total_width) / 2;
+
+    // Affichage des piles Trésor
+    attron(COLOR_PAIR(1));
+    mvprintw(current_y++, (COLS - 25) / 2, "========== PILES TRESOR ==========");
+    attroff(COLOR_PAIR(1));
+
+    int current_x = start_x;
+
+    for (size_t i = 0; i < m_PilesTresor.size(); i++) {
+        draw_card_rectangle(
+            current_y, current_x, card_width, card_height,
+            m_PilesTresor[i].first.getName(),
+            m_PilesTresor[i].second,
+            m_PilesTresor[i].first.getCost(),
+            "Valeur: " + std::to_string(m_PilesTresor[i].first.getCoins()),
+            1
+        );
+        current_x += card_width + spacing; // Passe à la position suivante
+    }
+
+    current_y += card_height + spacing;
+    current_x = start_x;
+
+    // Affichage des piles Victoire
+    attron(COLOR_PAIR(2));
+    mvprintw(current_y++, (COLS - 25) / 2, "========== PILES VICTOIRE ==========");
+    attroff(COLOR_PAIR(2));
+
+    for (size_t i = 0; i < m_PilesVictoire.size(); i++) {
+        draw_card_rectangle(
+            current_y, current_x, card_width, card_height,
+            m_PilesVictoire[i].first.getName(),
+            m_PilesVictoire[i].second,
+            m_PilesVictoire[i].first.getCost(),
+            "Points: " + std::to_string(m_PilesVictoire[i].first.getWinPoints()),
+            2
+        );
+        current_x += card_width + spacing;
+    }
+
+    current_y += card_height + spacing;
+    current_x = start_x;
+
+    // Affichage des piles Action
+    attron(COLOR_PAIR(3));
+    mvprintw(current_y++, (COLS - 25) / 2, "========== PILES ACTION ==========");
+    attroff(COLOR_PAIR(3));
+
+    for (size_t i = 0; i < m_PilesAction.size(); i++) {
+        draw_card_rectangle(
+            current_y, current_x, card_width, card_height,
+            m_PilesAction[i].first.getName(),
+            m_PilesAction[i].second,
+            m_PilesAction[i].first.getCost(),
+            "Action",
+            3
+        );
+        current_x += card_width + spacing;
+
+        // Si on a affiché 5 cartes, passer à la ligne suivante
+        if ((i + 1) % cards_per_line == 0) {
+            current_x = start_x;
+            current_y += card_height + spacing;
+        }
+    }
+
+    refresh(); // Actualisation de l'affichage
+
+    // Pause pour visualiser
+    mvprintw(LINES - 1, 0, "Appuyez sur une touche pour quitter...");
+    refresh();
+    getch();
+
+    // Fin de ncurses
+    endwin();
+}
+
 
 // Méthode pour chercher une carte dans les piles et donner l'index de cette carte dans la pile
 template <typename T> // Template pour pouvoir mettre plusieurs types suivant le type de la carte
