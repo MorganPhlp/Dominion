@@ -50,6 +50,8 @@ class Plateau{
     std::vector<std::vector<Carte*>>& getListeCartesDevoilees();
     std::vector<Carte*>& getListeCartesEcartees();
     size_t getMaxIndex() const;
+    
+    bool getVide(size_t index);
  	
     static void printTotalCard(); // Afficher toutes les cartes chargées
     void print(std::string pseudo, int coins, int buys, int score) const; // Afficher le plateau

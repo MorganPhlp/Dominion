@@ -351,10 +351,13 @@ void Joueur::initNouveauTour(){
 }
 
 void Joueur::buyCard(int index, Plateau &plat){
-  Carte* c = plat.buyCard(index);
-  m_coins -= c->getCost();
-  m_nb_buys -= 1;
-  m_defausse.push_back(c);
+  if(plat.getVide(index)) throw std::runtime_error("Pile vide, impossible d'acheter une carte.");
+  else{
+        Carte* c = plat.buyCard(index);
+        m_coins -= c->getCost();
+        m_nb_buys -= 1;
+        m_defausse.push_back(c);
+  }
 }
 
 void Joueur::receiveCard(int n, Plateau &plat){
@@ -378,8 +381,7 @@ void Joueur::receiveCard(int n, Plateau &plat){
   m_defausse.push_back(c);
 }
 
-void Joueur::throwMax(int n){
-  printHand();
+void Joueur::throwMax(int n, int& index){
   std:: cout << "Vous pouvez jeter jusqu'à " << n << " cartes de votre main" << std::endl;
   std::string rep;
   bool stop = false;
@@ -396,6 +398,8 @@ void Joueur::throwMax(int n){
         std::stoul(rep);
         if(std::stoul(rep) < m_hand.size()){
           jeterCarte(std::stoul(rep));
+          if(std::stoi(rep) < index && index != 20) index-=1;
+          else if(std::stoi(rep) == index) index = 20;
           break;
         }
       }

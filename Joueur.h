@@ -47,7 +47,7 @@ class Joueur{
     void makeHand();
     void defausser();
     void receiveCard(int n, Plateau &plat);
-    void throwMax(int n);
+    void throwMax(int n, int& index);
     void defausseCarte(int index);
     void initNouveauTour();
     void buyCard(int index, Plateau &plat);
