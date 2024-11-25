@@ -202,8 +202,8 @@ void Jeu::volerCartesAdversaires(){
 			Carte* c = listeCartesDevoilees.at(i).at(j);
 			if(c->getType() == TypeCarte::Tresor) tresor = true;
 		}
+		m_joueurActif->printCards(listeCartesDevoilees.at(i), "Cartes Devoilees");
 		if(tresor){
-		        m_joueurActif->printCards(listeCartesDevoilees.at(i), "Cartes Devoilees");
 		        std::cout << "Voulez-vous écarter une carte trésor ? Répondez par 'Oui' ou 'oui' ou 'O' ou 'o' si vous le souhaitez" << std::endl;
 		        std::cin >> res1;
 	                if(res1 == "O" or res1 == "o" or res1 == "Oui" or res1 == "oui"){

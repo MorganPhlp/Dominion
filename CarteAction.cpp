@@ -135,7 +135,6 @@ void CarteAction::printCard() const {
 
 void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, int &index, Jeu &j){ // Méthode pour gérer les différents cas spécifiques des cartes actions
         if(m_isAttack) j.verifDouve();
-        std::cout << "La carte est d'attaque ? " << m_isAttack << std::endl; 
 	if(name == "Atelier") p.receiveCard(4, plat);
 	else if(name == "Chapelle") p.throwMax(4); // TODO Modifier index suivant les cartes supprimées pour défausser la bonne carte
 	else if(name == "Festin"){
