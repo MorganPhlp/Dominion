@@ -5,6 +5,7 @@
 #include <iomanip>
 
 std::vector<size_t> m_joueursImmunises = {};
+std::unordered_map<size_t, std::vector<Carte*>> mapCartesDevoilees;
 
 Jeu::Jeu(Plateau plateau, std::vector<Joueur> listeJoueur) : m_nb_joueurs(listeJoueur.size()), m_plateau(plateau), m_listeJoueur(listeJoueur) {
 	for(size_t i = 0; i < m_listeJoueur.size(); i++){
@@ -33,13 +34,13 @@ Plateau Jeu::getPlateau(){
 
 void Jeu::tourJoueur(Joueur* j){
   j->initNouveauTour();
-  j->printHand();
 
   //Phase Action
   std::cout << "======== Phase Action ========" << std::endl;
   std::string choix;
   size_t index;
   while(j->getNbActions() > 0 && j->getNbCarteActionHand().first != 0){
+    if(j->queJardins()) break;
     std::cout << "Nombre d'actions restantes : " << j->getNbActions() << std::endl;
     j->printHand();
     std::cout << "Entrez le numéro de la carte que vous souhaitez jouer (ou ACHAT pour passer à la phase Achat : " << std::endl;
@@ -73,6 +74,7 @@ void Jeu::tourJoueur(Joueur* j){
   
   
   //Phase Achat
+  /*
   std::cout << "======== Phase Achat ========" << std::endl;
   while(j->getNbCarteTresorHand().first > 0){
     j->printHand();
@@ -147,7 +149,54 @@ void Jeu::tourJoueur(Joueur* j){
 
   std::cout << "Votre nouvelle main pour le prochain tour est prête !" << std::endl;
   j->printHand();
+  */
+  
+  while (j->getNbBuys() > 0) {
+        int coins = j->getCoins();
+        int buys = j->getNbBuys();
+        int score = j->calculerPoints(); // Utilisation du score actuel
+        std::string pseudo = j->getPseudo();
+
+        m_plateau.print(pseudo, coins, buys, score); // Affichage du plateau avec les infos du joueur
+
+        std::cout << "Choisissez l'index de la pile pour acheter une carte ou PASSER pour passer : " << std::endl;
+        std::string choix;
+        std::cin >> choix;
+
+        if (choix == "PASSER") break;
+
+        try {
+            index = std::stoi(choix);
+            if (index < m_plateau.getMaxIndex()) {
+                if (j->getCoins() >= m_plateau.chercherCoutParIndex(index)) {
+                    try {
+                        j->buyCard(index, m_plateau);
+                        std::cout << "Achat réussi !" << std::endl;
+                    } catch (const std::exception& e) {
+                        std::cerr << "Erreur lors de l'achat : " << e.what() << std::endl;
+                    }
+                } else {
+                    std::cout << "Vous n'avez pas assez de pièces !" << std::endl;
+                }
+            } else {
+                std::cout << "Index invalide !" << std::endl;
+            }
+        } catch (...) {
+            std::cerr << "Erreur lors de la lecture de l'index." << std::endl;
+        }
+    }
+
+    // Phase Ajustement
+    std::cout << "======== Phase Ajustement ========" << std::endl;
+    j->defausser(); // Défausser toutes les cartes jouées et les cartes en main
+    if (j->getDeck().size() < 5) {
+        j->assembleDeckDefausse();
+    }
+    j->makeHand(); // Piocher 5 nouvelles cartes
+    std::cout << "Votre nouvelle main pour le prochain tour est prête !" << std::endl;
+    j->printHand();
 }
+
 
 void Jeu::tousSaufActifMalediction(){
   for(size_t i = 0; i < m_listeJoueur.size(); i++){
@@ -157,12 +206,16 @@ void Jeu::tousSaufActifMalediction(){
   }
 }
 
-void Jeu::revelerCartes(){
+std::vector<size_t> Jeu::revelerCartes(){
+        std::vector<size_t> indexJoueur;
 	for(size_t i = 0; i < m_listeJoueur.size(); i++){
 		if(&m_listeJoueur.at(i) != m_joueurActif && std::find(m_joueursImmunises.begin(), m_joueursImmunises.end(), i) == m_joueursImmunises.end()){
+		        indexJoueur.push_back(i);
 			m_listeJoueur.at(i).devoiler2Cartes(m_plateau);
+			mapCartesDevoilees[i] = m_plateau.getListeCartesDevoilees().back();
 		}
 	}
+	return indexJoueur;
 }
 
 void Jeu::banditisme(){
@@ -172,7 +225,7 @@ void Jeu::banditisme(){
 		if(&m_listeJoueur.at(i) != m_joueurActif && std::find(m_joueursImmunises.begin(), m_joueursImmunises.end(), i) == m_joueursImmunises.end()){
 			for(size_t j = 0; j < 2; j++){
 				Carte* c = listeCartesDevoilees.at(i).at(j);
-				//c->printCard();
+				c->printCard();
 				if(c->getType() == TypeCarte::Tresor && c->getName() != "Cuivre"){
 					std::vector<Carte*>& rebut = m_listeJoueur.at(i).getRebut();
 					rebut.push_back(c);
@@ -189,40 +242,70 @@ void Jeu::volerCartesAdversaires(){
 	std::vector<Carte*>& listeCartesEcartees = m_plateau.getListeCartesEcartees();
 	size_t index;
 	bool stop = false;
+	bool tresor = false;
 	std::string res1,res2;
-	revelerCartes();
+	std::vector<size_t> indexJoueur = revelerCartes();
 	for(size_t i = 0; i < listeCartesDevoilees.size(); i++){
 		for(size_t j = 0; j < 2; j++){
 			Carte* c = listeCartesDevoilees.at(i).at(j);
-			c->printCard();
-			if(c->getType() == TypeCarte::Tresor){
-				std::cout << "Voulez-vous écarter cette carte ? Répondez par 'Oui' ou 'oui' ou 'O' ou 'o' si vous le souhaitez" << std::endl;
-				std::cin >> res1;
-				if(res1 == "O" or res1 == "o" or res1 == "Oui" or res1 == "oui"){
-					listeCartesEcartees.push_back(c);
-					break;
-				}
-			}
+			if(c->getType() == TypeCarte::Tresor) tresor = true;
+		}
+		m_joueurActif->printCards(listeCartesDevoilees.at(i), "Cartes Devoilees");
+		if(tresor){
+		        std::cout << "Voulez-vous écarter une carte trésor ? Répondez par 'Oui' ou 'oui' ou 'O' ou 'o' si vous le souhaitez" << std::endl;
+		        std::cin >> res1;
+	                if(res1 == "O" or res1 == "o" or res1 == "Oui" or res1 == "oui"){
+	                        while(true){
+		                        m_joueurActif->printCards(listeCartesDevoilees.at(i), "Cartes Devoilees");
+		                        std::cout << "Quelle carte trésor voulez-vous écarter ? (Entrez l'index)" << std::endl;
+		                        std::cin >> res1;
+		                        try{
+		                                size_t j = std::stoi(res1);
+		                                if(listeCartesDevoilees.at(i).at(j)->getType() == TypeCarte::Tresor){
+	                                                  listeCartesEcartees.push_back(listeCartesDevoilees.at(i).at(j));
+	                                                  break;
+	                                        }
+	                                        else{
+	                                                  std::cout << "Ce n'est pas une carte trésor" << std::endl;
+	                                        }
+	                                }
+	                                catch(...){
+	                                        std::cerr << "Index Invalide" << std::endl;
+	                                }
+		                }
+	                }
+	                tresor = false;
 		}
 	}
-	while(!stop or res2 != "O" or res2 != "o" or res2 != "Oui" or res2 != "oui"){
+	while(!stop and !listeCartesEcartees.empty()){
 		std::cout << "Souhaitez-vous récupérer une des cartes écartées ?" << std::endl;
 		std::cin >> res2;
 		if(res2 == "O" or res2 == "o" or res2 == "Oui" or res2 == "oui"){
+		        m_joueurActif->printCards(listeCartesEcartees, "Cartes Ecartees");
 			std::cout << "Entrer l'index de la carte que vous souhaitez récupérer : " << std::endl;
 			std::cin >> index;
-			if(index >= listeCartesEcartees.size()){
-				stop = true;
+			if(index < listeCartesEcartees.size()){
+				Carte* c = listeCartesEcartees.at(index);
+		                m_joueurActif->getDefausse().push_back(c);
+		                
+		                for (auto& [joueurIndex, cartes] : mapCartesDevoilees) {
+                                        auto point = std::find(cartes.begin(), cartes.end(), c);
+                                        if (point != cartes.end()) {
+                                                  cartes.erase(point);
+                                                  m_listeJoueur.at(joueurIndex).getDefausse().erase(std::remove(m_listeJoueur.at(joueurIndex).getDefausse().begin(), m_listeJoueur.at(joueurIndex).getDefausse().end(), c), m_listeJoueur.at(joueurIndex).getDefausse().end());
+                                                  break;
+                                        }
+                                }
+		                
+			        listeCartesEcartees.erase(listeCartesEcartees.begin() + index);
 			}
-			Carte* c = listeCartesEcartees.at(index);
-			m_joueurActif->getDefausse().push_back(c);
-			listeCartesEcartees.erase(listeCartesEcartees.begin() + index);
+			else{
+			        std::cout << "Index invalide" << std::endl;
+			}
 		}
-		
-	}
-	for(size_t i = 0; i < listeCartesEcartees.size(); i++){
-		Carte* c = listeCartesEcartees.at(i);
-		m_joueurActif->getRebut().push_back(c);
+		else{
+		  stop = true;
+		}
 	}
 	listeCartesDevoilees.clear();
 	listeCartesEcartees.clear();

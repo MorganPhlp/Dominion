@@ -79,6 +79,7 @@ class Joueur{
     std::vector<bool> decideDefausse(std::vector<Joueur> listeJoueur);
     bool handContainsDouve();
     void resetDraws();
+    bool queJardins();
 };
 
 #endif

@@ -23,7 +23,8 @@ int main(){
     
     int nb_joueurs = 2;
     Plateau plateau = Plateau(nb_joueurs);
-    plateau.print();
+    Joueur j1 = Joueur("Caca");
+    plateau.print(j1.getPseudo(), j1.getCoins(), j1.getNbBuys(), j1.getNbWinPoints());
     
     
     //TEST PRINTCARD()

@@ -331,8 +331,7 @@ void Plateau::print() const {
 }
 */
 
-
-void Plateau::print() const {
+void Plateau::print(std::string pseudo, int coins, int buys, int score) const {
     initscr();
     start_color();
     cbreak();
@@ -343,14 +342,22 @@ void Plateau::print() const {
     init_pair(1, COLOR_YELLOW, COLOR_BLACK); // Trésor
     init_pair(2, COLOR_GREEN, COLOR_BLACK);  // Victoire
     init_pair(3, COLOR_RED, COLOR_BLACK);    // Action
+    init_pair(4, COLOR_WHITE, COLOR_BLACK);  // Informations du joueur
 
     while (true) {
         clear();
 
+        // Affichage des informations du joueur actif
+        attron(COLOR_PAIR(4));
+        mvprintw(0, 0, "Joueur: %s", pseudo.c_str());
+        mvprintw(1, 0, "Pièces: %d | Achats: %d", coins, buys); // En haut à gauche
+        mvprintw(1, COLS - 20, "Score: %d", score); // En haut à droite
+        attroff(COLOR_PAIR(4));
+
         // Centrer le titre
         std::string title = "======== PLATEAU DOMINION ========";
         int title_x = (COLS - title.size()) / 2;
-        mvprintw(0, title_x, "%s", title.c_str());
+        mvprintw(1, title_x, "%s", title.c_str());
 
         // Fonction pour dessiner une carte complète
         auto draw_card_rectangle = [&](int y, int x, int width, int height, const std::string& name, int quantity, int cost, const std::string& extra, int color_pair, int index, const std::string& action_type = "") {
@@ -395,15 +402,16 @@ void Plateau::print() const {
             attroff(COLOR_PAIR(color_pair));
         };
 
-        const int card_width = 25;  // Largeur fixe de la carte
+        const int card_width = 28;  // Largeur fixe de la carte
         const int card_height = 8; // Hauteur augmentée pour inclure le type
-        const int spacing = 3;     // Espacement entre les cartes
+        const int width_spacing = 3;     // Espacement entre les cartes en largeur
+        const int height_spacing = 2;	// Espacement entre les cartes en hauteur
 
-        int current_y = 2; // Position verticale initiale
+        int current_y = 3; // Position verticale initiale après les informations du joueur
 
         // Calcul pour centrer les cartes horizontalement
         int cards_per_line = 5; // Nombre de cartes par ligne pour les Actions
-        int total_width = (cards_per_line * card_width) + ((cards_per_line - 1) * spacing);
+        int total_width = (cards_per_line * card_width) + ((cards_per_line - 1) * width_spacing);
         int start_x = (COLS - total_width) / 2;
 
         int current_x = start_x;
@@ -420,13 +428,13 @@ void Plateau::print() const {
                 m_PilesTresor[i].first.getName(),
                 m_PilesTresor[i].second,
                 m_PilesTresor[i].first.getCost(),
-                "Valeur: " + std::to_string(m_PilesTresor[i].first.getCoins()),
+                "Pieces ajoutees: " + std::to_string(m_PilesTresor[i].first.getCoins()),
                 1, index++
             );
-            current_x += card_width + spacing; // Passe à la position suivante
+            current_x += card_width + width_spacing; // Passe à la position suivante
         }
 
-        current_y += card_height + spacing;
+        current_y += card_height + height_spacing;
         current_x = start_x;
 
         // Affichage des piles Victoire
@@ -440,13 +448,13 @@ void Plateau::print() const {
                 m_PilesVictoire[i].first.getName(),
                 m_PilesVictoire[i].second,
                 m_PilesVictoire[i].first.getCost(),
-                "Points: " + std::to_string(m_PilesVictoire[i].first.getWinPoints()),
+                "Points Victoire: " + std::to_string(m_PilesVictoire[i].first.getWinPoints()),
                 2, index++
             );
-            current_x += card_width + spacing;
+            current_x += card_width + width_spacing;
         }
 
-        current_y += card_height + spacing;
+        current_y += card_height + height_spacing;
         current_x = start_x;
 
         // Affichage des piles Action
@@ -472,12 +480,12 @@ void Plateau::print() const {
                 "",
                 3, index++, action_type
             );
-            current_x += card_width + spacing;
+            current_x += card_width + width_spacing;
 
             // Si on a affiché 5 cartes, passer à la ligne suivante
             if ((i + 1) % cards_per_line == 0) {
                 current_x = start_x;
-                current_y += card_height + spacing;
+                current_y += card_height + height_spacing;
             }
         }
 

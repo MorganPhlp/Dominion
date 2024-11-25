@@ -52,7 +52,7 @@ class Plateau{
     size_t getMaxIndex() const;
  	
     static void printTotalCard(); // Afficher toutes les cartes chargées
-    void print() const; // Afficher le plateau
+    void print(std::string pseudo, int coins, int buys, int score) const; // Afficher le plateau
     
     // Trouver l'id d'une carte d'un type en rentrant son nom
     size_t chercherCarteAction(std::string name);

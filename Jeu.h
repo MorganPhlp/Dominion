@@ -3,6 +3,7 @@
 #include <vector>
 #include "Joueur.h"
 #include "Plateau.h"
+#include <unordered_map>
 
 class Jeu{
   private :
@@ -10,6 +11,7 @@ class Jeu{
     Plateau m_plateau;
     std::vector<Joueur> m_listeJoueur;
     std::vector<size_t> m_joueursImmunises;
+    std::unordered_map<size_t, std::vector<Carte*>> mapCartesDevoilees;
     Joueur* m_joueurActif;
     int m_nbMarchand;
     void initJoueurActif(std::vector<Joueur>& liste);
@@ -21,7 +23,7 @@ class Jeu{
     void choixAchatCarte();
     void tousSaufActifMalediction();
     void volerCartesAdversaires();
-    void revelerCartes();
+    std::vector<size_t> revelerCartes();
     void tousSaufActifPiochent();
     void tousSaufActifDefausseJusqua(size_t n);
     void tousSaufActifPoseCarteVictoire();
