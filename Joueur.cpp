@@ -288,7 +288,7 @@ void Joueur::printCards(const std::vector<Carte*>& cards, const std::string& nam
         } else if (ch == '\t') { // Touche TAB
             // Demander l'index de la carte à afficher
             clear();
-            mvprintw(LINES / 2 - 1, (COLS - 40) / 2, "Entrez l'index de la carte (1-%zu): ", cards.size());
+            mvprintw(LINES / 2 - 1, (COLS - 40) / 2, "Entrez l'index de la carte (0-%zu): ", cards.size()-1);
             refresh();
 
             int index = -1;
@@ -297,7 +297,7 @@ void Joueur::printCards(const std::vector<Carte*>& cards, const std::string& nam
             noecho(); // Désactiver l'affichage de l'entrée utilisateur
 
             // Valider l'index
-            if (index >= 1 && index <= static_cast<int>(cards.size())) {
+            if (index >= 0 && index <= static_cast<int>(cards.size())) {
                 // Afficher la carte choisie
                 clear();
                 cards[index - 1]->printCard(); // Appelle printCard propre au type
@@ -436,7 +436,6 @@ void Joueur::devoiler2Cartes(Plateau &plat){
 		for(size_t j = 0; j < 2; j++){
 			temp.push_back(m_deck.at(j));	
 		}
-		break;
 	}
 	else{
 	        for(size_t i = 0; i < 2; i++){

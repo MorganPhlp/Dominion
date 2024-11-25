@@ -8,7 +8,8 @@
 
 int main(){
 
-	
+
+  /*	
   Plateau plat = Plateau(2);
   Joueur j1 = Joueur("Morgan");
   Joueur j2 = Joueur("Fefe");
@@ -16,14 +17,14 @@ int main(){
   Jeu jeu = Jeu(plat, liste);
   jeu.jouerPartie();
   return 0;
-	
+  */	
     
     //TEST PRINT PLATEAU	
-    /*
+    
     int nb_joueurs = 2;
     Plateau plateau = Plateau(nb_joueurs);
     plateau.print();
-    */
+    
     
     //TEST PRINTCARD()
     /*
@@ -91,8 +92,8 @@ int main(){
     */
     
     
-    //TEST PRINTCARD() DE CARTEVICTOIRE
     /*
+    //TEST PRINTCARD() DE CARTEVICTOIRE
     CarteVictoire carte1("Province", "Donne 6 points de victoire.", 8, 6);
     CarteVictoire carte2("Duché", "Donne 3 points de victoire.", 5, 3);
     CarteVictoire carte3("Domaine", "Donne 1 point de victoire.", 2, 1);
@@ -104,7 +105,10 @@ int main(){
     for (const auto& carte : cartes) {
         carte.printCard();
     }
+    */
     
+    //TEST PRINTCARDS()
+    /*
     // Initialisation du générateur aléatoire
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 

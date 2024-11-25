@@ -25,23 +25,22 @@ void CarteTresor::printCard() const{ // Méthode pour afficher la carte
 	if(m_coins != 0) std::cout << "+" << m_coins << " Pièces" << std::endl;
 }
 */
-
-// Méthode pour afficher une carte Tresor avec ncurses
 void CarteTresor::printCard() const {
     initscr();
     start_color();
     cbreak();
     noecho();
 
-    // Initialisation des couleurs pour les cartes Tresor
-    init_pair(1, COLOR_YELLOW, COLOR_BLACK); // Couleur pour les cartes Tresor
+    // Initialisation des couleurs pour les cartes Trésor
+    init_pair(1, COLOR_YELLOW, COLOR_BLACK); // Couleur pour les cartes Trésor
 
     clear();
 
     // Dimensions de la carte
-    const int card_width = 35;  // Largeur de la carte
-    const int card_height = 10; // Hauteur de la carte
-    int start_x = (COLS - card_width) / 2;  // Centrer horizontalement
+    const int card_width = 40;  // Largeur de la carte
+    const int card_height = 15; // Hauteur de la carte
+    const int padding = 2;      // Décalage intérieur
+    int start_x = (COLS - card_width) / 2;   // Centrer horizontalement
     int start_y = (LINES - card_height) / 2; // Centrer verticalement
 
     attron(COLOR_PAIR(1));
@@ -56,29 +55,47 @@ void CarteTresor::printCard() const {
     mvaddch(start_y + card_height - 1, start_x, '+');
     mvaddch(start_y + card_height - 1, start_x + card_width - 1, '+');
 
+    // Variables pour le contenu
+    int current_y = start_y + 1; // Position initiale pour l'affichage des attributs
+
     // Ajouter les informations principales
-    mvprintw(start_y + 1, start_x + 2, "Nom: %s", this->getName().c_str());
-    mvprintw(start_y + 2, start_x + 2, "Coût: %d", this->getCost());
-    mvprintw(start_y + 3, start_x + 2, "+%d Pièces", this->getCoins());
+    mvprintw(current_y++, start_x + padding, "Nom: %s", this->getName().c_str());
+    mvprintw(current_y++, start_x + padding, "Coût: %d", this->getCost());
+    mvprintw(current_y++, start_x + padding, "+%d Pièces", this->getCoins());
 
-    // Afficher la description, si disponible, en gérant les retours à la ligne
+    // Gestion de la description
     if (!this->getDescription().empty()) {
-        int description_start_y = start_y + 5; // Lignes après les informations principales
-        int max_lines = card_height - 6; // Nombre de lignes disponibles pour la description
-        std::vector<std::string> wrapped_text = wrapText(this->getDescription(), card_width - 4);
+        std::string description = this->getDescription();
+        mvprintw(current_y++, start_x + padding, "Description:");
 
-        for (size_t i = 0; i < wrapped_text.size() && i < static_cast<size_t>(max_lines); ++i) {
-            mvprintw(description_start_y + i, start_x + 2, "Description :");
-            mvprintw(description_start_y + i + 1, start_x + 2, "%s", wrapped_text[i].c_str());
+        // Découper la description pour éviter les débordements
+        size_t max_line_width = card_width - 2 * padding;
+        std::istringstream desc_stream(description);
+        std::string word;
+        std::string line;
+
+        while (desc_stream >> word) {
+            if (line.size() + word.size() + 1 > max_line_width) {
+                mvprintw(current_y++, start_x + padding, "%s", line.c_str());
+                line.clear();
+            }
+            if (!line.empty()) line += " ";
+            line += word;
+        }
+        if (!line.empty()) {
+            mvprintw(current_y++, start_x + padding, "%s", line.c_str());
         }
     }
 
     attroff(COLOR_PAIR(1));
 
-    // Pause pour visualisation
-    mvprintw(LINES - 1, 0, "Appuyez sur une touche pour continuer...");
-    refresh();
-    getch();
+    // Pause pour visualisation et attendre 'q' pour quitter
+    int ch;
+    do {
+        mvprintw(LINES - 1, 0, "Appuyez sur 'q' pour quitter.");
+        refresh();
+        ch = getch();
+    } while (ch != 'q');
 
     endwin();
 }
