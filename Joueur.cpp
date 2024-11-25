@@ -431,24 +431,17 @@ void Joueur::putCardFromHandToDeck(){
 void Joueur::devoiler2Cartes(Plateau &plat){
 	std::vector<Carte*> temp;
 	size_t taille = m_deck.size();
-	for(size_t i = 0; i < 2; i++){
-		switch (taille) {
-			case 0:
-				assembleDeckDefausse();
-				for(size_t j = 0; j < 2; j++){
-					m_deck.at(j)->printCard();
-					temp.push_back(m_deck.at(j));	
-				}
-				break;
-			case 1:
-				m_deck.at(0)->printCard();
-				temp.push_back(m_deck.at(0));
-				assembleDeckDefausse();
-				temp.push_back(m_deck.at(0));
-				break;
+	if(taille <= 1){
+		assembleDeckDefausse();
+		for(size_t j = 0; j < 2; j++){
+			temp.push_back(m_deck.at(j));	
 		}
-		m_deck.at(i)->printCard();
-		temp.push_back(m_deck.at(i));
+		break;
+	}
+	else{
+	        for(size_t i = 0; i < 2; i++){
+		        temp.push_back(m_deck.at(i));
+	        }
 	}
 	std::vector<std::vector<Carte*>>& listeCartesDevoilees = plat.getListeCartesDevoilees();
 	listeCartesDevoilees.push_back(temp);

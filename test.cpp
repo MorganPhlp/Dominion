@@ -8,15 +8,15 @@
 
 int main(){
 
-	/*
-	Plateau plat = Plateau(2);
-	Joueur j1 = Joueur("Morgan");
-	Joueur j2 = Joueur("Fefe");
-	std::vector<Joueur> liste = {j1,j2};
-	Jeu jeu = Jeu(plat, liste);
-	jeu.jouerPartie();
-	return 0;
-	*/
+	
+  Plateau plat = Plateau(2);
+  Joueur j1 = Joueur("Morgan");
+  Joueur j2 = Joueur("Fefe");
+  std::vector<Joueur> liste = {j1,j2};
+  Jeu jeu = Jeu(plat, liste);
+  jeu.jouerPartie();
+  return 0;
+	
     
     //TEST PRINT PLATEAU	
     /*
@@ -104,7 +104,6 @@ int main(){
     for (const auto& carte : cartes) {
         carte.printCard();
     }
-    */
     
     // Initialisation du générateur aléatoire
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
@@ -161,6 +160,8 @@ int main(){
     delete carteVictoire2;
     delete carteTresor1;
     delete carteTresor2;
+    
+    */
 
     return 0;
 }
