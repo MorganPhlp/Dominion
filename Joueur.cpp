@@ -359,20 +359,26 @@ void Joueur::buyCard(int index, Plateau &plat){
 
 void Joueur::receiveCard(int n, Plateau &plat){
   std::vector<std::pair<Carte*, int>> liste = plat.getMax(n);
-  std::cout << "Quelle carte voulez-vous parmi les suivantes : " << std::endl;
+  std::vector<Carte*> listeAffichee;
   for(size_t i = 0; i < liste.size(); i++){
-    if(i == liste.size()-1) std::cout << liste.at(i).first->getName() << std::endl;
-    else std::cout << liste.at(i).first->getName() << "; ";
+    listeAffichee.push_back(liste.at(i).first);
   }
-  size_t index = 10000;
+  std::cout << "Quelle carte voulez-vous parmi les suivantes : " << std::endl;
+  size_t index = liste.size();
   while(index >= liste.size()){
-    std:: cin >> index;
+    printCards(listeAffichee, "Cartes disponibles");
+    try{
+      std:: cin >> index;
+    }
+    catch(...){
+      std::cerr << "Vous n'avez pas rentré un chiffre" << std::endl;
+    }
   }
   Carte* c = plat.buyCard(liste.at(index).second);
   m_defausse.push_back(c);
 }
 
-void Joueur::throwMax(int n){ // TODO Gestion erreurs
+void Joueur::throwMax(int n){
   printHand();
   std:: cout << "Vous pouvez jeter jusqu'à " << n << " cartes de votre main" << std::endl;
   std::string rep;
@@ -433,16 +439,13 @@ void Joueur::devoiler2Cartes(Plateau &plat){
 	size_t taille = m_deck.size();
 	if(taille <= 1){
 		assembleDeckDefausse();
-		for(size_t j = 0; j < 2; j++){
-			temp.push_back(m_deck.at(j));	
-		}
-		break;
 	}
-	else{
-	        for(size_t i = 0; i < 2; i++){
-		        temp.push_back(m_deck.at(i));
-	        }
-	}
+        for(size_t i = 0; i < 2; i++){
+                m_defausse.push_back(m_deck.at(i));
+                m_deck.erase(m_deck.begin()+i);
+                size_t taille = m_defausse.size();
+	        temp.push_back(m_defausse.at(taille-1));
+        }
 	std::vector<std::vector<Carte*>>& listeCartesDevoilees = plat.getListeCartesDevoilees();
 	listeCartesDevoilees.push_back(temp);
 }
@@ -479,6 +482,9 @@ void Joueur::defaussePuisPioche(){ //TODO Gerer Gestion Erreurs
 }
 
 void Joueur::piocher(){
+  if(m_deck.empty()){
+    assembleDeckDefausse();
+  }
   m_hand.push_back(m_deck.at(0));
   m_deck.erase(m_deck.begin());
 }
@@ -592,13 +598,14 @@ void Joueur::piocherJusquaEtDefausseAction(size_t n){
 
 void Joueur::receiveTresor(int n, Plateau &plat){
   std::vector<std::pair<Carte*, int>> liste = plat.getMaxTresor(n);
-  std::cout << "Quelle carte voulez-vous parmi les suivantes : " << std::endl;
+  std::vector<Carte*> listeAffichee;
   for(size_t i = 0; i < liste.size(); i++){
-    if(i== liste.size()-1) std::cout << liste.at(i).first->getName() << std::endl;
-    else std::cout << liste.at(i).first->getName() << "; ";
+    listeAffichee.push_back(liste.at(i).first);
   }
-  size_t index = 10000;
+  std::cout << "Quelle carte voulez-vous parmi les suivantes : " << std::endl;
+  size_t index = liste.size();
   while(index >= liste.size()){
+    printCards(listeAffichee, "Cartes Disponibles");
     std:: cin >> index;
   }
   Carte* c = plat.buyCard(liste.at(index).second);
@@ -817,4 +824,13 @@ std::vector<bool> Joueur::decideDefausse(std::vector<Joueur> listeJoueur){
 
 void Joueur::resetDraws(){
   m_draws = 0;
+}
+
+bool Joueur::queJardins(){
+  for(size_t i = 0; i < m_hand.size(); i++){
+    if(m_hand.at(i)->getType() == TypeCarte::Action && m_hand.at(i)->getName() != "Jardins"){
+      return false;
+    }
+  }
+  return true;
 }
