@@ -730,3 +730,18 @@ int Plateau::chercherCoutParIndex(size_t index){
   }
 }
 
+bool Plateau::getVide(size_t index){
+  if(index > m_PilesTresor.size() - 1){ // Vérifie si l'index est plus loin que les cartes trésor
+    index -= m_PilesTresor.size();
+    if(index > m_PilesVictoire.size() - 1){ // Vérifie si l'index est plus loin que les cartes victoire
+      index -= m_PilesVictoire.size(); 
+      return (m_PilesAction.at(index).second == 0); // On est dans les cartes action
+    }
+    else{ // On est dans les cartes victoire
+      return (m_PilesVictoire.at(index).second == 0);
+    }
+  }
+  else{ // On est dans les cartes trésor
+    return (m_PilesTresor.at(index).second == 0);
+  }
+}
