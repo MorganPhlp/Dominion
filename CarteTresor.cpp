@@ -18,12 +18,8 @@ void CarteTresor::play(Joueur &p, Plateau &plat, int index, Jeu &j){ // Méthode
 
 // Getters
 int CarteTresor::getCoins() const{return m_coins;}
-/*
-void CarteTresor::printCard() const{ // Méthode pour afficher la carte
-	Carte::printCard();
-	if(m_coins != 0) std::cout << "+" << m_coins << " Pièces" << std::endl;
-}
-*/
+
+//Méthode pour afficher une carte Tresor
 void CarteTresor::printCard() const {
     initscr();
     start_color();

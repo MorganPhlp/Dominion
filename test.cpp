@@ -8,9 +8,10 @@
 int main(){
 
   //Test partie de jeu
+  
   Plateau plat = Plateau(2);
-  Joueur j1 = Joueur("Momo");
-  Joueur j2 = Joueur("Fefe");
+  Joueur j1 = Joueur("Morgan");
+  Joueur j2 = Joueur("Ny Fenohery");
   std::vector<Joueur> liste = {j1,j2};
   Jeu jeu = Jeu(plat, liste);
   jeu.jouerPartie();

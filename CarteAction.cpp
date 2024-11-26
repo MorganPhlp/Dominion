@@ -14,8 +14,8 @@
 // Constructeur
 CarteAction::CarteAction(std::string name, std::string description, int cost, int actions, int buys, int draws, int coins, bool isAttack, bool isReaction) : Carte(name, description, cost, TypeCarte::Action), m_actions(actions), m_buys(buys), m_draws(draws), m_coins(coins), m_isAttack(isAttack), m_isReaction(isReaction) {}
 
-
-void CarteAction::play(Joueur &p, Plateau &plat, int index, Jeu &j){ // Méthode pour jouer une carte
+// Méthode pour jouer une carte
+void CarteAction::play(Joueur &p, Plateau &plat, int index, Jeu &j){
   if(getName() != "Festin") p.defausseCarte(index);
   if(!getDescription().empty()) playDescription(getName(), p, plat, index, j);
   p.addActions(m_actions);
@@ -25,18 +25,12 @@ void CarteAction::play(Joueur &p, Plateau &plat, int index, Jeu &j){ // Méthode
   if(m_isAttack) j.viderImmunises();
 }
 
-
 // Getters
 int CarteAction::getDraws() const{return m_draws;}
-
 int CarteAction::getBuys() const{return m_buys;}
-
 int CarteAction::getActions() const{return m_actions;}
-
 int CarteAction::getCoins() const{return m_coins;}
-
 bool CarteAction::getIsAttack() const{return m_isAttack;}
-
 bool CarteAction::getIsReaction() const{return m_isReaction;}
 
 // Méthode pour afficher une carte Action

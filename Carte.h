@@ -23,7 +23,6 @@ class Carte{
   	Carte(std::string name, std::string description, int cost, TypeCarte type); // Constructeur
   	virtual ~Carte(); // Destructeur virtuel car au moins une méthode virtuelle
   	virtual void play(Joueur &p, Plateau &plat, int index, Jeu &j) = 0; // Méthode virtuelle pour jouer la carte qui ne sera défini que dans ses classes héritées
-  	//void buy(Joueur &p, Jeu &j);
   	
   	// Getters
   	std::string getName() const;
