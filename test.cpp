@@ -8,6 +8,7 @@
 
 int main(){
 
+
   Plateau plat = Plateau(2);
   Joueur j1 = Joueur("Momo");
   Joueur j2 = Joueur("Fefe");
@@ -15,9 +16,10 @@ int main(){
   Jeu jeu = Jeu(plat, liste);
   jeu.jouerPartie();
   return 0;
+
   
-  /*
   // Partie presque à la fin 
+  /*
   Plateau plat2 = Plateau(2, true);
   Joueur j21 = Joueur("Morgan");
   Joueur j22 = Joueur("Ny Fenohery");

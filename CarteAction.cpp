@@ -38,18 +38,6 @@ int CarteAction::getCoins() const{return m_coins;}
 bool CarteAction::getIsAttack() const{return m_isAttack;}
 
 bool CarteAction::getIsReaction() const{return m_isReaction;}
-/*
-void CarteAction::printCard() const{ // Méthode pour afficher les cartes
-	Carte::printCard();
-	if(m_draws != 0) std::cout << "+" << m_draws << " Cartes" << std::endl;
-	if(m_actions != 0) std::cout << "+" << m_actions << " Actions" << std::endl;
-	if(m_buys != 0) std::cout << "+" << m_buys << " Achats" << std::endl;
-	if(m_coins != 0) std::cout << "+" << m_coins << " Pièces" << std::endl;
-	if(m_isAttack) std::cout << "Carte Attaque" << std::endl;
-	if(m_isReaction) std::cout << "Carte Réaction" << std::endl;
-}
-*/
-
 
 // Méthode pour afficher une carte Action
 void CarteAction::printCard() const {

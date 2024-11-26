@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <ncurses.h>
+#include <cstring>
 
 std::vector<CarteTresor> Plateau::listeCarteTresor;
 std::vector<CarteAction> Plateau::listeCarteAction;
@@ -18,18 +19,109 @@ std::vector<std::vector<Carte*>> m_listeCartesDevoilees;
 std::vector<Carte*> m_listeCartesEcartees;
 const size_t Plateau::m_maxIndex = 17;
 
-Plateau::Plateau(int nb_joueurs) { // Constructeur
-  remplirListeCarte();
-  size_t rep;
-  std::cout << "Voulez-vous jouer avec un set de cartes Action au hasard, avec le set de base ou en choisissant vous mêmes les cartes Action ? (Répondez 1, 2 ou 3 suivant la réponse)"<<std::endl;
-  while(rep!=1 && rep != 2 && rep!=3){
-    std::cin >> rep;
-  }
-  if(rep == 1) choisirCarteActionHasard();
-  else if(rep == 2) choisirCarteActionSetBase();
-  else choisirCarteActionCreation();
-  remplirPiles(nb_joueurs);
+//Constructeur
+Plateau::Plateau(int nb_joueurs) {
+    initscr();
+    start_color();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+
+    // Initialisation des couleurs pour les messages de popup
+    init_pair(1, COLOR_WHITE, COLOR_BLACK);
+    init_pair(2, COLOR_CYAN, COLOR_BLACK);  // Couleur pour "DOMINION"
+    
+    clear();
+    refresh();
+
+    // Affichage du message de bienvenue
+    WINDOW* popup = newwin(8, 60, (LINES - 9) / 2, (COLS - 60) / 2); // Fenêtre centrée
+    box(popup, 0, 0);
+
+    // Afficher "Bienvenue sur" en taille normale
+    wattron(popup, COLOR_PAIR(1));
+    mvwprintw(popup, 2, (60 - strlen("Bienvenue sur")) / 2, "Bienvenue sur");
+    wattroff(popup, COLOR_PAIR(1));
+
+    // Afficher "DOMINION" en taille plus grande
+    wattron(popup, COLOR_PAIR(2) | A_BOLD);
+    mvwprintw(popup, 4, (60 - strlen("DOMINION")) / 2, "DOMINION");
+    wattroff(popup, COLOR_PAIR(2) | A_BOLD);
+
+    wrefresh(popup);
+    getch(); // Attendre une interaction
+    delwin(popup);
+
+    // Initialisation de la liste des cartes
+    remplirListeCarte();
+    if (listeCarteAction.empty()) {
+        std::cerr << "Erreur : listeCarteAction n'a pas été initialisée correctement !" << std::endl;
+        endwin();
+        return;
+    }
+
+    clear();
+    refresh();
+    
+    // Affichage du choix du set
+    popup = newwin(7, 60, (LINES - 7) / 2, (COLS - 60) / 2); // Fenêtre centrée
+    box(popup, 0, 0);
+    wattron(popup, COLOR_PAIR(1));
+    mvwprintw(popup, 1, 2, "Voulez-vous jouer avec :");
+    mvwprintw(popup, 2, 4, "1. Un set de cartes Action au hasard");
+    mvwprintw(popup, 3, 4, "2. Le set de base");
+    mvwprintw(popup, 4, 4, "3. En choisissant vous-même les cartes Action");
+    mvwprintw(popup, 5, 2, "Entrez votre choix (1, 2 ou 3): ");
+    wattroff(popup, COLOR_PAIR(1));
+    wrefresh(popup);
+
+    // Lecture de l'entrée utilisateur
+    size_t rep = 0;
+    echo();
+    wscanw(popup, "%zu", &rep);
+    noecho();
+
+    // Supprimer la fenêtre popup
+    delwin(popup);
+
+    // Validation de l'entrée et exécution
+    while (rep != 1 && rep != 2 && rep != 3) {
+        // Réafficher la fenêtre en cas d'entrée invalide
+        popup = newwin(5, 50, (LINES - 5) / 2, (COLS - 50) / 2); // Fenêtre centrée
+        box(popup, 0, 0);
+        wattron(popup, COLOR_PAIR(1));
+        mvwprintw(popup, 1, 2, "Choix invalide. Veuillez entrer 1, 2 ou 3.");
+        mvwprintw(popup, 3, 2, "Entrez votre choix (1, 2 ou 3): ");
+        wattroff(popup, COLOR_PAIR(1));
+        wrefresh(popup);
+
+        echo();
+        wscanw(popup, "%zu", &rep);
+        noecho();
+
+        delwin(popup);
+    }
+
+    // Exécution des choix avec messages de debug
+    if (rep == 1) {
+        std::cout << "Exécution de choisirCarteActionHasard()" << std::endl;
+        choisirCarteActionHasard();
+    } else if (rep == 2) {
+        std::cout << "Exécution de choisirCarteActionSetBase()" << std::endl;
+        choisirCarteActionSetBase();
+    } else {
+        std::cout << "Exécution de choisirCarteActionCreation()" << std::endl;
+        choisirCarteActionCreation();
+    }
+
+    // Remplir les piles
+    std::cout << "Remplissage des piles pour " << nb_joueurs << " joueurs." << std::endl;
+    remplirPiles(nb_joueurs);
+
+    endwin();
 }
+
+
 
 Plateau::Plateau(int nb_joueurs, bool finPartie){ // Constructeur spécial pour la soutenance
   (void) finPartie;
@@ -151,33 +243,6 @@ void Plateau::remplirListeCarte(){
 	}
 }
 
-/*
-// Méthode pour afficher toutes les cartes (seulement pour vérifier qu'on les avait toutes)
-void Plateau::printTotalCard(){
-    int index = 0;
-    std::cout << "========== CARTES TRESOR ==========" << std::endl;
-    for (const CarteTresor& carte : listeCarteTresor) {
-        carte.printCard();
-        std::cout << "-----------------------------------" << std::endl;
-        index++;
-    }
-
-    std::cout << "\n========== CARTES VICTOIRE ==========" << std::endl;
-    for (const CarteVictoire& carte : listeCarteVictoire) {
-        carte.printCard();
-        std::cout << "-----------------------------------" << std::endl;
-        index++;
-    }
-
-    std::cout << "\n========== CARTES ACTION ==========" << std::endl;
-    for (const CarteAction& carte : listeCarteAction) {
-        carte.printCard();
-        std::cout << "-----------------------------------" << std::endl;
-        index++;
-    }
-}
-*/
-
 // Méthode pour choisir 10 cartes action au hasard parmi la liste de cartes action
 void Plateau::choisirCarteActionHasard() {
     m_listeCarteActionChoisie.clear();
@@ -200,33 +265,139 @@ void Plateau::choisirCarteActionSetBase(){
   }
 }
 
-void Plateau::choisirCarteActionCreation(){
-  m_listeCarteActionChoisie.clear();
-  std::vector<size_t> indicesChoisis;
-  size_t rep, nb = 0;
-  while(nb < 10){
-    for(size_t i = 0; i < listeCarteAction.size(); i++){ 
-      if(std::find(indicesChoisis.begin(), indicesChoisis.end(), i) == indicesChoisis.end()){ 
-        std::cout << i << ". " << listeCarteAction.at(i).getName() << std::endl;
-      }
+void Plateau::choisirCarteActionCreation() {
+    initscr();
+    start_color();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+
+    // Initialisation des couleurs
+    init_pair(1, COLOR_YELLOW, COLOR_BLACK); // Cartes disponibles
+    init_pair(2, COLOR_GREEN, COLOR_BLACK);  // Cartes choisies
+    init_pair(3, COLOR_CYAN, COLOR_BLACK);   // Titre
+    init_pair(4, COLOR_RED, COLOR_BLACK);    // Description détaillée
+
+    // Déclarations
+    m_listeCarteActionChoisie.clear();
+    std::vector<size_t> indicesChoisis;
+    size_t rep;
+    int nbChoisies = 0;
+    const int card_width = 28;  // Largeur du rectangle
+    const int card_height = 3;  // Hauteur du rectangle
+    const int spacing = 1;      // Espacement entre les rectangles
+
+    while (nbChoisies < 10) {
+        clear();
+
+        // Affichage des titres
+        attron(COLOR_PAIR(3));
+        mvprintw(1, 5, "Liste cartes Action disponibles");
+        mvprintw(1, COLS / 2 + 5, "Liste cartes Action choisies");
+        attroff(COLOR_PAIR(3));
+
+        // Séparation centrale
+        for (int i = 0; i < LINES; ++i) {
+            mvaddch(i, COLS / 2, '|');
+        }
+
+        // Fonction pour dessiner un rectangle
+        auto draw_rectangle = [&](int y, int x, const std::string& text, int index, int color_pair) {
+            attron(COLOR_PAIR(color_pair));
+            mvhline(y, x, '-', card_width);
+            mvhline(y + card_height - 1, x, '-', card_width);
+            mvvline(y, x, '|', card_height);
+            mvvline(y, x + card_width - 1, '|', card_height);
+            mvaddch(y, x, '+');
+            mvaddch(y, x + card_width - 1, '+');
+            mvaddch(y + card_height - 1, x, '+');
+            mvaddch(y + card_height - 1, x + card_width - 1, '+');
+
+            // Afficher l'index et le nom
+            mvprintw(y + 1, x + 2, "%d. %s", index, text.c_str());
+            attroff(COLOR_PAIR(color_pair));
+        };
+
+        // Affichage des cartes disponibles
+        int current_y = 2, current_x = 5;
+        for (size_t i = 0; i < listeCarteAction.size(); i++) {
+            if (std::find(indicesChoisis.begin(), indicesChoisis.end(), i) == indicesChoisis.end()) {
+                draw_rectangle(current_y, current_x, listeCarteAction[i].getName(), i, 1);
+                current_y += card_height + spacing;
+
+                // Retour à une nouvelle colonne
+                if (current_y + card_height > LINES - 2) {
+                    current_y = 2;
+                    current_x += card_width + spacing;
+                }
+            }
+        }
+
+        // Affichage des cartes choisies
+        current_y = 2;
+        current_x = COLS / 2 + 5;
+        for (size_t i = 0; i < m_listeCarteActionChoisie.size(); i++) {
+            draw_rectangle(current_y, current_x, m_listeCarteActionChoisie[i].getName(), i + 1, 2);
+            current_y += card_height + spacing;
+        }
+
+        // Instructions pour l'utilisateur
+        mvprintw(LINES - 3, 5, "Appuyez sur TAB pour voir une carte en détail.");
+        mvprintw(LINES - 2, 5, "Entrez l'index d'une carte à choisir:");
+
+        refresh();
+
+        // Attente de l'entrée utilisateur
+        int ch = getch();
+
+        if (ch == '\t') { // Demande de description détaillée
+            clear();
+            mvprintw(LINES / 2 - 2, COLS / 2 - 20, "Entrez l'index de la carte (0-%zu):", listeCarteAction.size()-1);
+            refresh();
+            echo();
+            scanw("%zu", &rep);
+            noecho();
+
+            if (rep < listeCarteAction.size()) {
+                clear();
+                listeCarteAction[rep].printCard(); // Appelle la méthode de description de la carte
+                mvprintw(LINES - 2, 5, "Appuyez sur une touche pour continuer...");
+                refresh();
+                getch();
+            } else {
+                mvprintw(LINES - 2, 5, "Index invalide. Appuyez sur une touche...");
+                refresh();
+                getch();
+            }
+        } else { // Sélection de carte
+            echo();
+            scanw("%zu", &rep);
+            noecho();
+
+            if (rep < listeCarteAction.size() && std::find(indicesChoisis.begin(), indicesChoisis.end(), rep) == indicesChoisis.end()) {
+                m_listeCarteActionChoisie.push_back(listeCarteAction[rep]);
+                indicesChoisis.push_back(rep);
+                nbChoisies++;
+            } else {
+                mvprintw(LINES - 2, 5, "Index invalide ou déjà sélectionné. Appuyez sur une touche...");
+                refresh();
+                getch();
+            }
+        }
     }
-    
-    try{
-      std::cin >> rep;
-      if(rep < listeCarteAction.size() && std::find(indicesChoisis.begin(), indicesChoisis.end(), rep) == indicesChoisis.end()){
-        m_listeCarteActionChoisie.push_back(listeCarteAction.at(rep));
-        indicesChoisis.push_back(rep);
-        nb++;
-      }
-      else{
-        std::cout << "Index trop grand ou déjà sélectionné" << std::endl;
-      }
+
+    // Résumé final des choix
+    clear();
+    mvprintw(1, (COLS - 30) / 2, "Cartes Action choisies:");
+    int y = 3;
+    for (const auto& carte : m_listeCarteActionChoisie) {
+        mvprintw(y++, (COLS - 30) / 2, "- %s", carte.getName().c_str());
     }
-    catch(...){
-      std::cerr << "Erreur d'index" << std::endl;
-    }
-    
-  }
+    mvprintw(LINES - 2, 5, "Appuyez sur une touche pour continuer...");
+    refresh();
+    getch();
+
+    endwin();
 }
 
 // Méthode pour remplir les piles du plateau suivant le nombre de joueurs
@@ -253,120 +424,6 @@ void Plateau::remplirPiles(int nb_joueurs) {
     }
 }
 
-/*
-// Méthode pour afficher le plateau
-void Plateau::print() const{
-  size_t somme = 0;
-  std::cout << "======== PLATEAU DOMINION ========\n\n";
-    
-  std::cout << "========== PILES TRESOR ==========\n";
-  for (size_t i = 0; i < m_PilesTresor.size(); i++) {
-    std::cout << '[' << somme << ']';
-    std::cout << "Quantité: " << m_PilesTresor.at(i).second << " | ";
-    m_PilesTresor.at(i).first.printCard();
-    std::cout << "-----------------------------------\n";
-    somme++;
-  }
-
-  std::cout << "\n========== PILES VICTOIRE ==========\n";
-  for (size_t i = 0; i < m_PilesVictoire.size(); i++) {
-    std::cout << '[' << somme << ']';
-    std::cout << "Quantité: " << m_PilesVictoire.at(i).second << " | ";
-    m_PilesVictoire.at(i).first.printCard();
-    std::cout << "-----------------------------------\n";
-    somme++;
-  }
-
-  std::cout << "\n========== PILES ACTION ==========\n";
-  for (size_t i = 0; i < m_PilesAction.size(); i++) {
-    std::cout << '[' << somme << ']';
-    std::cout << "Quantité: " << m_PilesAction.at(i).second << " | ";
-    m_PilesAction.at(i).first.printCard();
-    std::cout << "-----------------------------------\n";
-    somme++;
-  }
-
-  std::cout << "\n===================================\n";
-}
-*/
-
-/*
-void Plateau::print() const {
-    
-    initscr();
-    start_color();
-    cbreak();
-    noecho();
-    keypad(stdscr, TRUE);
-
-    // Initialisation des paires de couleurs (si ce n'est pas déjà fait dans Plateau::print())
-    init_pair(1, COLOR_YELLOW, COLOR_BLACK); // Trésor
-    init_pair(2, COLOR_GREEN, COLOR_BLACK);  // Victoire
-    init_pair(3, COLOR_RED, COLOR_BLACK);    // Action
-
-
-    int y = 0; // Position verticale initiale
-
-    attron(A_BOLD);
-    mvprintw(y++, 0, "======== PLATEAU DOMINION ========");
-    attroff(A_BOLD);
-
-    // Affichage des piles Trésor
-    attron(COLOR_PAIR(1));
-    mvprintw(y++, 0, "========== PILES TRESOR ==========");
-    attroff(COLOR_PAIR(1));
-
-    for (size_t i = 0; i < m_PilesTresor.size(); i++) {
-        attron(COLOR_PAIR(1));
-        mvprintw(y++, 2, "Quantité: %d | Nom: %s | Coût: %d | Valeur: %d",
-                 m_PilesTresor[i].second,
-                 m_PilesTresor[i].first.getName().c_str(),
-                 m_PilesTresor[i].first.getCost(),
-                 m_PilesTresor[i].first.getCoins());
-        attroff(COLOR_PAIR(1));
-    }
-
-    // Affichage des piles Victoire
-    attron(COLOR_PAIR(2));
-    mvprintw(y++, 0, "========== PILES VICTOIRE ==========");
-    attroff(COLOR_PAIR(2));
-
-    for (size_t i = 0; i < m_PilesVictoire.size(); i++) {
-        attron(COLOR_PAIR(2));
-        mvprintw(y++, 2, "Quantité: %d | Nom: %s | Coût: %d | Points: %d",
-                 m_PilesVictoire[i].second,
-                 m_PilesVictoire[i].first.getName().c_str(),
-                 m_PilesVictoire[i].first.getCost(),
-                 m_PilesVictoire[i].first.getWinPoints());
-        attroff(COLOR_PAIR(2));
-    }
-
-    // Affichage des piles Action
-    attron(COLOR_PAIR(3));
-    mvprintw(y++, 0, "========== PILES ACTION ==========");
-    attroff(COLOR_PAIR(3));
-
-    for (size_t i = 0; i < m_PilesAction.size(); i++) {
-        attron(COLOR_PAIR(3));
-        mvprintw(y++, 2, "Quantité: %d | Nom: %s | Coût: %d",
-                 m_PilesAction[i].second,
-                 m_PilesAction[i].first.getName().c_str(),
-                 m_PilesAction[i].first.getCost());
-        attroff(COLOR_PAIR(3));
-    }
-
-    // Rafraîchir l'affichage
-    refresh();
-    
-    // Attendre une entrée avant de quitter
-    mvprintw(LINES - 1, 0, "Appuyez sur une touche pour quitter...");
-    refresh();
-    getch();
-
-    // Terminaison de ncurses
-    endwin();
-}
-*/
 
 void Plateau::print(std::string pseudo, int coins, int buys, int score) const {
     initscr();

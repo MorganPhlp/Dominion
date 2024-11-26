@@ -175,17 +175,9 @@ void Jeu::tourJoueur(Joueur* j){
   j->printHand();
   */
   
-  
+  //Phase Action
   while (j->getNbActions() > 0 && j->getNbCarteActionHand().first != 0) {
     if (j->queJardins()) break; // Sortie si toutes les cartes sont des "Jardins"
-
-/*
-  while (j->getNbBuys() > 0) {
-        int coins = j->getCoins();
-        int buys = j->getNbBuys();
-        int score = j->getNbWinPoints(); // Utilisation du score actuel
-        std::string pseudo = j->getPseudo();
-        */
 
     j->printHand(); // Affiche la main actuelle
 
@@ -255,6 +247,7 @@ void Jeu::tourJoueur(Joueur* j){
     j->resetDraws();
 }
   
+  //Phase Achat
   while (j->getNbCarteTresorHand().first > 0) {
     j->printHand(); // Affiche la main actuelle
 
@@ -322,7 +315,6 @@ void Jeu::tourJoueur(Joueur* j){
     }
 
 }
-  
   
   while (j->getNbBuys() > 0) {
     int coins = j->getCoins();
@@ -404,7 +396,8 @@ void Jeu::tourJoueur(Joueur* j){
         delwin(error);
     }
     
-    //phase ajustement
+  }
+  //Phase ajustement
     std::cout << "======== Phase Ajustement ========" << std::endl;
     j->defausser(); //Défausser toutes les cartes jouées et les cartes en main
 
@@ -416,7 +409,6 @@ void Jeu::tourJoueur(Joueur* j){
 
     std::cout << "Votre nouvelle main pour le prochain tour est prête !" << std::endl;
     j->printHand();
-  }
 }
 
 
@@ -441,7 +433,6 @@ std::vector<size_t> Jeu::revelerCartes(){
 }
 
 void Jeu::banditisme(){
-	//m_joueurActif->printDefausse();		//Permet de vérifier qu'on recoit bien la carte Or
 	revelerCartes();
 	std::vector<std::vector<Carte*>>& listeCartesDevoilees = m_plateau.getListeCartesDevoilees();
 	for(size_t i = 0; i < listeCartesDevoilees.size(); i++){
@@ -562,11 +553,10 @@ void Jeu::tousSaufActifPoseCarteVictoire(){
       for(const auto index : indices){
       	Carte* c = m_listeJoueur.at(i).getHand().at(index);
       	temp.push_back(c);
-      	//m_listeJoueur.at(i).getHand().at(index).printCard();
       }
       m_listeJoueur.at(i).printCards(temp,"Cartes Victoire de la main");
       if(m_listeJoueur.at(i).getNbCarteVictoireHand().first == 0){
-        m_listeJoueur.at(i).printHand(); // TODO Dévoiler la main aux autres joueurs (peut-être à changer)
+        m_listeJoueur.at(i).printHand();
       }
       else {
       	m_listeJoueur.at(i).carteVictoireOnDeck();
@@ -583,35 +573,6 @@ bool Jeu::verifWin(){
   
   return m_plateau.getNbPileVide() >= 3;
 }
-
-/*
-void Jeu::calculerScoreFinal() {
-    std::cout << "======== Affichage des scores ========" << std::endl;
-    std::vector<std::pair<Joueur, int>> tabScore;
-    for (auto& joueur : m_listeJoueur) {
-        int score = joueur.calculerPoints();
-        tabScore.push_back(std::make_pair(joueur, score));
-    }
-    
-    std::sort(tabScore.begin(), tabScore.end(), [](const auto &p1, const auto &p2){
-      return p1.second > p2.second;
-    });
-    
-    std::cout << std::left << std::setw(15) << "Joueur" << "Score" << std::endl;
-    std::cout << "-------------------------------" << std::endl;
-    for (size_t i = 0; i < tabScore.size(); ++i) {
-        if (i == 0 || tabScore.at(i).second == tabScore.at(0).second) {
-            std::cout << std::left << std::setw(15) << tabScore.at(i).first.getPseudo() 
-                      << tabScore.at(i).second << " (GAGNANT)" << std::endl;
-        } else {
-            std::cout << std::left << std::setw(15) << tabScore.at(i).first.getPseudo() 
-                      << tabScore.at(i).second << std::endl;
-        }
-    }
-    std::cout << "===============================" << std::endl;
-}
-
-*/
 
 void Jeu::calculerScoreFinal() {
     initscr();
@@ -637,7 +598,7 @@ void Jeu::calculerScoreFinal() {
     });
 
     // Déterminer la taille de la fenêtre en fonction du nombre de joueurs
-    int num_lines = 4 + tabScore.size(); // 4 lignes pour le titre, séparateur, et espace
+    int num_lines = 15 + tabScore.size(); // 4 lignes pour le titre, séparateur, et espace
     int num_cols = 50; // Largeur fixe pour l'affichage
     int start_y = (LINES - num_lines) / 2;
     int start_x = (COLS - num_cols) / 2;
@@ -648,7 +609,7 @@ void Jeu::calculerScoreFinal() {
 
     // Afficher le titre
     wattron(score_popup, COLOR_PAIR(1));
-    mvwprintw(score_popup, 1, (num_cols - 26) / 2, "======== Tableau des scores ========");
+    mvwprintw(score_popup, 1, (num_cols - 26) / 2, " Tableau des scores ");
     wattroff(score_popup, COLOR_PAIR(1));
 
     // Afficher les scores des joueurs
@@ -682,26 +643,6 @@ void Jeu::calculerScoreFinal() {
 }
 
 
-/*
-void Jeu::jouerPartie(){
-  std::cout << "======== Début de la partie ========" << std::endl;
-  int nbTour = 0;
-  while (!verifWin()) {
-    nbTour++;
-    std::cout << "\n======== Tour numéro " << nbTour << " ========" << std::endl;
-    for (size_t i = 0; i < m_listeJoueur.size(); i++) {
-      m_joueurActif = &m_listeJoueur.at(i);
-      std::cout << "\nTour de " << m_joueurActif->getPseudo() << std::endl;
-      tourJoueur(m_joueurActif);
-      if (verifWin()) {
-        std::cout << "Fin de la partie atteinte en " << nbTour << " tours" << std::endl;
-        break;
-      }
-    }
-  }
-  calculerScoreFinal();
-}
-*/
 
 void Jeu::jouerPartie() {
     initscr();
@@ -741,6 +682,10 @@ void Jeu::jouerPartie() {
         wrefresh(popup);
         getch();
         delwin(popup);
+        
+        // Rafraîchir l'écran principal avant d'afficher des fenêtres
+    	clear();
+    	refresh();
 
         // Tour de chaque joueur
         for (size_t i = 0; i < m_listeJoueur.size(); i++) {
@@ -755,6 +700,10 @@ void Jeu::jouerPartie() {
             wrefresh(popup);
             getch();
             delwin(popup);
+            
+            // Rafraîchir l'écran principal avant d'afficher des fenêtres
+    	    clear();
+    	    refresh();
 
             // Exécuter le tour du joueur
             tourJoueur(m_joueurActif);
@@ -772,6 +721,10 @@ void Jeu::jouerPartie() {
     }
 
     // Affichage du message "Fin de partie"
+    
+    // Rafraîchir l'écran principal avant d'afficher des fenêtres
+    clear();
+    refresh();
     popup = newwin(5, 50, (LINES - 5) / 2, (COLS - 50) / 2); // Fenêtre centrée
     box(popup, 0, 0);
     wattron(popup, COLOR_PAIR(1));
