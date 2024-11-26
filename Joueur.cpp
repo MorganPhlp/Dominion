@@ -71,6 +71,17 @@ void Joueur::initDeck(Plateau& p) {
     shuffleCartes(m_deck);
 }
 
+void Joueur::initDeckFin(Plateau& p) { // Méthode spéciale pour la soutenance
+    m_deck.clear();
+    addCardsByNameInDeck("Or", 7, p.getListeCarteTresor());
+    addCardsByNameInDeck("Jardins", 4, p.getListeCarteAction());
+    addCardsByNameInDeck("Voleur", 1, p.getListeCarteAction());
+    addCardsByNameInDeck("Douve", 1, p.getListeCarteAction());
+    addCardsByNameInDeck("Atelier", 1, p.getListeCarteAction());
+    addCardsByNameInDeck("Province", 3, p.getListeCarteVictoire(), 6);
+    shuffleCartes(m_deck);
+}
+
 void Joueur::shuffleCartes(std::vector<Carte*>& v){
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	shuffle(v.begin(), v.end(), std::default_random_engine(seed));
@@ -381,7 +392,7 @@ void Joueur::receiveCard(int n, Plateau &plat){
   m_defausse.push_back(c);
 }
 
-void Joueur::throwMax(int n, int& index){
+void Joueur::throwMax(int n){
   std:: cout << "Vous pouvez jeter jusqu'à " << n << " cartes de votre main" << std::endl;
   std::string rep;
   bool stop = false;
@@ -398,8 +409,6 @@ void Joueur::throwMax(int n, int& index){
         std::stoul(rep);
         if(std::stoul(rep) < m_hand.size()){
           jeterCarte(std::stoul(rep));
-          if(std::stoi(rep) < index && index != 20) index-=1;
-          else if(std::stoi(rep) == index) index = 20;
           break;
         }
       }
@@ -518,6 +527,7 @@ void Joueur::regarderDefausseEtPrendre(){
 }
 
 void Joueur::demandeDefausse(){
+  printHand();
   std::string rep;
   size_t index;
   std::cout << "Quelle carte voulez vous defausser ? (Ecrivez l'index de la carte)" << std::endl;
@@ -619,7 +629,12 @@ void Joueur::receiveTresor(int n, Plateau &plat){
   size_t index = liste.size();
   while(index >= liste.size()){
     printCards(listeAffichee, "Cartes Disponibles");
-    std:: cin >> index;
+    try{
+      std:: cin >> index;
+    }
+    catch(...){
+      std::cerr << "Erreur d'index" << std::endl;
+    }
   }
   Carte* c = plat.buyCard(liste.at(index).second);
   m_hand.push_back(c);
@@ -627,21 +642,27 @@ void Joueur::receiveTresor(int n, Plateau &plat){
 
 void Joueur::jeterTresorPourRecuperPlus(size_t n, Plateau &plat){
   std::pair<size_t,std::vector<size_t>> nbTresor = getNbCarteTresorHand();
+  std::vector<Carte*> temp;
+  for(size_t i = 0; i < nbTresor.second.size(); i++){
+    temp.push_back(m_hand.at(nbTresor.second.at(i)));
+  }
   if(nbTresor.first == 0){
     std::cout << "Vous n'avez pas de cartes Tresor à jeter" << std::endl;
   }
   else{
-    size_t index;
+    size_t indexTemp, index;
     bool valide = false;
     std::string rep;
     while(!valide){
+      printCards(temp, "Cartes Tresor de votre main");
       std::cout << "Quelle carte trésor voulez vous jeter pour recevoir une carte Tresor coûtant jusqu'à 3 pièces de plus ? (Ecrivez l'index de la carte ou STOP si vous ne voulez pas en jeter)" << std::endl;
       std::cin >> rep;
       if(rep == "STOP" || rep == "stop" || rep == "Stop") break;
       else{
         try{
-          index = std::stoul(rep);
-          if(index < m_hand.size() && std::find(nbTresor.second.begin(), nbTresor.second.end(), index) != nbTresor.second.end()){
+          indexTemp = std::stoul(rep);
+          if(indexTemp < temp.size()){
+            index = nbTresor.second.at(indexTemp);
             size_t cout = m_hand.at(index)->getCost();
             m_rebut.push_back(m_hand.at(index));
             m_hand.erase(m_hand.begin()+index);
@@ -666,6 +687,7 @@ void Joueur::trocCuivrePieces(){
 				addCoins(3);
 				m_rebut.push_back(m_hand.at(i));
 				m_hand.erase(m_hand.begin()+i);	
+				break;
 			}
 		}
 	}
@@ -673,12 +695,16 @@ void Joueur::trocCuivrePieces(){
 
 int Joueur::renovation(){
 	size_t index;
-	int cost;
-	std::cout << "Vous devez jeter une carte. Entrez l'index de la carte que vous souhaitez jeter : " << std::endl;
-	std::cin >> index;		
+	int cost;		
 	while(index >= m_hand.size()){
-		std::cout << "Index invalide. Veuillez entrer un index valide." << std::endl;
-		std::cin >> index;
+		std::cout << "Vous devez jeter une carte. Entrez l'index de la carte que vous souhaitez jeter : " << std::endl;
+		printHand();
+		try{
+		  std::cin >> index;
+	        }
+	        catch(...){
+	          std::cerr << "Index invalide" << std::endl;
+	        }
 	}
 	cost = m_hand.at(index)->getCost();
 	jeterCarte(index);
@@ -708,10 +734,13 @@ void Joueur::vassal(Plateau &plat, Jeu &j){
 		std::cout << "Voulez-vous jouer cette carte Action ? Répondez par 'Oui' ou 'oui' ou 'O' ou 'o' si vous le souhaitez." << std::endl;
 			std::cin >> res;
 			if(res == "O" or res == "o" or res == "Oui" or res == "oui"){
-				dynamic_cast<CarteAction*>(c)->play(*this, plat, 0, j);
+				c->play(*this, plat, 0, j);
             			return;	
 			}
 	} 
+	else{
+	  std::cout << "Cette carte a été défaussé de votre deck" << std::endl;
+	}
 	defausseCarteDeck(0);
 }
 
@@ -804,6 +833,7 @@ void Joueur::putDeckInDefausse(){
 }
 
 int Joueur::calculerPoints(){
+  defausser();
   assembleDeckDefausse();
   int score = 0;
   for(size_t i = 0; i < m_deck.size(); i++){
@@ -846,4 +876,45 @@ bool Joueur::queJardins(){
     }
   }
   return true;
+}
+
+void Joueur::calculerScore(){ // TODO A refaire mieux
+  int score = 0;
+  for(size_t i = 0; i < m_deck.size(); i++){
+    if(m_deck.at(i)->getType() == TypeCarte::Victoire){
+      CarteVictoire* c = dynamic_cast<CarteVictoire*>(m_deck.at(i));
+      if(c) score += c->getWinPoints();
+    }
+  }
+  for(size_t i = 0; i < m_hand.size(); i++){
+    if(m_hand.at(i)->getType() == TypeCarte::Victoire){
+      CarteVictoire* c = dynamic_cast<CarteVictoire*>(m_hand.at(i));
+      if(c) score += c->getWinPoints();
+    }
+  }
+  for(size_t i = 0; i < m_defausse.size(); i++){
+    if(m_defausse.at(i)->getType() == TypeCarte::Victoire){
+      CarteVictoire* c = dynamic_cast<CarteVictoire*>(m_defausse.at(i));
+      if(c) score += c->getWinPoints();
+    }
+  }
+  m_nb_win_points = score;
+}
+
+void Joueur::defausserCarteParPileVide(Plateau& plat){
+  size_t rep = m_hand.size();
+  int nb = plat.getNbPileVide();
+  for(int i = 0; i < nb; i++){
+    while(rep >= m_hand.size()){
+      std::cout << "Quelle carte voulez-vous défausser (Entrez l'index de la carte)" << std::endl;
+      printHand();
+      try{
+        std::cin >> rep;
+      }
+      catch(...){
+        std::cerr << "Index invalide" << std::endl;
+      }
+    }
+    defausseCarte(rep);
+  }
 }

@@ -18,6 +18,7 @@ class Jeu{
     void tourJoueur(Joueur* j);
   public :
     Jeu(Plateau plateau, std::vector<Joueur> listeJoueur);
+    Jeu(Plateau plateau, std::vector<Joueur> listeJoueur, bool finPartie);
     ~Jeu();
     Plateau getPlateau();
     void choixAchatCarte();
@@ -28,7 +29,6 @@ class Jeu{
     void tousSaufActifDefausseJusqua(size_t n);
     void tousSaufActifPoseCarteVictoire();
     void banditisme();
-    void defausserCarteParPileVide(Plateau& plat);
     bool verifWin();
     void calculerScoreFinal();
     void jouerPartie();

@@ -15,15 +15,12 @@ CarteAction::CarteAction(std::string name, std::string description, int cost, in
 
 
 void CarteAction::play(Joueur &p, Plateau &plat, int index, Jeu &j){ // Méthode pour jouer une carte
+  if(getName() != "Festin") p.defausseCarte(index);
   if(!getDescription().empty()) playDescription(getName(), p, plat, index, j);
   p.addActions(m_actions);
   p.addBuys(m_buys);
   p.addDraws(m_draws);
   p.addCoins(m_coins);
-  if(getName() != "Festin"){
-    if(getName() == "Chapelle" && index == 20){}
-    else p.defausseCarte(index);
-  }
   if(m_isAttack) j.viderImmunises();
 }
 
@@ -152,7 +149,7 @@ void CarteAction::printCard() const {
 void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, int &index, Jeu &j){ // Méthode pour gérer les différents cas spécifiques des cartes actions
         if(m_isAttack) j.verifDouve();
 	if(name == "Atelier") p.receiveCard(4, plat);
-	else if(name == "Chapelle") p.throwMax(4, index); // TODO Modifier index suivant les cartes supprimées pour défausser la bonne carte
+	else if(name == "Chapelle") p.throwMax(4);
 	else if(name == "Festin"){
 	  p.jeterCarte(index);
 	  p.receiveCard(5, plat);
@@ -179,16 +176,15 @@ void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, in
         else if(name == "Milice") j.tousSaufActifDefausseJusqua(3);
         else if(name == "Mine") p.jeterTresorPourRecuperPlus(3, plat);
         else if(name == "Prêteur sur gages") p.trocCuivrePieces();
-        else if(name == "Braconnier") j.defausserCarteParPileVide(plat);
+        else if(name == "Braconnier") p.defausserCarteParPileVide(plat);
         else if(name == "Rénovation") {
         	int cost = p.renovation();
-        	p.receiveCard(cost,plat);
+        	p.receiveCard(cost+2,plat);
         }
-
         else if(name == "Sentinelle") p.sentinelle();
         else if(name == "Salle du Trône") {} //TODO Fonctionnement spécial à faire après
         else if (name == "Vassal") p.vassal(plat,j);
-        else if(name == "Chancellier") p.putDeckInDefausse();
+        else if(name == "Chancelier") p.putDeckInDefausse();
         else if(name == "Espion") j.espionnage();
 }
 

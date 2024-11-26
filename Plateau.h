@@ -33,11 +33,13 @@ class Plateau{
     static void remplirListeCarte(); // Remplir les listes pour chaque type de cartes chargées
     void choisirCarteActionHasard(); // Choisir au hasard les 10 cartes action de la partie
     void choisirCarteActionSetBase(); // Choisir les 10 cartes action du set de base
+    void choisirCarteActionCreation();
     void remplirPiles(int nb_joueurs); // Remplir les piles de cartes
     template <typename T>
     size_t chercherCarte(const std::vector<std::pair<T, int>>& pile, const std::string& name); // Trouver l'id de la carte cherchée par nom pour pouvoir l'acheter
   public :
     Plateau(int nb_joueurs); // Constructeur
+    Plateau(int nb_joueurs, bool finPartie); // Constructeur spécial pour la soutenance
     ~Plateau(); // Destructeur
     
     // Getters
@@ -52,6 +54,7 @@ class Plateau{
     size_t getMaxIndex() const;
     
     bool getVide(size_t index);
+    int getNbPileVide();
  	
     static void printTotalCard(); // Afficher toutes les cartes chargées
     void print(std::string pseudo, int coins, int buys, int score) const; // Afficher le plateau
@@ -65,6 +68,7 @@ class Plateau{
     std::vector<std::pair<Carte*, int>> getMax(int n); // Avoir toutes les cartes disponibles d'un coût maximal n
     std::vector<std::pair<Carte*, int>> getMaxTresor(int n); // Avoir toutes les cartes trésor disponibles d'un coût maximal n
     int chercherCoutParIndex(size_t index);
+    void modifierPlateauFin(); // Méthode spéciale pour la soutenance
 
 };
 

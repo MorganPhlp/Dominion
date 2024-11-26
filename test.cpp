@@ -9,23 +9,33 @@
 int main(){
 
 
-  /*	
+  
   Plateau plat = Plateau(2);
-  Joueur j1 = Joueur("Morgan");
+  Joueur j1 = Joueur("Momo");
   Joueur j2 = Joueur("Fefe");
   std::vector<Joueur> liste = {j1,j2};
   Jeu jeu = Jeu(plat, liste);
   jeu.jouerPartie();
   return 0;
-  */	
-    
+  
+  /*
+  // Partie presque à la fin 
+  Plateau plat2 = Plateau(2, true);
+  Joueur j21 = Joueur("Morgan");
+  Joueur j22 = Joueur("Ny Fenohery");
+  std::vector<Joueur> liste2 = {j21,j22};
+  Jeu jeu2 = Jeu(plat2, liste2, true);
+  jeu2.jouerPartie();
+  */
+  
+    /*
     //TEST PRINT PLATEAU	
     
     int nb_joueurs = 2;
     Plateau plateau = Plateau(nb_joueurs);
     Joueur j1 = Joueur("Caca");
     plateau.print(j1.getPseudo(), j1.getCoins(), j1.getNbBuys(), j1.getNbWinPoints());
-    
+    */
     
     //TEST PRINTCARD()
     /*
