@@ -43,6 +43,7 @@ class Joueur{
     void printHand() const;
     void printDefausse() const;
     void printDeck() const;
+    void printRebut() const;
     void assembleDeckDefausse();
     void makeHand();
     void defausser();

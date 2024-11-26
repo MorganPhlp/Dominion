@@ -3,7 +3,6 @@
 #include "CarteTresor.h"
 #include "Joueur.h"
 #include <ncurses.h>
-#include "Utilities.h"
 #include <sstream>
 #include <vector>
 

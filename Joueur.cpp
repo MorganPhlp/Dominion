@@ -202,8 +202,8 @@ void Joueur::printCards(const std::vector<Carte*>& cards, const std::string& nam
         clear();
 
         // Dimensions des cartes
-        const int card_width = 20;  // Largeur de la carte
-        const int card_height = 7;  // Hauteur de la carte
+        const int card_width = 28;  // Largeur de la carte
+        const int card_height = 8;  // Hauteur de la carte
         const int spacing = 4;      // Espacement entre les cartes
         int cards_per_line = std::min(5, COLS / (card_width + spacing)); // Cartes par ligne
         int total_lines = (cards.size() + cards_per_line - 1) / cards_per_line; // Nombre total de lignes nécessaires
@@ -297,10 +297,10 @@ void Joueur::printCards(const std::vector<Carte*>& cards, const std::string& nam
             noecho(); // Désactiver l'affichage de l'entrée utilisateur
 
             // Valider l'index
-            if (index >= 0 && index <= static_cast<int>(cards.size())) {
+            if (index >= 0 && index < static_cast<int>(cards.size())) {
                 // Afficher la carte choisie
                 clear();
-                cards[index - 1]->printCard(); // Appelle printCard propre au type
+                cards[index]->printCard(); // Appelle printCard propre au type
                 mvprintw(LINES - 2, 0, "Appuyez sur une touche pour revenir...");
                 refresh();
                 getch(); // Attendre une touche pour revenir
@@ -320,6 +320,7 @@ void Joueur::printCards(const std::vector<Carte*>& cards, const std::string& nam
 void Joueur::printHand() const{ printCards(m_hand, "Main");}
 void Joueur::printDefausse() const{ printCards(m_defausse, "Défausse");}
 void Joueur::printDeck() const{ printCards(m_deck, "Deck");}
+void Joueur::printRebut() const{ printCards(m_rebut, "Rébut");}
 
 void Joueur::transferCards(std::vector<Carte*>& source, std::vector<Carte*>& destination, size_t nb) {
   nb = std::min(nb, source.size());
@@ -428,6 +429,7 @@ void Joueur::putCardFromHandToDeck(){
   size_t rep;
   bool stop = false;
   while(!stop){
+      printHand();
       std:: cout << "Quelle carte voulez-vous mettre sur le haut de votre deck ? (Ecrivez l'index de la carte)" << std::endl;
       std::cin >> rep;
       if(rep < m_hand.size()){
@@ -443,7 +445,6 @@ void Joueur::devoiler2Cartes(Plateau &plat){
 	size_t taille = m_deck.size();
 	if(taille <= 1){
 		assembleDeckDefausse();
-
 		for(size_t j = 0; j < 2; j++){
 			temp.push_back(m_deck.at(j));	
 		}
@@ -474,11 +475,11 @@ void Joueur::receiveArgent(Plateau &plat){ //Met sur le haut du deck
 }
 
 void Joueur::defaussePuisPioche(){ //TODO Gerer Gestion Erreurs
-  printHand();
   size_t nb = 0;
   std::string rep;
   bool stop = false;
   while(!stop && m_hand.size() != 0){
+      printHand();
       std:: cout << "Quelle carte voulez-vous défausser ? (Ecrivez l'index de la carte ou STOP si vous ne voulez plus en jeter)" << std::endl;
       std::cin >> rep;
       if(rep == "STOP") stop = true;
@@ -506,11 +507,11 @@ void Joueur::regarderDefausseEtPrendre(){
   printDefausse(); // Rajouter les index
   std::string rep;
   size_t index;
-  std::cout << "Quelle carte voulez vous prendre et mettre sur le dessus de votre Deck ? (Ecrivez l'index de la carte ou autre chose si vous ne voulez-pas en prendre)" << std::endl;
+  std::cout << "Quelle carte voulez vous prendre et mettre sur le dessus de votre Deck ? (Ecrivez l'index de la carte ou sinon autre chose si vous ne voulez pas en prendre)" << std::endl;
   std::cin >> rep;
   try{
     index = std::stoul(rep);
-    if(index < m_hand.size()){
+    if(index < m_defausse.size()){
       m_deck.insert(m_deck.begin(), m_defausse.at(index));
       m_defausse.erase(m_defausse.begin()+index);
     }
@@ -583,13 +584,15 @@ void Joueur::piocherJusquaEtDefausseAction(size_t n){
   else{
     std::vector<Carte*> temp;
     while(m_hand.size() < n){
+      printHand();
       Carte* c = m_deck.at(0);
       m_deck.erase(m_deck.begin());
       if(c->getType() == TypeCarte::Action){
+        printHand();
         bool valide = false;
         std::string rep;
         while(!valide){
-          std::cout << "Vous venez de piocher la carte " << c->getName() << " \nVoulez vous la garder dans votre main (OUI pour la garder et NON pour la défausser)" << std::endl;
+          std::cout << "Vous venez de piocher la carte " << c->getName() << " \nVoulez-vous la garder dans votre main (OUI pour la garder et NON pour la défausser)" << std::endl;
           std::cin >> rep;
           if(rep == "oui" || rep == "OUI" || rep == "Oui"){
             m_hand.push_back(c);

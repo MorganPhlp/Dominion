@@ -4,10 +4,11 @@
 #include "Joueur.h"
 #include "Plateau.h"
 #include "Jeu.h"
-#include "Utilities.h"
 #include <ncurses.h>
 #include <sstream>
 #include <vector>
+#include <locale>
+#include <codecvt>
 
 
 // Constructeur
@@ -15,15 +16,14 @@ CarteAction::CarteAction(std::string name, std::string description, int cost, in
 
 
 void CarteAction::play(Joueur &p, Plateau &plat, int index, Jeu &j){ // Méthode pour jouer une carte
+  if(getName() != "Festin"){
+  	p.defausseCarte(index);
+  }
   if(!getDescription().empty()) playDescription(getName(), p, plat, index, j);
   p.addActions(m_actions);
   p.addBuys(m_buys);
   p.addDraws(m_draws);
   p.addCoins(m_coins);
-  if(getName() != "Festin"){
-    if(getName() == "Chapelle" && index == 20){}
-    else p.defausseCarte(index);
-  }
   if(m_isAttack) j.viderImmunises();
 }
 

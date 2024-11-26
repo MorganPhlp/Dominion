@@ -9,23 +9,22 @@
 int main(){
 
 
-  /*	
+  	
   Plateau plat = Plateau(2);
   Joueur j1 = Joueur("Morgan");
   Joueur j2 = Joueur("Fefe");
   std::vector<Joueur> liste = {j1,j2};
   Jeu jeu = Jeu(plat, liste);
   jeu.jouerPartie();
-  return 0;
-  */	
+  	
     
     //TEST PRINT PLATEAU	
-    
+    /*
     int nb_joueurs = 2;
     Plateau plateau = Plateau(nb_joueurs);
     Joueur j1 = Joueur("Caca");
     plateau.print(j1.getPseudo(), j1.getCoins(), j1.getNbBuys(), j1.getNbWinPoints());
-    
+    */
     
     //TEST PRINTCARD()
     /*
@@ -167,6 +166,7 @@ int main(){
     delete carteTresor2;
     
     */
+    
 
     return 0;
 }

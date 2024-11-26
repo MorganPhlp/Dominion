@@ -2,7 +2,6 @@
 #include <string>
 #include "CarteVictoire.h"
 #include "Joueur.h"
-#include "Utilities.h"
 #include <ncurses.h>
 #include <sstream>
 #include <vector>
