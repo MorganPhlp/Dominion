@@ -17,6 +17,17 @@ Jeu::Jeu(Plateau plateau, std::vector<Joueur> listeJoueur) : m_nb_joueurs(listeJ
 	m_nbMarchand = 0;
 }
 
+Jeu::Jeu(Plateau plateau, std::vector<Joueur> listeJoueur, bool finPartie) : m_nb_joueurs(listeJoueur.size()), m_plateau(plateau), m_listeJoueur(listeJoueur) {
+        (void) finPartie;
+	for(size_t i = 0; i < m_listeJoueur.size(); i++){
+		m_listeJoueur.at(i).initDeckFin(m_plateau);
+		m_listeJoueur.at(i).makeHand();
+	}
+	initJoueurActif(m_listeJoueur);
+	m_nbMarchand = 0;
+	m_plateau.modifierPlateauFin();
+}
+
 Jeu::~Jeu() {}
 
 void Jeu::initJoueurActif(std::vector<Joueur>& liste){
@@ -37,7 +48,8 @@ Plateau Jeu::getPlateau(){
 void Jeu::tourJoueur(Joueur* j){
   j->initNouveauTour();
   size_t index;
-
+  j->calculerScore();
+  
   //Phase Action
   //std::cout << "======== Phase Action ========" << std::endl;
   /*
@@ -166,6 +178,14 @@ void Jeu::tourJoueur(Joueur* j){
   
   while (j->getNbActions() > 0 && j->getNbCarteActionHand().first != 0) {
     if (j->queJardins()) break; // Sortie si toutes les cartes sont des "Jardins"
+
+/*
+  while (j->getNbBuys() > 0) {
+        int coins = j->getCoins();
+        int buys = j->getNbBuys();
+        int score = j->getNbWinPoints(); // Utilisation du score actuel
+        std::string pseudo = j->getPseudo();
+        */
 
     j->printHand(); // Affiche la main actuelle
 
@@ -300,6 +320,7 @@ void Jeu::tourJoueur(Joueur* j){
         getch(); // Attendre que l'utilisateur appuie sur une touche
         delwin(error);
     }
+
 }
   
   
@@ -308,6 +329,7 @@ void Jeu::tourJoueur(Joueur* j){
     int buys = j->getNbBuys();
     int score = j->calculerPoints();
     std::string pseudo = j->getPseudo();
+    if(verifWin()) return;
 
     m_plateau.print(pseudo, coins, buys, score); // Affichage du plateau avec les infos du joueur
 
@@ -525,7 +547,6 @@ void Jeu::tousSaufActifPiochent(){
 void Jeu::tousSaufActifDefausseJusqua(size_t n){
   for(size_t i = 0; i < m_listeJoueur.size(); i++){
     if(&m_listeJoueur.at(i) != m_joueurActif && std::find(m_joueursImmunises.begin(), m_joueursImmunises.end(), i) == m_joueursImmunises.end()){
-      m_listeJoueur.at(i).printHand();
       while(m_listeJoueur.at(i).getHand().size() > n){
         m_listeJoueur.at(i).demandeDefausse();
       }
@@ -555,62 +576,12 @@ void Jeu::tousSaufActifPoseCarteVictoire(){
   }
 }
 
-void Jeu::defausserCarteParPileVide(Plateau& plat){
-	size_t taillePileAction = plat.getPilesAction().size();
-	for(size_t i = 0; i < taillePileAction; i++){
-		if(plat.getPilesAction().at(i).second == 0){
-			for(size_t j = 0; j < m_listeJoueur.size(); i++){
-				for(size_t k = 0; k < m_listeJoueur.at(j).getHand().size(); k++){
-					if(m_listeJoueur.at(j).getHand().at(k)->getName() == plat.getPilesAction().at(i).first.getName()){
-						m_listeJoueur.at(j).getDefausse().push_back(m_listeJoueur.at(j).getHand().at(k));
-					}
-				}
-			}
-		}
-	}
-	size_t taillePileTresor = plat.getPilesTresor().size();
-	for(size_t i = 0; i < taillePileTresor; i++){
-		if(plat.getPilesTresor().at(i).second == 0){
-			for(size_t j = 0; j < m_listeJoueur.size(); i++){
-				for(size_t k = 0; k < m_listeJoueur.at(j).getHand().size(); k++){
-					if(m_listeJoueur.at(j).getHand().at(k)->getName() == plat.getPilesTresor().at(i).first.getName()){
-						m_listeJoueur.at(j).getDefausse().push_back(m_listeJoueur.at(j).getHand().at(k));
-					}
-				}
-			}
-		}
-	}
-	size_t taillePileVictoire = plat.getPilesVictoire().size();
-	for(size_t i = 0; i < taillePileVictoire; i++){
-		if(plat.getPilesVictoire().at(i).second == 0){
-			for(size_t j = 0; j < m_listeJoueur.size(); i++){
-				for(size_t k = 0; k < m_listeJoueur.at(j).getHand().size(); k++){
-					if(m_listeJoueur.at(j).getHand().at(k)->getName() == plat.getPilesVictoire().at(i).first.getName()){
-						m_listeJoueur.at(j).getDefausse().push_back(m_listeJoueur.at(j).getHand().at(k));
-					}
-				}
-			}
-		}
-	}
-}
-
 bool Jeu::verifWin(){
-  int pilesVide = 0;
-  
   for(auto& pile : m_plateau.getPilesVictoire()){
-    if(pile.second == 0){
-      if(pile.first.getName() == "Province") return true;
-      pilesVide++;
-    }
-  }
-  for(auto& pile : m_plateau.getPilesAction()){
-    if(pile.second == 0) pilesVide++;
-  }
-  for(auto& pile : m_plateau.getPilesTresor()){
-    if(pile.second == 0) pilesVide++;
+    if(pile.second == 0 && pile.first.getName() == "Province") return true;
   }
   
-  return pilesVide >= 3;
+  return m_plateau.getNbPileVide() >= 3;
 }
 
 /*
@@ -629,12 +600,12 @@ void Jeu::calculerScoreFinal() {
     std::cout << std::left << std::setw(15) << "Joueur" << "Score" << std::endl;
     std::cout << "-------------------------------" << std::endl;
     for (size_t i = 0; i < tabScore.size(); ++i) {
-        if (i == 0) {
-            std::cout << std::left << std::setw(15) << tabScore[i].first.getPseudo() 
-                      << tabScore[i].second << " (GAGNANT)" << std::endl;
+        if (i == 0 || tabScore.at(i).second == tabScore.at(0).second) {
+            std::cout << std::left << std::setw(15) << tabScore.at(i).first.getPseudo() 
+                      << tabScore.at(i).second << " (GAGNANT)" << std::endl;
         } else {
-            std::cout << std::left << std::setw(15) << tabScore[i].first.getPseudo() 
-                      << tabScore[i].second << std::endl;
+            std::cout << std::left << std::setw(15) << tabScore.at(i).first.getPseudo() 
+                      << tabScore.at(i).second << std::endl;
         }
     }
     std::cout << "===============================" << std::endl;

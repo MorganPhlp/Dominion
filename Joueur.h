@@ -39,6 +39,7 @@ class Joueur{
     void playCard(int indexCarte);
     int calculateWinPoints();
     void initDeck(Plateau& p);
+    void initDeckFin(Plateau& p); // Méthode spéciale pour la soutenance
     void printCards(const std::vector<Carte*>& cards, const std::string& name) const;
     void printHand() const;
     void printDefausse() const;
@@ -48,7 +49,7 @@ class Joueur{
     void makeHand();
     void defausser();
     void receiveCard(int n, Plateau &plat);
-    void throwMax(int n, int& index);
+    void throwMax(int n);
     void defausseCarte(int index);
     void initNouveauTour();
     void buyCard(int index, Plateau &plat);
@@ -81,6 +82,8 @@ class Joueur{
     bool handContainsDouve();
     void resetDraws();
     bool queJardins();
+    void calculerScore();
+    void defausserCarteParPileVide(Plateau& plat);
 };
 
 #endif

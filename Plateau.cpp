@@ -21,12 +21,20 @@ const size_t Plateau::m_maxIndex = 17;
 Plateau::Plateau(int nb_joueurs) { // Constructeur
   remplirListeCarte();
   size_t rep;
-  std::cout << "Voulez-vous jouer avec un set de cartes Action au hasard ou avec le set de base ? (Répondez 1 ou 2 suivant la réponse)"<<std::endl;
-  while(rep!=1 && rep != 2){
+  std::cout << "Voulez-vous jouer avec un set de cartes Action au hasard, avec le set de base ou en choisissant vous mêmes les cartes Action ? (Répondez 1, 2 ou 3 suivant la réponse)"<<std::endl;
+  while(rep!=1 && rep != 2 && rep!=3){
     std::cin >> rep;
   }
   if(rep == 1) choisirCarteActionHasard();
-  else choisirCarteActionSetBase();
+  else if(rep == 2) choisirCarteActionSetBase();
+  else choisirCarteActionCreation();
+  remplirPiles(nb_joueurs);
+}
+
+Plateau::Plateau(int nb_joueurs, bool finPartie){ // Constructeur spécial pour la soutenance
+  (void) finPartie;
+  remplirListeCarte();
+  choisirCarteActionSetBase();
   remplirPiles(nb_joueurs);
 }
 
@@ -189,6 +197,35 @@ void Plateau::choisirCarteActionSetBase(){
   m_listeCarteActionChoisie.clear();
   for(size_t i = 0; i < 10; i++){ // On prend les 10 premières cartes car ce sont les 10 premières qu'on a ajouté dans la liste
     m_listeCarteActionChoisie.push_back(listeCarteAction.at(i));
+  }
+}
+
+void Plateau::choisirCarteActionCreation(){
+  m_listeCarteActionChoisie.clear();
+  std::vector<size_t> indicesChoisis;
+  size_t rep, nb = 0;
+  while(nb < 10){
+    for(size_t i = 0; i < listeCarteAction.size(); i++){ 
+      if(std::find(indicesChoisis.begin(), indicesChoisis.end(), i) == indicesChoisis.end()){ 
+        std::cout << i << ". " << listeCarteAction.at(i).getName() << std::endl;
+      }
+    }
+    
+    try{
+      std::cin >> rep;
+      if(rep < listeCarteAction.size() && std::find(indicesChoisis.begin(), indicesChoisis.end(), rep) == indicesChoisis.end()){
+        m_listeCarteActionChoisie.push_back(listeCarteAction.at(rep));
+        indicesChoisis.push_back(rep);
+        nb++;
+      }
+      else{
+        std::cout << "Index trop grand ou déjà sélectionné" << std::endl;
+      }
+    }
+    catch(...){
+      std::cerr << "Erreur d'index" << std::endl;
+    }
+    
   }
 }
 
@@ -657,4 +694,30 @@ bool Plateau::getVide(size_t index){
   else{ // On est dans les cartes trésor
     return (m_PilesTresor.at(index).second == 0);
   }
+}
+
+int Plateau::getNbPileVide(){
+  int nb = 0;
+  for(size_t i = 0; i < m_PilesAction.size(); i++){
+    if(m_PilesAction.at(i).second == 0) nb++;
+  }
+  for(size_t i = 0; i < m_PilesTresor.size(); i++){
+    if(m_PilesTresor.at(i).second == 0) nb++;
+  }
+  for(size_t i = 0; i < m_PilesVictoire.size(); i++){
+    if(m_PilesVictoire.at(i).second == 0) nb++;
+  }
+  return nb;
+}
+
+void Plateau::modifierPlateauFin(){
+  size_t index;
+  index = chercherCarteVictoire("Province");
+  m_PilesVictoire.at(index).second = 1;
+  index = chercherCarteAction("Voleur");
+  m_PilesAction.at(index).second = 1;
+  index = chercherCarteTresor("Or");
+  m_PilesTresor.at(index).second = 0;
+  index = chercherCarteAction("Jardins");
+  m_PilesAction.at(index).second = 0;
 }
