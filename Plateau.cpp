@@ -151,33 +151,6 @@ void Plateau::remplirListeCarte(){
 	}
 }
 
-/*
-// Méthode pour afficher toutes les cartes (seulement pour vérifier qu'on les avait toutes)
-void Plateau::printTotalCard(){
-    int index = 0;
-    std::cout << "========== CARTES TRESOR ==========" << std::endl;
-    for (const CarteTresor& carte : listeCarteTresor) {
-        carte.printCard();
-        std::cout << "-----------------------------------" << std::endl;
-        index++;
-    }
-
-    std::cout << "\n========== CARTES VICTOIRE ==========" << std::endl;
-    for (const CarteVictoire& carte : listeCarteVictoire) {
-        carte.printCard();
-        std::cout << "-----------------------------------" << std::endl;
-        index++;
-    }
-
-    std::cout << "\n========== CARTES ACTION ==========" << std::endl;
-    for (const CarteAction& carte : listeCarteAction) {
-        carte.printCard();
-        std::cout << "-----------------------------------" << std::endl;
-        index++;
-    }
-}
-*/
-
 // Méthode pour choisir 10 cartes action au hasard parmi la liste de cartes action
 void Plateau::choisirCarteActionHasard() {
     m_listeCarteActionChoisie.clear();
@@ -229,6 +202,116 @@ void Plateau::choisirCarteActionCreation(){
   }
 }
 
+/*
+// Sauvegarde de l'état du plateau
+void Plateau::savePlateau() {
+    std::ofstream file("Saves/save_plateau.csv");
+    if (!file.is_open()) {
+        std::cerr << "Impossible d'ouvrir le fichier pour la sauvegarde." << std::endl;
+        return;
+    }
+
+    // Sauvegarder les piles Trésor
+    file << "PileTresor\n";
+    for (const auto& pile : m_PilesTresor) {
+        file << pile.first.getName() << "," 
+             << pile.second << "," 
+             << pile.first.getCost() << ","
+             << pile.first.getCoins() << "\n";
+    }
+
+    // Sauvegarder les piles Victoire
+    file << "PileVictoire\n";
+    for (const auto& pile : m_PilesVictoire) {
+        file << pile.first.getName() << "," 
+             << pile.second << "," 
+             << pile.first.getCost() << ","
+             << pile.first.getWinPoints() << "\n";
+    }
+
+    // Sauvegarder les piles Action
+    file << "PileAction\n";
+    for (const auto& pile : m_PilesAction) {
+        file << pile.first.getName() << "," 
+             << pile.second << "," 
+             << pile.first.getCost() << ","
+             << pile.first.getActions() << ","
+             << pile.first.getBuys() << ","
+             << pile.first.getDraws() << ","
+             << pile.first.getCoins() << ","
+             << pile.first.getIsAttack() << ","
+             << pile.first.getIsReaction() << "\n";
+    }
+
+    file.close();
+    std::cout << "Sauvegarde du plateau terminée." << std::endl;
+}
+
+// Chargement de l'état du plateau
+void Plateau::loadPlateau() {
+    std::ifstream file("Saves/save_plateau.csv");
+    if (!file.is_open()) {
+        std::cerr << "Impossible d'ouvrir le fichier pour le chargement." << std::endl;
+        return;
+    }
+
+    std::string line, section;
+    m_PilesTresor.clear();
+    m_PilesVictoire.clear();
+    m_PilesAction.clear();
+
+    while (std::getline(file, line)) {
+        if (line == "PileTresor") {
+            section = "PileTresor";
+        } else if (line == "PileVictoire") {
+            section = "PileVictoire";
+        } else if (line == "PileAction") {
+            section = "PileAction";
+        } else if (!line.empty()) {
+            std::stringstream ss(line);
+            if (section == "PileTresor") {
+                std::string name;
+                int quantity;
+                std::getline(ss, name, ',');
+                quantity = lireInt(ss);
+                for (auto& carte : listeCarteTresor) {
+                    if (carte.getName() == name) {
+                        m_PilesTresor.emplace_back(carte, quantity);
+                        break;
+                    }
+                }
+            } else if (section == "PileVictoire") {
+                std::string name;
+                int quantity;
+                std::getline(ss, name, ',');
+                quantity = lireInt(ss);
+                for (auto& carte : listeCarteVictoire) {
+                    if (carte.getName() == name) {
+                        m_PilesVictoire.emplace_back(carte, quantity);
+                        break;
+                    }
+                }
+            } else if (section == "PileAction") {
+                std::string name;
+                int quantity;
+                std::getline(ss, name, ',');
+                quantity = lireInt(ss);
+                for (auto& carte : listeCarteAction) {
+                    if (carte.getName() == name) {
+                        m_PilesAction.emplace_back(carte, quantity);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    file.close();
+    std::cout << "Chargement du plateau terminé." << std::endl;
+}
+*/
+
+
 // Méthode pour remplir les piles du plateau suivant le nombre de joueurs
 void Plateau::remplirPiles(int nb_joueurs) {
     m_PilesTresor.clear(); 
@@ -252,121 +335,6 @@ void Plateau::remplirPiles(int nb_joueurs) {
         m_PilesAction.push_back(std::make_pair(carte, quantite));
     }
 }
-
-/*
-// Méthode pour afficher le plateau
-void Plateau::print() const{
-  size_t somme = 0;
-  std::cout << "======== PLATEAU DOMINION ========\n\n";
-    
-  std::cout << "========== PILES TRESOR ==========\n";
-  for (size_t i = 0; i < m_PilesTresor.size(); i++) {
-    std::cout << '[' << somme << ']';
-    std::cout << "Quantité: " << m_PilesTresor.at(i).second << " | ";
-    m_PilesTresor.at(i).first.printCard();
-    std::cout << "-----------------------------------\n";
-    somme++;
-  }
-
-  std::cout << "\n========== PILES VICTOIRE ==========\n";
-  for (size_t i = 0; i < m_PilesVictoire.size(); i++) {
-    std::cout << '[' << somme << ']';
-    std::cout << "Quantité: " << m_PilesVictoire.at(i).second << " | ";
-    m_PilesVictoire.at(i).first.printCard();
-    std::cout << "-----------------------------------\n";
-    somme++;
-  }
-
-  std::cout << "\n========== PILES ACTION ==========\n";
-  for (size_t i = 0; i < m_PilesAction.size(); i++) {
-    std::cout << '[' << somme << ']';
-    std::cout << "Quantité: " << m_PilesAction.at(i).second << " | ";
-    m_PilesAction.at(i).first.printCard();
-    std::cout << "-----------------------------------\n";
-    somme++;
-  }
-
-  std::cout << "\n===================================\n";
-}
-*/
-
-/*
-void Plateau::print() const {
-    
-    initscr();
-    start_color();
-    cbreak();
-    noecho();
-    keypad(stdscr, TRUE);
-
-    // Initialisation des paires de couleurs (si ce n'est pas déjà fait dans Plateau::print())
-    init_pair(1, COLOR_YELLOW, COLOR_BLACK); // Trésor
-    init_pair(2, COLOR_GREEN, COLOR_BLACK);  // Victoire
-    init_pair(3, COLOR_RED, COLOR_BLACK);    // Action
-
-
-    int y = 0; // Position verticale initiale
-
-    attron(A_BOLD);
-    mvprintw(y++, 0, "======== PLATEAU DOMINION ========");
-    attroff(A_BOLD);
-
-    // Affichage des piles Trésor
-    attron(COLOR_PAIR(1));
-    mvprintw(y++, 0, "========== PILES TRESOR ==========");
-    attroff(COLOR_PAIR(1));
-
-    for (size_t i = 0; i < m_PilesTresor.size(); i++) {
-        attron(COLOR_PAIR(1));
-        mvprintw(y++, 2, "Quantité: %d | Nom: %s | Coût: %d | Valeur: %d",
-                 m_PilesTresor[i].second,
-                 m_PilesTresor[i].first.getName().c_str(),
-                 m_PilesTresor[i].first.getCost(),
-                 m_PilesTresor[i].first.getCoins());
-        attroff(COLOR_PAIR(1));
-    }
-
-    // Affichage des piles Victoire
-    attron(COLOR_PAIR(2));
-    mvprintw(y++, 0, "========== PILES VICTOIRE ==========");
-    attroff(COLOR_PAIR(2));
-
-    for (size_t i = 0; i < m_PilesVictoire.size(); i++) {
-        attron(COLOR_PAIR(2));
-        mvprintw(y++, 2, "Quantité: %d | Nom: %s | Coût: %d | Points: %d",
-                 m_PilesVictoire[i].second,
-                 m_PilesVictoire[i].first.getName().c_str(),
-                 m_PilesVictoire[i].first.getCost(),
-                 m_PilesVictoire[i].first.getWinPoints());
-        attroff(COLOR_PAIR(2));
-    }
-
-    // Affichage des piles Action
-    attron(COLOR_PAIR(3));
-    mvprintw(y++, 0, "========== PILES ACTION ==========");
-    attroff(COLOR_PAIR(3));
-
-    for (size_t i = 0; i < m_PilesAction.size(); i++) {
-        attron(COLOR_PAIR(3));
-        mvprintw(y++, 2, "Quantité: %d | Nom: %s | Coût: %d",
-                 m_PilesAction[i].second,
-                 m_PilesAction[i].first.getName().c_str(),
-                 m_PilesAction[i].first.getCost());
-        attroff(COLOR_PAIR(3));
-    }
-
-    // Rafraîchir l'affichage
-    refresh();
-    
-    // Attendre une entrée avant de quitter
-    mvprintw(LINES - 1, 0, "Appuyez sur une touche pour quitter...");
-    refresh();
-    getch();
-
-    // Terminaison de ncurses
-    endwin();
-}
-*/
 
 void Plateau::print(std::string pseudo, int coins, int buys, int score) const {
     initscr();

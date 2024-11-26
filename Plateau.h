@@ -56,8 +56,12 @@ class Plateau{
     bool getVide(size_t index);
     int getNbPileVide();
  	
-    static void printTotalCard(); // Afficher toutes les cartes chargées
     void print(std::string pseudo, int coins, int buys, int score) const; // Afficher le plateau
+    
+    /*
+    void savePlateau();
+    void loadPlateau();
+    */
     
     // Trouver l'id d'une carte d'un type en rentrant son nom
     size_t chercherCarteAction(std::string name);

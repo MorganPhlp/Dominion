@@ -8,6 +8,7 @@
 #include <ncurses.h>
 #include <string>
 #include <vector>
+#include <fstream>
 
 //Constructeur
 Joueur::Joueur(std::string pseudo) : m_pseudo(pseudo) {
@@ -71,7 +72,7 @@ void Joueur::initDeck(Plateau& p) {
     shuffleCartes(m_deck);
 }
 
-void Joueur::initDeckFin(Plateau& p) { // Méthode spéciale pour la soutenance
+void Joueur::initDeckFin(Plateau& p) { // Méthode spéciale pour la soutenance pour fin de partie
     m_deck.clear();
     addCardsByNameInDeck("Or", 7, p.getListeCarteTresor());
     addCardsByNameInDeck("Jardins", 4, p.getListeCarteAction());
@@ -82,120 +83,98 @@ void Joueur::initDeckFin(Plateau& p) { // Méthode spéciale pour la soutenance
     shuffleCartes(m_deck);
 }
 
+// Essai de sauvegarde de partie mais non fini
+
+/*
+void Joueur::saveCards(const std::string& filename, const std::vector<Carte*>& cards) {
+    std::ofstream outFile(filename);
+    if (!outFile.is_open()) {
+        std::cerr << "Erreur lors de l'ouverture du fichier pour la sauvegarde : " << filename << std::endl;
+        return;
+    }
+    outFile << "name,cost,type\n";
+    for (const auto& card : cards) {
+        outFile << card->getName() << ","
+    }
+    outFile.close();
+    std::cout << "Sauvegarde des cartes réussie dans le fichier CSV : " << filename << std::endl;
+}
+
+void Joueur::loadCards(const std::string& filename, std::vector<Carte*>& cards, const Plateau& plateau) {
+    std::ifstream inFile(filename);
+    if (!inFile.is_open()) {
+        std::cerr << "Erreur lors de l'ouverture du fichier pour le chargement : " << filename << std::endl;
+        return;
+    }
+    std::string line;
+    std::getline(inFile, line);
+    while (std::getline(inFile, line)) {
+        std::istringstream iss(line);
+        std::string name;
+
+        if (std::getline(iss, name, ',') &&
+            iss >> cost &&
+            iss.ignore(1) &&
+            std::getline(iss, type, ',')) {
+            Carte* card = plateau.findCardByName(name);
+            if (card) {
+                cards.push_back(card);
+            } else {
+                std::cerr << "Carte non trouvée dans le plateau : " << name << std::endl;
+            }
+        }
+    }
+    inFile.close();
+    std::cout << "Chargement des cartes depuis le fichier CSV : " << filename << " terminé." << std::endl;
+}
+
+void Joueur::loadPlayer(const Plateau& plateau, std::string pseudo) {
+    loadCards("Saves/" + pseudo + "/deck.csv", m_deck, plateau);
+    loadCards("Saves/" + pseudo + "/hand.csv", m_hand, plateau);
+    loadCards("Saves/" + pseudo + "/defausse.csv", m_defausse, plateau);
+    loadCards("Saves/" + pseudo + "/rebut.csv", m_rebut, plateau);
+    std::ifstream inFile("Saves/" + pseudo + "/player_data.csv");
+    if (inFile.is_open()) {
+        std::string line;
+        std::getline(inFile, line);
+        if (std::getline(inFile, line)) {
+            std::istringstream iss(line);
+            std::getline(iss, m_pseudo, ',');
+            iss >> m_coins;
+            iss.ignore(1);
+            iss >> m_nb_actions;
+            iss.ignore(1);
+            iss >> m_nb_buys;
+            iss.ignore(1);
+            iss >> m_nb_win_points;
+        }
+        inFile.close();
+    }
+}
+
+void Joueur::savePlayer() {
+    saveCards("Saves/" + m_pseudo +"/deck.csv", m_deck);
+    saveCards("Saves/" + m_pseudo + "/hand.csv", m_hand);
+    saveCards("Saves/" + m_pseudo + "/defausse.csv", m_defausse);
+    saveCards("Saves/" + m_pseudo + "/rebut.csv", m_rebut);
+    std::ofstream outFile("Saves/" + m_pseudo + "/player_data.csv");
+    if (outFile.is_open()) {
+        outFile << "pseudo,coins,actions,buys,win_points\n";
+        outFile << m_pseudo << ","
+                << m_coins << ","
+                << m_nb_actions << ","
+                << m_nb_buys << ","
+                << m_nb_win_points << "\n";
+        outFile.close();
+    }
+}
+*/
+
+
 void Joueur::shuffleCartes(std::vector<Carte*>& v){
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	shuffle(v.begin(), v.end(), std::default_random_engine(seed));
 }
-
-// TODO Méthode à changer pour plus joli avec index
-/*
-void Joueur::printCards(const std::vector<Carte*>& cards, const std::string& name) const{
-  std::cout << "======== " << name << " " << m_pseudo << " ========\n\n";
-  for(size_t i = 0; i < cards.size(); i++){
-    std::cout << '[' << i << ']';
-    cards.at(i)->printCard();
-    std::cout << "-----------------------------------\n";
-  }
-}
-*/
-
-
-// Méthode pour afficher les cartes d'un joueur
-/*
-void Joueur::printCards(const std::vector<Carte*>& cards, const std::string& name) const {
-    initscr();
-    start_color();
-    cbreak();
-    noecho();
-
-    // Initialisation des couleurs pour les cartes
-    init_pair(1, COLOR_YELLOW, COLOR_BLACK); // Trésor
-    init_pair(2, COLOR_GREEN, COLOR_BLACK);  // Victoire
-    init_pair(3, COLOR_RED, COLOR_BLACK);    // Action
-
-    clear();
-
-    // Dimensions des cartes
-    const int card_width = 20;  // Largeur de la carte
-    const int card_height = 7;  // Hauteur de la carte
-    const int spacing = 4;      // Espacement entre les cartes
-    int cards_per_line = std::min(5, COLS / (card_width + spacing)); // Cartes par ligne
-    int total_lines = (cards.size() + cards_per_line - 1) / cards_per_line; // Nombre total de lignes nécessaires
-
-    // Calcul de la position verticale pour centrer les cartes
-    int total_height = total_lines * (card_height + spacing) + 2; // Hauteur totale (lignes de cartes + espacement + titre)
-    int start_y = (LINES - total_height) / 2; // Centrer verticalement
-
-    // Calcul de la position horizontale pour centrer le titre
-    std::string title = "======== " + name + " : " + m_pseudo + " ========";
-    int title_x = (COLS - title.size()) / 2;
-    mvprintw(start_y, title_x, "%s", title.c_str());
-
-    // Calcul de la position horizontale pour centrer les cartes
-    int start_x = (COLS - (cards_per_line * card_width + (cards_per_line - 1) * spacing)) / 2;
-
-    // Dessiner les cartes
-    auto draw_card = [&](int y, int x, Carte* card, int index) {
-        // Déterminer la couleur de la carte en fonction de son type
-        int color_pair = 1;
-        switch (card->getType()) {
-            case TypeCarte::Victoire: color_pair = 2; break;
-            case TypeCarte::Action: color_pair = 3; break;
-            default: break; // Trésor reste 1
-        }
-
-        attron(COLOR_PAIR(color_pair));
-
-        // Dessiner la bordure
-        mvhline(y, x, '-', card_width);
-        mvhline(y + card_height - 1, x, '-', card_width);
-        mvvline(y, x, '|', card_height);
-        mvvline(y, x + card_width - 1, '|', card_height);
-        mvaddch(y, x, '+');
-        mvaddch(y, x + card_width - 1, '+');
-        mvaddch(y + card_height - 1, x, '+');
-        mvaddch(y + card_height - 1, x + card_width - 1, '+');
-
-        // Ajouter les informations de la carte
-        mvprintw(y + 1, x + 2, "Nom: %s", card->getName().c_str());
-        mvprintw(y + 2, x + 2, "Coût: %d", card->getCost());
-        mvprintw(y + 3, x + 2, "Type: %s", 
-            card->getType() == TypeCarte::Victoire ? "Victoire" : 
-            card->getType() == TypeCarte::Action ? "Action" : "Tresor");
-
-        // Centrer l'index sur la dernière ligne
-        std::string index_str = std::to_string(index + 1); // Passer à une numérotation de 1
-        int index_x = x + (card_width - index_str.size()) / 2; // Centrer l'index
-        mvprintw(y + card_height - 2, index_x, "%s", index_str.c_str());
-
-        attroff(COLOR_PAIR(color_pair));
-    };
-
-    // Variables pour le positionnement
-    int current_x = start_x;
-    int current_y = start_y + 2; // Position après le titre
-
-    for (size_t i = 0; i < cards.size(); i++) {
-        draw_card(current_y, current_x, cards[i], i);
-
-        // Passer à la carte suivante
-        current_x += card_width + spacing;
-
-        // Retour à la ligne si nécessaire
-        if ((i + 1) % cards_per_line == 0) {
-            current_x = start_x;
-            current_y += card_height + spacing;
-        }
-    }
-
-    // Pause pour visualisation
-    mvprintw(LINES - 1, 0, "Appuyez sur une touche pour continuer...");
-    refresh();
-    getch();
-
-    endwin();
-}
-*/
 
 void Joueur::printCards(const std::vector<Carte*>& cards, const std::string& name) const {
     initscr();

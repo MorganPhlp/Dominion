@@ -1,4 +1,3 @@
-//#include "Plateau.h"
 #include "Jeu.h"
 #include <ncurses.h>
 #include <vector>
