@@ -42,6 +42,8 @@ Jeu::Jeu(Plateau plateau, std::vector<Joueur> listeJoueur, bool finPartie) : m_n
 
 Jeu::~Jeu() {}
 
+
+//Initialise le joueur actif initial de façon aléatoire parmis les joueurs de la partie 
 void Jeu::initJoueurActif(std::vector<Joueur>& liste){
 	std::default_random_engine re(std::chrono::system_clock::now().time_since_epoch().count());
 	int taille = liste.size();
@@ -52,6 +54,7 @@ void Jeu::initJoueurActif(std::vector<Joueur>& liste){
 	std::cout << "Le joueur actif initial est : " << m_joueurActif->getPseudo() << std::endl;
 }
 
+//Retourne le plateau
 Plateau Jeu::getPlateau(){
 	return m_plateau;
 }
@@ -90,146 +93,16 @@ void Jeu::loadPartie() {
 */
 
 
-
+//Permet de gérer les différentes phases(Action, Achat et Ajustement) du tour d'un joueur
 void Jeu::tourJoueur(Joueur* j){
   j->initNouveauTour();
   size_t index;
   j->calculerScore();
   
-<<<<<<< HEAD
-  //Phase Action
-  //std::cout << "======== Phase Action ========" << std::endl;
-  /*
-  std::string choix;
-  
-  while(j->getNbActions() > 0 && j->getNbCarteActionHand().first != 0){
-    if(j->queJardins()) break;
-    std::cout << "Nombre d'actions restantes : " << j->getNbActions() << std::endl;
-    j->printHand();
-    std::cout << "Entrez le numéro de la carte que vous souhaitez jouer (ou ACHAT pour passer à la phase Achat) : " << std::endl;
-    std::cin >> choix;
-    if(choix == "ACHAT") break;
-    try{
-      index = std::stoi(choix);
-      if(index < j->getHand().size()){
-        Carte* carte = j->getHand().at(index);
-        if(carte->getType() != TypeCarte::Action || carte->getName() == "Jardins"){
-          std::cout << "Vous ne pouvez pas jouer cette carte" << std::endl;
-        }
-        else{
-          carte->play(*j, m_plateau, index, *this);
-          j->addActions(-1);
-        }		
-      }
-      else{
-        std::cout << "Index invalide" << std::endl;
-      }
-    }
-    catch (...){
-      std::cerr << "Erreur lors de la lecture de l'index" << std::endl;
-    }
-    int nb = j->getDraws();
-    if(nb != 0){
-      for(int i = 0; i < nb; i++) j->piocher();
-    }
-    j->resetDraws();
-  }
-  */
-  
-  //Phase Achat
-  //std::cout << "======== Phase Achat ========" << std::endl;
-  /*
-  while(j->getNbCarteTresorHand().first > 0){
-    j->printHand();
-    std::cout << "Entrez l'index d'une carte Trésor à jouer (ou PASSER pour passer) : " << std::endl;
-    std::cin >> choix;
-    if(choix == "PASSER") break;
-    try{
-      index = std::stoi(choix);
-      if(index < j->getHand().size()){
-        Carte* carte = j->getHand().at(index);
-        if(carte->getType() == TypeCarte::Tresor){
-          if(carte->getName() == "Argent" && m_nbMarchand != 0){
-            carte->play(*j, m_plateau, index, *this);
-            j->addCoins(m_nbMarchand);
-            m_nbMarchand = 0;
-          }
-          else{
-            carte->play(*j, m_plateau, index, *this);
-          }
-        }
-        else{
-          std::cout << "Vous ne pouvez pas jouer cette carte" << std::endl;
-        }
-      }
-      else{
-        std::cout << "Index Invalide" << std::endl;
-      }
-    }
-    catch (...){
-      std::cerr << "Erreur lors de la lecture de l'index" << std::endl;
-    }
-  }
-  */
-  
-  /*
-  while(j->getNbBuys() > 0){
-    int coins = j->getCoins();
-    int buys = j->getNbBuys();
-    int score = j->calculerPoints(); // Utilisation du score actuel
-    std::string pseudo = j->getPseudo();
-
-    m_plateau.print(pseudo, coins, buys, score); // Affichage du plateau avec les infos du joueur
-    
-    std::cout << "Choisissez l'index de la pile pour acheter une carte ou PASSER pour passer : " << std::endl;
-    std::cin >> choix;
-    if (choix == "PASSER") break;
-    try{
-      index = std::stoi(choix);
-      if (index < m_plateau.getMaxIndex()){
-        if(j->getCoins() >= m_plateau.chercherCoutParIndex(index)){
-          try {
-            j->buyCard(index, m_plateau);
-            std::cout << "Achat réussi !" << std::endl;
-          } catch (const std::exception& e) {
-            std::cerr << "Erreur : " << e.what() << std::endl;
-          }
-        }
-        else{
-          std::cout << "Vous n'avez pas assez de pièces" << std::endl;
-        }
-      }
-      else{
-        std::cout << "Index invalide" << std::endl;
-      }
-    }
-    catch (const std::exception& e){
-      std::cerr << "Erreur lors de la lecture de l'index \n Erreur " << e.what() << std::endl;
-    }
-  }
-	
-  //phase ajustement
-  std::cout << "======== Phase Ajustement ========" << std::endl;
-  j->defausser(); //Défausser toutes les cartes jouées et les cartes en main
-
-  //Reformer le deck si nécessaire et piocher 5 cartes pour une nouvelle main
-  if (j->getDeck().size() < 5) {
-    j->assembleDeckDefausse();
-  }
-  j->makeHand();  // Piocher 5 nouvelles cartes
-
-  std::cout << "Votre nouvelle main pour le prochain tour est prête !" << std::endl;
-  j->printHand();
-  */
-  
   //Phase Action
   while (j->getNbActions() > 0 && j->getNbCarteActionHand().first != 0) {
     if (j->queJardins()) break; // Sortie si toutes les cartes sont des "Jardins"
 
-=======
-  while (j->getNbActions() > 0 && j->getNbCarteActionHand().first != 0) {
-    if (j->queJardins()) break; // Sortie si toutes les cartes sont des "Jardins"
->>>>>>> bb6769e8ae16491cc5b3a94612654fefe2696467
     j->printHand(); // Affiche la main actuelle
 
     // Création d'une fenêtre popup pour demander l'action
@@ -447,9 +320,7 @@ void Jeu::tourJoueur(Joueur* j){
         delwin(error);
     }
     
-<<<<<<< HEAD
-  }
-  //Phase ajustement
+    //phase ajustement
     std::cout << "======== Phase Ajustement ========" << std::endl;
     j->defausser(); //Défausser toutes les cartes jouées et les cartes en main
 
@@ -461,26 +332,11 @@ void Jeu::tourJoueur(Joueur* j){
 
     std::cout << "Votre nouvelle main pour le prochain tour est prête !" << std::endl;
     j->printHand();
-=======
-    
   }
-  
-  //phase ajustement
-  std::cout << "======== Phase Ajustement ========" << std::endl;
-  j->defausser(); //Défausser toutes les cartes jouées et les cartes en main
-
-  //Reformer le deck si nécessaire et piocher 5 cartes pour une nouvelle main
-  if (j->getDeck().size() < 5) {
-    j->assembleDeckDefausse();
-  }
-  j->makeHand();  // Piocher 5 nouvelles cartes
-
-  std::cout << "Votre nouvelle main pour le prochain tour est prête !" << std::endl;
-  j->printHand();
->>>>>>> bb6769e8ae16491cc5b3a94612654fefe2696467
 }
 
 
+//Tous les joueurs sauf le joueur actif recoivent une carte malédiction
 void Jeu::tousSaufActifMalediction(){
   for(size_t i = 0; i < m_listeJoueur.size(); i++){
     if(&m_listeJoueur.at(i) != m_joueurActif && std::find(m_joueursImmunises.begin(), m_joueursImmunises.end(), i) == m_joueursImmunises.end()){
@@ -489,6 +345,8 @@ void Jeu::tousSaufActifMalediction(){
   }
 }
 
+
+//Permet de révéler les 2 premières cartes du deck de tous les joueurs adverses
 std::vector<size_t> Jeu::revelerCartes(){
         std::vector<size_t> indexJoueur;
 	for(size_t i = 0; i < m_listeJoueur.size(); i++){
@@ -501,6 +359,8 @@ std::vector<size_t> Jeu::revelerCartes(){
 	return indexJoueur;
 }
 
+
+//Les adverses révèlent les 2 premieres cartes de leur deck, jettent une carte Tresor révélées autre que le Cuivre et défaussent le reste
 void Jeu::banditisme(){
 	revelerCartes();
 	std::vector<std::vector<Carte*>>& listeCartesDevoilees = m_plateau.getListeCartesDevoilees();
@@ -512,16 +372,16 @@ void Jeu::banditisme(){
 				if(c->getType() == TypeCarte::Tresor && c->getName() != "Cuivre"){
 					std::vector<Carte*>& rebut = m_listeJoueur.at(i).getRebut();
 					rebut.push_back(c);
-					//m_listeJoueur.at(i).printRebut();
 				}
 				std::vector<Carte*>& defausse = m_listeJoueur.at(i).getDefausse();
 				defausse.push_back(c);
-				//m_listeJoueur.at(i).printDefausse();
 			}
 		}
 	}	
 }
 
+
+//Les adversaires doivent choisir s'ils veulent écarter une carte Trésor ou non, et le joueur Actif décide s'il veut récupérer des cartes parmis ces cartes dévoilées
 void Jeu::volerCartesAdversaires(){
 	std::vector<std::vector<Carte*>>& listeCartesDevoilees = m_plateau.getListeCartesDevoilees();
 	std::vector<Carte*>& listeCartesEcartees = m_plateau.getListeCartesEcartees();
@@ -596,6 +456,7 @@ void Jeu::volerCartesAdversaires(){
 	listeCartesEcartees.clear();
 }
 
+//Tous les joueurs adverses piochent une carte
 void Jeu::tousSaufActifPiochent(){
   for(size_t i = 0; i < m_listeJoueur.size(); i++){
     if(&m_listeJoueur.at(i) != m_joueurActif){
@@ -604,6 +465,7 @@ void Jeu::tousSaufActifPiochent(){
   }
 }
 
+//Tous les joueurs adverses doivent défausser jusqu'à n cartes, sauf s'ils sont immunisés
 void Jeu::tousSaufActifDefausseJusqua(size_t n){
   for(size_t i = 0; i < m_listeJoueur.size(); i++){
     if(&m_listeJoueur.at(i) != m_joueurActif && std::find(m_joueursImmunises.begin(), m_joueursImmunises.end(), i) == m_joueursImmunises.end()){
@@ -614,6 +476,7 @@ void Jeu::tousSaufActifDefausseJusqua(size_t n){
   }
 }
 
+//Tous les joueurs adverses doivent dévoiler les cartes Victoire de leur main s'il y en a, ou bien ils dévoilent toute la main sinon, sauf s'ils sont immunisés
 void Jeu::tousSaufActifPoseCarteVictoire(){
   for(size_t i = 0; i < m_listeJoueur.size(); i++){
     if(&m_listeJoueur.at(i) != m_joueurActif && std::find(m_joueursImmunises.begin(), m_joueursImmunises.end(), i) == m_joueursImmunises.end()){
@@ -635,6 +498,7 @@ void Jeu::tousSaufActifPoseCarteVictoire(){
   }
 }
 
+//Permet de vérifier une des conditions de victoire (pile de cartes Province vide)
 bool Jeu::verifWin(){
   for(auto& pile : m_plateau.getPilesVictoire()){
     if(pile.second == 0 && pile.first.getName() == "Province") return true;
@@ -643,6 +507,7 @@ bool Jeu::verifWin(){
   return m_plateau.getNbPileVide() >= 3;
 }
 
+//Permet de calculer le tableau des scores finaux des joueurs à la fin d'une partie
 void Jeu::calculerScoreFinal() {
     initscr();
     start_color();
@@ -711,11 +576,7 @@ void Jeu::calculerScoreFinal() {
     endwin();
 }
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> bb6769e8ae16491cc5b3a94612654fefe2696467
+//Méthode qui fait tourner la partie, avec des affichages explicites par rapport à où on en est dans la partie
 void Jeu::jouerPartie() {
     initscr();
     start_color();
@@ -801,7 +662,7 @@ void Jeu::jouerPartie() {
     popup = newwin(5, 50, (LINES - 5) / 2, (COLS - 50) / 2); // Fenêtre centrée
     box(popup, 0, 0);
     wattron(popup, COLOR_PAIR(1));
-    mvwprintw(popup, 2, 8, "Fin de la partie atteinte en %d tours", nbTour);
+    mvwprintw(popup, 2, 8, "Fin de la partie atteinte en %d tour(s)", nbTour);
     wattroff(popup, COLOR_PAIR(1));
     wrefresh(popup);
     getch();
@@ -814,7 +675,7 @@ void Jeu::jouerPartie() {
 }
 
 
-
+//Permet de révéler la 1ère carte du deck de chaque joueur (sauf s'ils sont immunisés) et le joueur Actif décide s'il veut que cette carte soit défaussée ou si elle revient dans le deck du joueur
 void Jeu::espionnage(){
 	std::vector<bool> reponse = m_joueurActif->decideDefausse(m_listeJoueur);
 	
@@ -824,13 +685,13 @@ void Jeu::espionnage(){
 			m_listeJoueur.at(i).getDeck().at(0)->printCard();
 			if(reponse.at(i) == true){
 				m_listeJoueur.at(i).defausseCarteDeck(0);
-			}		
+			}
 		}
-		
 	}
 }
-	
 
+
+//Permet de vérifier si un joueur possède une carte Douve, auquel cas le joueur sera immunisé
 void Jeu::verifDouve(){
   for(size_t i = 0; i < m_listeJoueur.size(); i++){
     if(m_listeJoueur.at(i).handContainsDouve()){
@@ -840,10 +701,12 @@ void Jeu::verifDouve(){
   }
 }
 
+//Permet de vider le vecteur de joueurs immunisés
 void Jeu::viderImmunises(){
   m_joueursImmunises = {};
 }
 
+//Permet d'incrémenter le nombre de carte Marchand pendant une partie
 void Jeu::addNbMarchand(){
   m_nbMarchand++;
 }

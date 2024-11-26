@@ -171,7 +171,7 @@ void CarteAction::playDescription(std::string name, Joueur &p, Plateau &plat, in
         	p.receiveCard(cost+2,plat);
         }
         else if(name == "Sentinelle") p.sentinelle();
-        else if(name == "Salle du Trône") {} //TODO Fonctionnement spécial à faire après
+        else if(name == "Salle du Trône") {} //TODO Fonctionnement spécial à faire
         else if (name == "Vassal") p.vassal(plat,j);
         else if(name == "Chancelier") p.putDeckInDefausse();
         else if(name == "Espion") j.espionnage();

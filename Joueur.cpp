@@ -47,8 +47,10 @@ std::vector<Carte*>& Joueur::getDeck(){ return m_deck;}
 std::vector<Carte*>& Joueur::getDefausse(){ return m_defausse;}
 std::vector<Carte*>& Joueur::getRebut(){ return m_rebut;}
 
+
+// Permet d'ajouter plusieurs copies d'une carte spécifique identifiée par son nom dans le deck du joueur
 template <typename T>
-void Joueur::addCardsByNameInDeck(const std::string& name, int nb,std::vector<T>& cardList, int winPoints) {
+void Joueur::addCardsByNameInDeck(const std::string& name, int nb, std::vector<T>& cardList, int winPoints) {
     auto point = std::find_if(cardList.begin(), cardList.end(), [&](T& c) {
         return c.getName() == name;
     });
@@ -72,7 +74,9 @@ void Joueur::initDeck(Plateau& p) {
     shuffleCartes(m_deck);
 }
 
-void Joueur::initDeckFin(Plateau& p) { // Méthode spéciale pour la soutenance pour fin de partie
+
+// Méthode spéciale pour la soutenance pour fin de partie
+void Joueur::initDeckFin(Plateau& p) { 
     m_deck.clear();
     addCardsByNameInDeck("Or", 7, p.getListeCarteTresor());
     addCardsByNameInDeck("Jardins", 4, p.getListeCarteAction());
@@ -170,12 +174,13 @@ void Joueur::savePlayer() {
 }
 */
 
-
+//méthode qui permet de mélanger un vecteur passé en paramètre de façon aléatoire
 void Joueur::shuffleCartes(std::vector<Carte*>& v){
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	shuffle(v.begin(), v.end(), std::default_random_engine(seed));
 }
 
+//méthode qui permet d'afficher des cartes dans un vecteur
 void Joueur::printCards(const std::vector<Carte*>& cards, const std::string& name) const {
     initscr();
     start_color();
@@ -306,41 +311,48 @@ void Joueur::printCards(const std::vector<Carte*>& cards, const std::string& nam
 }
 
 
-
+//Méthodes pour afficher la main, la défausse, le deck et le rébut
 void Joueur::printHand() const{ printCards(m_hand, "Main");}
 void Joueur::printDefausse() const{ printCards(m_defausse, "Défausse");}
 void Joueur::printDeck() const{ printCards(m_deck, "Deck");}
 void Joueur::printRebut() const{ printCards(m_rebut, "Rébut");}
 
+//Méthode pour transférer une carte d'une source à une destination
 void Joueur::transferCards(std::vector<Carte*>& source, std::vector<Carte*>& destination, size_t nb) {
   nb = std::min(nb, source.size());
   destination.insert(destination.end(), source.begin(), source.begin() + nb);
   source.erase(source.begin(), source.begin() + nb);
 }
 
+//Permet de récupérer des cartes de la défausse et de les transférer dans le deck
 void Joueur::assembleDeckDefausse(){
   shuffleCartes(m_defausse);
   transferCards(m_defausse, m_deck, m_defausse.size());
 }
 
+//Permet de créer une main si cette dernière contient moins de 5 cartes
 void Joueur::makeHand(){
   if(m_deck.size() < 5) assembleDeckDefausse();
   transferCards(m_deck, m_hand, 5);
 }
 
+//Permet de défausser toute une main
 void Joueur::defausser(){ transferCards(m_hand, m_defausse, m_hand.size()); }
 
+//Permet de défausser une carte d'un certain index
 void Joueur::defausseCarte(int index){
   m_defausse.push_back(m_hand.at(index));
   m_hand.erase(m_hand.begin()+index);
 }
 
+//Permet d'initialiser les attributs du joueur actif lors d'un nouveau tour
 void Joueur::initNouveauTour(){
   m_coins = 0;
   m_nb_actions = 1;
   m_nb_buys = 1;
 }
 
+//Permet d'acheter une carte disponible sur le plateau, qui sera ajoutée à la défausse
 void Joueur::buyCard(int index, Plateau &plat){
   if(plat.getVide(index)) throw std::runtime_error("Pile vide, impossible d'acheter une carte.");
   else{
@@ -351,6 +363,7 @@ void Joueur::buyCard(int index, Plateau &plat){
   }
 }
 
+//Permet de recevoir une carte dans sa défausse
 void Joueur::receiveCard(int n, Plateau &plat){
   std::vector<std::pair<Carte*, int>> liste = plat.getMax(n);
   std::vector<Carte*> listeAffichee;
@@ -372,6 +385,7 @@ void Joueur::receiveCard(int n, Plateau &plat){
   m_defausse.push_back(c);
 }
 
+//Permet au joueur de jeter jusqu'à n cartes
 void Joueur::throwMax(int n){
   std:: cout << "Vous pouvez jeter jusqu'à " << n << " cartes de votre main" << std::endl;
   std::string rep;
@@ -402,10 +416,14 @@ void Joueur::throwMax(int n){
   }
 }
 
+
+//Permet de jeter une carte qui se trouve à un certain index
 void Joueur::jeterCarte(int index){
   m_hand.erase(m_hand.begin()+index);
 }
 
+
+//Permet de recevoir une carte Malédiction
 void Joueur::receiveMalediction(Plateau &plat){
   int index = plat.chercherCarteVictoire("Malédiction");
   Carte* c = plat.buyCard(index);
@@ -413,6 +431,7 @@ void Joueur::receiveMalediction(Plateau &plat){
   addWinPoints(-1);
 }
 
+//Permet de mettre une carte de la main directement sur le haut du deck
 void Joueur::putCardFromHandToDeck(){
   size_t rep;
   bool stop = false;
@@ -428,6 +447,7 @@ void Joueur::putCardFromHandToDeck(){
   m_hand.erase(m_hand.begin() + rep);
 }
 
+//Permet de dévoiler les 2 premières cartes du deck du joueur
 void Joueur::devoiler2Cartes(Plateau &plat){
 	std::vector<Carte*> temp;
 	size_t taille = m_deck.size();
@@ -452,17 +472,20 @@ void Joueur::devoiler2Cartes(Plateau &plat){
 	listeCartesDevoilees.push_back(temp);
 }
 
-void Joueur::receiveOr(Plateau &plat){ // Met dans la defausse
+//Permet au joueur de recevoir une carte Or, qui sera ajoutée à sa défausse
+void Joueur::receiveOr(Plateau &plat){
   Carte* c = plat.buyCard(plat.chercherCarteTresor("Or"));
   m_defausse.push_back(c);
 }
 
-void Joueur::receiveArgent(Plateau &plat){ //Met sur le haut du deck
+//Permet au joueur de recevoir une carte Argent qui sera ajoutée sur le haut de son deck
+void Joueur::receiveArgent(Plateau &plat){
   Carte* c = plat.buyCard(plat.chercherCarteTresor("Argent"));
   m_deck.insert(m_deck.begin(), c);
 }
 
-void Joueur::defaussePuisPioche(){ //TODO Gerer Gestion Erreurs
+//Permet au joueur de défausser un nombre n de cartes et de piocher n cartes
+void Joueur::defaussePuisPioche(){
   size_t nb = 0;
   std::string rep;
   bool stop = false;
@@ -483,6 +506,7 @@ void Joueur::defaussePuisPioche(){ //TODO Gerer Gestion Erreurs
   m_deck.erase(m_deck.begin(), m_deck.begin()+nb);
 }
 
+//Permet de piocher la carte la plus haute du deck
 void Joueur::piocher(){
   if(m_deck.empty()){
     assembleDeckDefausse();
@@ -491,6 +515,7 @@ void Joueur::piocher(){
   m_deck.erase(m_deck.begin());
 }
 
+//Permet de regarder la défausse et de prendre une carte pour la mettre au dessus du deck
 void Joueur::regarderDefausseEtPrendre(){
   printDefausse(); // Rajouter les index
   std::string rep;
@@ -506,6 +531,7 @@ void Joueur::regarderDefausseEtPrendre(){
   } catch (...) {}
 }
 
+//Demande au joueur quelle carte il souhaite défausser
 void Joueur::demandeDefausse(){
   printHand();
   std::string rep;
@@ -520,6 +546,7 @@ void Joueur::demandeDefausse(){
   } catch (...) {}
 }
 
+//Permet d'obtenir le nombre de carte d'un certain type et les indices de ces cartes dans la main du joueur
 std::pair<size_t, std::vector<size_t>> Joueur::getNbCarteHandByType(TypeCarte type) {
     size_t nb = 0;
     std::vector<size_t> indices;
@@ -532,10 +559,13 @@ std::pair<size_t, std::vector<size_t>> Joueur::getNbCarteHandByType(TypeCarte ty
     return std::make_pair(nb, indices);
 }
 
+
+//Permet d'obtenir le nombre de carte Victoire, Trésor et Action et les indices de ces cartes dans la main du joueur
 std::pair<size_t,std::vector<size_t>> Joueur::getNbCarteVictoireHand(){ return getNbCarteHandByType(TypeCarte::Victoire);}
 std::pair<size_t,std::vector<size_t>> Joueur::getNbCarteTresorHand(){ return getNbCarteHandByType(TypeCarte::Tresor);}
 std::pair<size_t,std::vector<size_t>> Joueur::getNbCarteActionHand(){ return getNbCarteHandByType(TypeCarte::Action);}
 
+//Permet de savoir si un deck contient des cartes Victoire ou non et en fonction du nombre de cartes Victoire, de les mettre sur le haut du deck
 void Joueur::carteVictoireOnDeck(){
   size_t index;
   if(getNbCarteVictoireHand().first == 1){
@@ -568,6 +598,7 @@ void Joueur::carteVictoireOnDeck(){
   }
 }
 
+//Permet de piocher jusqu'à avoir n cartes dans sa main, et si on pioche une carte Action, on peut la garder dans sa main ou bien la défausser
 void Joueur::piocherJusquaEtDefausseAction(size_t n){
   if(m_hand.size() >= n) std::cout << "Vous avez déjà plus de " << n << " cartes en main" << std::endl;
   else{
@@ -601,6 +632,8 @@ void Joueur::piocherJusquaEtDefausseAction(size_t n){
   }
 }
 
+
+//Permet de recevoir une carte Tresor
 void Joueur::receiveTresor(int n, Plateau &plat){
   std::vector<std::pair<Carte*, int>> liste = plat.getMaxTresor(n);
   std::vector<Carte*> listeAffichee;
@@ -622,6 +655,7 @@ void Joueur::receiveTresor(int n, Plateau &plat){
   m_hand.push_back(c);
 }
 
+//Permet de jeter une carte Trésor et de recevoir une carte Trésor coûtant jusqu'à 3 pièces de plus
 void Joueur::jeterTresorPourRecuperPlus(size_t n, Plateau &plat){
   std::pair<size_t,std::vector<size_t>> nbTresor = getNbCarteTresorHand();
   std::vector<Carte*> temp;
@@ -637,7 +671,7 @@ void Joueur::jeterTresorPourRecuperPlus(size_t n, Plateau &plat){
     std::string rep;
     while(!valide){
       printCards(temp, "Cartes Tresor de votre main");
-      std::cout << "Quelle carte trésor voulez vous jeter pour recevoir une carte Tresor coûtant jusqu'à 3 pièces de plus ? (Ecrivez l'index de la carte ou STOP si vous ne voulez pas en jeter)" << std::endl;
+      std::cout << "Quelle carte trésor voulez-vous jeter pour recevoir une carte Tresor coûtant jusqu'à 3 pièces de plus ? (Ecrivez l'index de la carte ou STOP si vous ne voulez pas en jeter)" << std::endl;
       std::cin >> rep;
       if(rep == "STOP" || rep == "stop" || rep == "Stop") break;
       else{
@@ -658,6 +692,8 @@ void Joueur::jeterTresorPourRecuperPlus(size_t n, Plateau &plat){
   }
 }
 
+
+//Permet au joueur de troquer une carte Cuivre pour 3 pièces
 void Joueur::trocCuivrePieces(){
 	std::string res;
 	for(size_t i = 0; i < m_hand.size(); i++){
@@ -675,6 +711,8 @@ void Joueur::trocCuivrePieces(){
 	}
 }
 
+
+//Oblige le joueur à jeter une carte de sa main mais il reçoit une carte coutant jusqu a 2 pieces de plus que celle qu'il a jetée
 int Joueur::renovation(){
 	size_t index;
 	int cost;		
@@ -693,6 +731,7 @@ int Joueur::renovation(){
 	return cost;
 }
 
+//Permet de défausser une carte du deck
 void Joueur::defausseCarteDeck(size_t index){
 	if (index < m_deck.size()) {
         	m_defausse.push_back(m_deck.at(index));
@@ -702,6 +741,7 @@ void Joueur::defausseCarteDeck(size_t index){
     	}
 }
 
+//Permet de défausser la premiere carte en haut du deck, si c'est une carte Action, le joueur peut la jouer
 void Joueur::vassal(Plateau &plat, Jeu &j){
 	if (m_deck.empty()) {
         	std::cout << "Votre deck est vide, rien à défausser !" << std::endl;
@@ -727,6 +767,8 @@ void Joueur::vassal(Plateau &plat, Jeu &j){
 }
 
 
+//Permet de regarder les 2 premieres cartes du deck, et le joueur choisit de jeter et/ou defausser autant qu'il le souhaite 
+//Ensuite le reste est remis sur le haut du deck dans l ordre que le joueur souhaite
 void Joueur::sentinelle(){
 	std::string rep;
 	std::vector<Carte*> temp;
@@ -796,6 +838,8 @@ void Joueur::sentinelle(){
     	std::cout << "Les cartes ont été replacées sur le haut de votre deck." << std::endl;
 }
 
+
+//Permet de défausser tout le deck ou non
 void Joueur::putDeckInDefausse(){
   std::string rep;
   bool fin = false;
@@ -814,6 +858,8 @@ void Joueur::putDeckInDefausse(){
   }
 }
 
+
+//Permet de calculer les points de Victoire dans le deck du joueur
 int Joueur::calculerPoints(){
   defausser();
   assembleDeckDefausse();
@@ -828,6 +874,7 @@ int Joueur::calculerPoints(){
   return score;
 }
 
+//Vérifie si la main d'un joueur contient une carte Douve
 bool Joueur::handContainsDouve(){
   for(size_t i = 0; i < m_hand.size(); i++){
     if(m_hand.at(i)->getName() == "Douve")return true;
@@ -835,6 +882,7 @@ bool Joueur::handContainsDouve(){
   return false;
 }
 
+//Permet de décider si l'on veut défausser une carte ou non des joueurs adverses
 std::vector<bool> Joueur::decideDefausse(std::vector<Joueur> listeJoueur){
 	std::vector<bool> reponse;
 	std::string res;
@@ -847,10 +895,12 @@ std::vector<bool> Joueur::decideDefausse(std::vector<Joueur> listeJoueur){
 	return reponse;
 }
 
+//Permet de remmettre à 0 le nombre de cartes piochables par un joueur
 void Joueur::resetDraws(){
   m_draws = 0;
 }
 
+//Permet de vérifier dans la main d'un joueur ne contient que des cartes Jardins
 bool Joueur::queJardins(){
   for(size_t i = 0; i < m_hand.size(); i++){
     if(m_hand.at(i)->getType() == TypeCarte::Action && m_hand.at(i)->getName() != "Jardins"){
@@ -860,7 +910,9 @@ bool Joueur::queJardins(){
   return true;
 }
 
-void Joueur::calculerScore(){ // TODO A refaire mieux
+
+//Calcule le score total d'un joueur en parcourant sa main, son deck et sa défausse
+void Joueur::calculerScore(){
   int score = 0;
   for(size_t i = 0; i < m_deck.size(); i++){
     if(m_deck.at(i)->getType() == TypeCarte::Victoire){
@@ -883,6 +935,8 @@ void Joueur::calculerScore(){ // TODO A refaire mieux
   m_nb_win_points = score;
 }
 
+
+//Permet de défausser un certain nombre de cartes par pile vide sur le plateau
 void Joueur::defausserCarteParPileVide(Plateau& plat){
   size_t rep = m_hand.size();
   int nb = plat.getNbPileVide();
