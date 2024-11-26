@@ -8,6 +8,7 @@
 #include <ncurses.h>
 #include <string>
 #include <vector>
+#include <fstream>
 
 //Constructeur
 Joueur::Joueur(std::string pseudo) : m_pseudo(pseudo) {
@@ -71,7 +72,7 @@ void Joueur::initDeck(Plateau& p) {
     shuffleCartes(m_deck);
 }
 
-void Joueur::initDeckFin(Plateau& p) { // Méthode spéciale pour la soutenance
+void Joueur::initDeckFin(Plateau& p) { // Méthode spéciale pour la soutenance pour fin de partie
     m_deck.clear();
     addCardsByNameInDeck("Or", 7, p.getListeCarteTresor());
     addCardsByNameInDeck("Jardins", 4, p.getListeCarteAction());
@@ -81,6 +82,94 @@ void Joueur::initDeckFin(Plateau& p) { // Méthode spéciale pour la soutenance
     addCardsByNameInDeck("Province", 3, p.getListeCarteVictoire(), 6);
     shuffleCartes(m_deck);
 }
+
+// Essai de sauvegarde de partie mais non fini
+
+/*
+void Joueur::saveCards(const std::string& filename, const std::vector<Carte*>& cards) {
+    std::ofstream outFile(filename);
+    if (!outFile.is_open()) {
+        std::cerr << "Erreur lors de l'ouverture du fichier pour la sauvegarde : " << filename << std::endl;
+        return;
+    }
+    outFile << "name,cost,type\n";
+    for (const auto& card : cards) {
+        outFile << card->getName() << ","
+    }
+    outFile.close();
+    std::cout << "Sauvegarde des cartes réussie dans le fichier CSV : " << filename << std::endl;
+}
+
+void Joueur::loadCards(const std::string& filename, std::vector<Carte*>& cards, const Plateau& plateau) {
+    std::ifstream inFile(filename);
+    if (!inFile.is_open()) {
+        std::cerr << "Erreur lors de l'ouverture du fichier pour le chargement : " << filename << std::endl;
+        return;
+    }
+    std::string line;
+    std::getline(inFile, line);
+    while (std::getline(inFile, line)) {
+        std::istringstream iss(line);
+        std::string name;
+
+        if (std::getline(iss, name, ',') &&
+            iss >> cost &&
+            iss.ignore(1) &&
+            std::getline(iss, type, ',')) {
+            Carte* card = plateau.findCardByName(name);
+            if (card) {
+                cards.push_back(card);
+            } else {
+                std::cerr << "Carte non trouvée dans le plateau : " << name << std::endl;
+            }
+        }
+    }
+    inFile.close();
+    std::cout << "Chargement des cartes depuis le fichier CSV : " << filename << " terminé." << std::endl;
+}
+
+void Joueur::loadPlayer(const Plateau& plateau, std::string pseudo) {
+    loadCards("Saves/" + pseudo + "/deck.csv", m_deck, plateau);
+    loadCards("Saves/" + pseudo + "/hand.csv", m_hand, plateau);
+    loadCards("Saves/" + pseudo + "/defausse.csv", m_defausse, plateau);
+    loadCards("Saves/" + pseudo + "/rebut.csv", m_rebut, plateau);
+    std::ifstream inFile("Saves/" + pseudo + "/player_data.csv");
+    if (inFile.is_open()) {
+        std::string line;
+        std::getline(inFile, line);
+        if (std::getline(inFile, line)) {
+            std::istringstream iss(line);
+            std::getline(iss, m_pseudo, ',');
+            iss >> m_coins;
+            iss.ignore(1);
+            iss >> m_nb_actions;
+            iss.ignore(1);
+            iss >> m_nb_buys;
+            iss.ignore(1);
+            iss >> m_nb_win_points;
+        }
+        inFile.close();
+    }
+}
+
+void Joueur::savePlayer() {
+    saveCards("Saves/" + m_pseudo +"/deck.csv", m_deck);
+    saveCards("Saves/" + m_pseudo + "/hand.csv", m_hand);
+    saveCards("Saves/" + m_pseudo + "/defausse.csv", m_defausse);
+    saveCards("Saves/" + m_pseudo + "/rebut.csv", m_rebut);
+    std::ofstream outFile("Saves/" + m_pseudo + "/player_data.csv");
+    if (outFile.is_open()) {
+        outFile << "pseudo,coins,actions,buys,win_points\n";
+        outFile << m_pseudo << ","
+                << m_coins << ","
+                << m_nb_actions << ","
+                << m_nb_buys << ","
+                << m_nb_win_points << "\n";
+        outFile.close();
+    }
+}
+*/
+
 
 void Joueur::shuffleCartes(std::vector<Carte*>& v){
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();

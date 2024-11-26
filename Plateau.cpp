@@ -400,6 +400,116 @@ void Plateau::choisirCarteActionCreation() {
     endwin();
 }
 
+/*
+// Sauvegarde de l'état du plateau
+void Plateau::savePlateau() {
+    std::ofstream file("Saves/save_plateau.csv");
+    if (!file.is_open()) {
+        std::cerr << "Impossible d'ouvrir le fichier pour la sauvegarde." << std::endl;
+        return;
+    }
+
+    // Sauvegarder les piles Trésor
+    file << "PileTresor\n";
+    for (const auto& pile : m_PilesTresor) {
+        file << pile.first.getName() << "," 
+             << pile.second << "," 
+             << pile.first.getCost() << ","
+             << pile.first.getCoins() << "\n";
+    }
+
+    // Sauvegarder les piles Victoire
+    file << "PileVictoire\n";
+    for (const auto& pile : m_PilesVictoire) {
+        file << pile.first.getName() << "," 
+             << pile.second << "," 
+             << pile.first.getCost() << ","
+             << pile.first.getWinPoints() << "\n";
+    }
+
+    // Sauvegarder les piles Action
+    file << "PileAction\n";
+    for (const auto& pile : m_PilesAction) {
+        file << pile.first.getName() << "," 
+             << pile.second << "," 
+             << pile.first.getCost() << ","
+             << pile.first.getActions() << ","
+             << pile.first.getBuys() << ","
+             << pile.first.getDraws() << ","
+             << pile.first.getCoins() << ","
+             << pile.first.getIsAttack() << ","
+             << pile.first.getIsReaction() << "\n";
+    }
+
+    file.close();
+    std::cout << "Sauvegarde du plateau terminée." << std::endl;
+}
+
+// Chargement de l'état du plateau
+void Plateau::loadPlateau() {
+    std::ifstream file("Saves/save_plateau.csv");
+    if (!file.is_open()) {
+        std::cerr << "Impossible d'ouvrir le fichier pour le chargement." << std::endl;
+        return;
+    }
+
+    std::string line, section;
+    m_PilesTresor.clear();
+    m_PilesVictoire.clear();
+    m_PilesAction.clear();
+
+    while (std::getline(file, line)) {
+        if (line == "PileTresor") {
+            section = "PileTresor";
+        } else if (line == "PileVictoire") {
+            section = "PileVictoire";
+        } else if (line == "PileAction") {
+            section = "PileAction";
+        } else if (!line.empty()) {
+            std::stringstream ss(line);
+            if (section == "PileTresor") {
+                std::string name;
+                int quantity;
+                std::getline(ss, name, ',');
+                quantity = lireInt(ss);
+                for (auto& carte : listeCarteTresor) {
+                    if (carte.getName() == name) {
+                        m_PilesTresor.emplace_back(carte, quantity);
+                        break;
+                    }
+                }
+            } else if (section == "PileVictoire") {
+                std::string name;
+                int quantity;
+                std::getline(ss, name, ',');
+                quantity = lireInt(ss);
+                for (auto& carte : listeCarteVictoire) {
+                    if (carte.getName() == name) {
+                        m_PilesVictoire.emplace_back(carte, quantity);
+                        break;
+                    }
+                }
+            } else if (section == "PileAction") {
+                std::string name;
+                int quantity;
+                std::getline(ss, name, ',');
+                quantity = lireInt(ss);
+                for (auto& carte : listeCarteAction) {
+                    if (carte.getName() == name) {
+                        m_PilesAction.emplace_back(carte, quantity);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    file.close();
+    std::cout << "Chargement du plateau terminé." << std::endl;
+}
+*/
+
+
 // Méthode pour remplir les piles du plateau suivant le nombre de joueurs
 void Plateau::remplirPiles(int nb_joueurs) {
     m_PilesTresor.clear(); 

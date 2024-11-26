@@ -36,6 +36,14 @@ class Joueur{
     void addCoins(int coins);
     void addDraws(int draws);
     void addWinPoints(int win_points);
+    // Essai de sauvegarde de partie mais non fini
+    /*
+    void saveCards(const std::string& filename, const std::vector<Carte*>& cards);
+    void loadCards(const std::string& filename, std::vector<Carte*>& cards, const Plateau& plateau);
+    void loadPlayer(const Plateau& plateau, std::string pseudo);
+    void savePlayer();
+    */
+    
     void playCard(int indexCarte);
     int calculateWinPoints();
     void initDeck(Plateau& p);

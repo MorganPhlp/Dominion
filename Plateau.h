@@ -58,6 +58,11 @@ class Plateau{
  	
     void print(std::string pseudo, int coins, int buys, int score) const; // Afficher le plateau
     
+    /*
+    void savePlateau();
+    void loadPlateau();
+    */
+    
     // Trouver l'id d'une carte d'un type en rentrant son nom
     size_t chercherCarteAction(std::string name);
     size_t chercherCarteTresor(std::string name);

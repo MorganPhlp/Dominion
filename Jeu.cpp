@@ -4,11 +4,22 @@
 #include <functional>
 #include <iomanip>
 #include <ncurses.h>
+#include <fstream>
+#include <stdexcept>
 
 std::vector<size_t> m_joueursImmunises = {};
 std::unordered_map<size_t, std::vector<Carte*>> mapCartesDevoilees;
 
+// Constructeur
 Jeu::Jeu(Plateau plateau, std::vector<Joueur> listeJoueur) : m_nb_joueurs(listeJoueur.size()), m_plateau(plateau), m_listeJoueur(listeJoueur) {
+        /*
+        std::string rep;
+        std::cout << "Voulez-vous charger une ancienne partie ? (Entrez o, oui, Oui ou OUI pour cela)" << std::endl;
+        std::cin >> rep;
+        if(rep == "o" || rep == "oui" || rep == "O" || rep == "Oui" || rep == "OUI"){
+          loadPartie();
+        }
+        */
 	for(size_t i = 0; i < m_listeJoueur.size(); i++){
 		m_listeJoueur.at(i).initDeck(m_plateau);
 		m_listeJoueur.at(i).makeHand();
@@ -17,6 +28,7 @@ Jeu::Jeu(Plateau plateau, std::vector<Joueur> listeJoueur) : m_nb_joueurs(listeJ
 	m_nbMarchand = 0;
 }
 
+// Constructeur spécial pour fin de partie
 Jeu::Jeu(Plateau plateau, std::vector<Joueur> listeJoueur, bool finPartie) : m_nb_joueurs(listeJoueur.size()), m_plateau(plateau), m_listeJoueur(listeJoueur) {
         (void) finPartie;
 	for(size_t i = 0; i < m_listeJoueur.size(); i++){
@@ -44,12 +56,47 @@ Plateau Jeu::getPlateau(){
 	return m_plateau;
 }
 
+/*
+void saveJoueurs() {
+    for (const auto& joueur : m_listeJoueur) {
+        joueur.savePlayer();
+    }
+}
+
+void loadJoueurs(const std::vector<string>& listePseudo, const Plateau& plateau) {
+    m_listeJoueur.clear();
+    for(size_t i = 0; i < listePseudo.size(); i++){
+        Joueur joueur(listePseudo.at(i));
+        joueur.loadPlayer(listePseudo.at(i), plateau);
+        m_listeJoueur.push_back(joueur);
+    }
+}
+
+
+void Jeu::savePartie() {
+    m_plateau.savePlateau();
+    saveJoueurs();
+}
+
+void Jeu::loadPartie() {
+    m_plateau.loadPlateau();
+    std::vector<string> listePseudo;
+    for(){
+      listePseudo.push_back(m_listeJoueur.getPseudo());
+    }
+    loadJoueurs(listePseudo,m_plateau);
+    initJoueurActif(m_listeJoueur);
+}
+*/
+
+
 
 void Jeu::tourJoueur(Joueur* j){
   j->initNouveauTour();
   size_t index;
   j->calculerScore();
   
+<<<<<<< HEAD
   //Phase Action
   //std::cout << "======== Phase Action ========" << std::endl;
   /*
@@ -179,6 +226,10 @@ void Jeu::tourJoueur(Joueur* j){
   while (j->getNbActions() > 0 && j->getNbCarteActionHand().first != 0) {
     if (j->queJardins()) break; // Sortie si toutes les cartes sont des "Jardins"
 
+=======
+  while (j->getNbActions() > 0 && j->getNbCarteActionHand().first != 0) {
+    if (j->queJardins()) break; // Sortie si toutes les cartes sont des "Jardins"
+>>>>>>> bb6769e8ae16491cc5b3a94612654fefe2696467
     j->printHand(); // Affiche la main actuelle
 
     // Création d'une fenêtre popup pour demander l'action
@@ -396,6 +447,7 @@ void Jeu::tourJoueur(Joueur* j){
         delwin(error);
     }
     
+<<<<<<< HEAD
   }
   //Phase ajustement
     std::cout << "======== Phase Ajustement ========" << std::endl;
@@ -409,6 +461,23 @@ void Jeu::tourJoueur(Joueur* j){
 
     std::cout << "Votre nouvelle main pour le prochain tour est prête !" << std::endl;
     j->printHand();
+=======
+    
+  }
+  
+  //phase ajustement
+  std::cout << "======== Phase Ajustement ========" << std::endl;
+  j->defausser(); //Défausser toutes les cartes jouées et les cartes en main
+
+  //Reformer le deck si nécessaire et piocher 5 cartes pour une nouvelle main
+  if (j->getDeck().size() < 5) {
+    j->assembleDeckDefausse();
+  }
+  j->makeHand();  // Piocher 5 nouvelles cartes
+
+  std::cout << "Votre nouvelle main pour le prochain tour est prête !" << std::endl;
+  j->printHand();
+>>>>>>> bb6769e8ae16491cc5b3a94612654fefe2696467
 }
 
 
@@ -642,8 +711,11 @@ void Jeu::calculerScoreFinal() {
     endwin();
 }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> bb6769e8ae16491cc5b3a94612654fefe2696467
 void Jeu::jouerPartie() {
     initscr();
     start_color();
@@ -713,11 +785,12 @@ void Jeu::jouerPartie() {
                 break;
             }
         }
-
-        // Sortir de la boucle principale si la partie est gagnée
-        if (verifWin()) {
-            break;
-        }
+        /*
+        std::string rep;
+        std::cout << "Voulez-vous sauvegarder votre partie ? (Ecrivez o, oui, Oui, OUI si vous le voulez)" << std::endl;
+        std::cin >> rep;
+        if(rep == "o" || rep == "O" || rep == "oui" || rep == "Oui" || rep == "OUI") savePartie();
+        */
     }
 
     // Affichage du message "Fin de partie"
