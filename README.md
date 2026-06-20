@@ -1,93 +1,157 @@
-# Dominion Game
+# 🎮 Jeu Dominion en C++ (Interface Ncurses)
 
+Ce projet est une implémentation complète et interactive en C++ du célèbre jeu de cartes de deck-building **Dominion**. Le jeu se déroule entièrement dans le terminal et tire parti de la bibliothèque **ncurses** pour proposer une interface textuelle colorée, structurée et réactive.
 
+---
 
-## Getting started
+## 🃏 Concept du Jeu
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+**Dominion** est un jeu de cartes basé sur le mécanisme de **deck-building** (construction de pioche) :
+1. Chaque joueur commence la partie avec un deck identique et très simple (composé de cartes de monnaie *Cuivre* et de cartes de victoire de base *Domaine*).
+2. Au fil des tours, les joueurs accumulent de la monnaie pour acheter des cartes plus puissantes disponibles sur le plateau de jeu central (de meilleures cartes Trésor, des cartes d'Action aux effets variés, ou des cartes Victoire de grande valeur).
+3. Le but ultime est d'optimiser son deck afin d'y incorporer le maximum de points de victoire (cartes *Province*, *Duché*, *Domaine*, *Jardins*) avant la fin de la partie.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+---
 
-## Add your files
+## ✨ Fonctionnalités Clés
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+- **Modes de sélection des cartes Action :**
+  - **Set aléatoire :** Sélection automatique de 10 cartes Action au hasard pour diversifier chaque partie.
+  - **Set de base :** Utilisation des 10 premières cartes d'action classiques pour une partie équilibrée.
+  - **Création personnalisée :** Interface interactive permettant aux joueurs de choisir manuellement les 10 cartes Action qui composeront le plateau.
+
+- **Moteur de jeu complet avec trois phases par tour :**
+  - **Phase Action :** Possibilité de jouer une ou plusieurs cartes Action de sa main (octroyant des bonus d'actions, d'achats, de pioches ou des pièces).
+  - **Phase Achat :** Activation des cartes Trésor en main pour générer de la monnaie, puis achat de nouvelles cartes sur le Plateau.
+  - **Phase Ajustement (Clean-up) :** Toutes les cartes jouées et les cartes restantes en main sont envoyées dans la défausse. Le joueur pioche ensuite une nouvelle main de 5 cartes. Si sa pioche est vide, sa défausse est automatiquement mélangée pour reformer le deck.
+
+- **Interface Graphique en Terminal (`ncurses`) :**
+  - Affichage stylisé des cartes avec bordures rectangulaires et descriptions bien alignées.
+  - Système de couleurs dynamique pour différencier instantanément les types de cartes :
+    - 🟡 **Jaune** : Cartes Trésor
+    - 🟢 **Vert** : Cartes Victoire (et cartes spéciales comme Jardins / Malédiction)
+    - 🔴 **Rouge** : Cartes Action classiques
+    - 🔵 **Bleu** : Cartes Action de type *Réaction*
+    - 🟣 **Magenta** : Cartes Action de type *Attaque*
+  - Popups d'aide, de description détaillée des cartes (via la touche `TAB` et la saisie de l'index de la carte), et fenêtres flottantes de confirmation ou de messages d'erreur.
+
+- **Interactions Avancées et Effets Spéciaux :**
+  - Gestion des attaques (ex. *Milice*, *Sorcière*, *Voleur*, *Bandit*, *Espion*) qui ciblent les adversaires.
+  - Prise en charge de la carte de réaction *Douve* qui, si elle est présente dans la main d'un joueur attaqué, lui permet de s'immuniser contre les effets néfastes.
+  - Calcul dynamique des points de victoire complexes (p. ex. les cartes *Jardins* dont la valeur dépend de la taille totale du deck).
+
+- **Simulation & Fin de partie :**
+  - Fin de partie déclenchée si la pile de cartes *Province* est épuisée ou si au moins 3 piles de cartes du plateau sont vides.
+  - Affichage soigné d'un tableau final des scores récapitulant les points de chaque joueur et déclarant le gagnant.
+
+---
+
+## 🏗️ Architecture Logicielle
+
+Le projet est conçu de manière modulaire en C++ avec un fort accent sur l'orienté objet, le polymorphisme et le découpage logique des responsabilités :
+
+### 1. Structure des Cartes (Polymorphisme)
+- **`Carte` (Classe de base abstraite) :** Contient les attributs communs à toutes les cartes (nom, description, coût, type) et déclare l'interface virtuelle pure `play()` et `printCard()`.
+- **`CarteTresor` :** Représente les ressources financières (*Cuivre*, *Argent*, *Or*) ajoutant des pièces lors de la phase d'achat.
+- **`CarteVictoire` :** Représente les cartes rapportant des points de score (*Domaine*, *Duché*, *Province*, *Malédiction*). Ces cartes ne peuvent pas être jouées activement.
+- **`CarteAction` :** Représente les cartes d'action. En plus de fournir des bonus cumulatifs (pioche, action, achat, pièces), elle gère les actions spécifiques de chaque carte via une méthode de routage interne `playDescription()`.
+
+### 2. Moteur de Jeu et États
+- **`Joueur` :** Gère le cycle de vie des cartes propres à chaque joueur (main, deck, défausse, rebut), le calcul de son score et les modifications de ses ressources temporaires de tour.
+- **`Plateau` :** Gère les piles de cartes disponibles sur la table. Il prend en charge le chargement dynamique de la base de données des cartes depuis le fichier CSV.
+- **`Jeu` :** Orchestre le déroulement global de la partie, alternant les tours des joueurs, gérant la vérification des conditions de fin de jeu et l'affichage des scores finaux.
+
+---
+
+## 📋 Cartes Implémentées dans le Projet
+
+Toutes les caractéristiques des cartes du jeu sont chargées dynamiquement depuis le fichier **`ExcelActionCards.csv`** :
+
+| Type | Nom de la Carte | Coût | Description / Effets |
+| :--- | :--- | :---: | :--- |
+| **Trésor** | Cuivre | 0 | +1 Pièce |
+| **Trésor** | Argent | 3 | +2 Pièces |
+| **Trésor** | Or | 6 | +3 Pièces |
+| **Victoire** | Domaine | 2 | +1 Point de Victoire |
+| **Victoire** | Duché | 5 | +3 Points de Victoire |
+| **Victoire** | Province | 8 | +6 Points de Victoire |
+| **Victoire** | Malédiction | 0 | -1 Point de Victoire |
+| **Action** | Village | 3 | +1 Carte, +2 Actions |
+| **Action** | Bûcheron | 3 | +2 Pièces, +1 Achat |
+| **Action** | Forgeron | 4 | +3 Cartes |
+| **Action** | Marché | 5 | +1 Carte, +1 Action, +1 Achat, +1 Pièce |
+| **Action** | Atelier | 3 | Recevez une carte coûtant jusqu'à 4 pièces. |
+| **Action** | Chapelle | 2 | Écartez (jetez au rebut) jusqu'à 4 cartes de votre main. |
+| **Action** | Rénovation | 4 | Écartez une carte de votre main. Recevez une carte coûtant jusqu'à 2 pièces de plus. |
+| **Action** | Mine | 5 | Écartez une carte Trésor de votre main et gagnez directement en main une carte Trésor coûtant jusqu'à 3 pièces de plus. |
+| **Action** | Vassal | 3 | Défaussez la première carte de votre deck. Si c'est une Action, vous pouvez la jouer. |
+| **Attaque** | Sorcière | 5 | +2 Cartes. Tous les autres joueurs reçoivent une carte Malédiction dans leur défausse. |
+| **Attaque** | Milice | 4 | +2 Pièces. Les autres joueurs doivent défausser des cartes pour n'en garder que 3 en main. |
+| **Attaque** | Voleur | 4 | Révèle les 2 premières cartes du deck des adversaires. Vous pouvez écarter et voler l'une de leurs cartes Trésor. |
+| **Réaction** | Douve | 2 | +2 Cartes. Dévoiler cette carte depuis votre main annule les effets de toute carte Attaque jouée contre vous. |
+
+---
+
+## 🛠️ Compilation et Exécution
+
+### Prérequis
+- Un compilateur C++ supportant au minimum la norme **C++11** (comme `g++`).
+- La bibliothèque **ncurses** installée sur votre système.
+  - **Sur Debian/Ubuntu et dérivés :**
+    ```bash
+    sudo apt-get install libncurses5-dev libncursesw5-dev
+    ```
+  - **Sur macOS (via Homebrew) :**
+    ```bash
+    brew install ncurses
+    ```
+  - **Sur Windows :** Configurez la bibliothèque sous MSYS2, WSL ou MinGW.
+
+### Commandes de Compilation (`Makefile`)
+
+Le projet est livré avec un `Makefile` complet pour faciliter la gestion de l'application :
+
+1. **Compiler le projet :**
+   ```bash
+   make
+   ```
+   ou
+   ```bash
+   make exec
+   ```
+   *Génère les fichiers objets (`.o`) et l'exécutable final nommé `exec`.*
+
+2. **Lancer le jeu :**
+   ```bash
+   make run
+   ```
+
+3. **Lancer en mode Débogage (avec GDB) :**
+   ```bash
+   make debug
+   ```
+
+4. **Nettoyer les fichiers compilés temporaires :**
+   ```bash
+   make clean
+   ```
+
+---
+
+## 📂 Structure du Projet
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/et4-info/dominion-game.git
-git branch -M main
-git push -uf origin main
+Dominion/
+├── Carte.h / Carte.cpp               # Classe de base abstraite représentant une carte
+├── CarteAction.h / CarteAction.cpp   # Cartes d'Action avec effets et bonus
+├── CarteTresor.h / CarteTresor.cpp   # Cartes de Trésor (Cuivre, Argent, Or)
+├── CarteVictoire.h / CarteVictoire.cpp # Cartes de Victoire (Points de score, Malédictions)
+├── Joueur.h / Joueur.cpp             # État du joueur (deck, main, défausse) et actions associées
+├── Plateau.h / Plateau.cpp           # Gestion des piles d'achat du plateau et rendu visuel
+├── Jeu.h / Jeu.cpp                   # Déroulement du jeu, tours et phases de jeu
+├── ExcelActionCards.csv              # Base de données CSV listant toutes les cartes et leurs attributs
+├── test.cpp                          # Point d'entrée de l'application (fonction main)
+├── Makefile                          # Script d'automatisation de la compilation
+├── doctest.h                         # Framework léger de tests unitaires
+└── Saves/                            # Dossier de sauvegarde (état en cours de développement)
 ```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://gitlab.com/et4-info/dominion-game/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
